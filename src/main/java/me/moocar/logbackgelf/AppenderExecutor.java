@@ -42,5 +42,10 @@ public class AppenderExecutor<E> {
         }
     }
 
+  public void close()
+  {
+    transport.close();
+  }
+
 
 }

@@ -14,6 +14,7 @@ public final class Transport
 {
   private final InetAddress _address;
   private final int _port;
+  private DatagramSocket _socket;
 
   public Transport( final InetAddress address, final int port )
   {
@@ -46,30 +47,38 @@ public final class Transport
 
   private void sendPacket( final DatagramPacket datagramPacket )
   {
-    final DatagramSocket datagramSocket = getDatagramSocket();
     try
     {
-      datagramSocket.send( datagramPacket );
+      getSocket().send( datagramPacket );
     }
     catch( final IOException ioe )
     {
       throw new RuntimeException( ioe );
     }
-    finally
-    {
-      datagramSocket.close();
-    }
   }
 
-  private DatagramSocket getDatagramSocket()
+  private DatagramSocket getSocket()
   {
     try
     {
-      return new DatagramSocket();
+      if( null == _socket )
+      {
+        _socket = new DatagramSocket();
+      }
+      return _socket;
     }
     catch( final SocketException se )
     {
       throw new RuntimeException( se );
+    }
+  }
+
+  public void close()
+  {
+    if( null != _socket )
+    {
+      _socket.close();
+      _socket = null;
     }
   }
 }

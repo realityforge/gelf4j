@@ -60,7 +60,18 @@ public class GelfAppender<E> extends AppenderBase<E> {
         initExecutor();
     }
 
-    /**
+  @Override
+  public void stop()
+  {
+    if( null != appenderExecutor )
+    {
+      appenderExecutor.close();
+      appenderExecutor = null;
+    }
+    super.stop();
+  }
+
+  /**
      * This is an ad-hoc dependency injection mechanism. We don't want create all these classes every time a message is
      * logged. They will hang around for the lifetime of the appender.
      */
