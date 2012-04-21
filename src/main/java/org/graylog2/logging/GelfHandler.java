@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.ErrorManager;
@@ -13,9 +12,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
+import me.moocar.logbackgelf.GelfMessage;
 import me.moocar.logbackgelf.GreylogConnection;
 import me.moocar.logbackgelf.SyslogLevel;
-import org.graylog2.GelfMessage;
 
 public class GelfHandler
   extends Handler

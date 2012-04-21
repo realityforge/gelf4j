@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.security.MessageDigest;
 import java.util.List;
 
 /**
@@ -25,8 +24,7 @@ public class GreylogConnection
   {
     _port = port;
     _address = address;
-    final String hostName = InetAddress.getLocalHost().getHostName();
-    _encoder = new GelfEncoder( MessageDigest.getInstance( "MD5" ), hostName );
+    _encoder = new GelfEncoder();
   }
 
   /**

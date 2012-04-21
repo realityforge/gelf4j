@@ -10,7 +10,7 @@ import org.apache.log4j.MDC;
 import org.apache.log4j.NDC;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
-import org.graylog2.GelfMessage;
+import me.moocar.logbackgelf.GelfMessage;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
