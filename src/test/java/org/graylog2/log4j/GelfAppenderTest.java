@@ -33,7 +33,7 @@ public class GelfAppenderTest {
         gelfSender = new TestGelfSender();
 
       gelfAppender = new GelfAppender();
-      final Field field = gelfAppender.getClass().getField( "_connection" );
+      final Field field = gelfAppender.getClass().getDeclaredField( "_connection" );
       field.setAccessible( true );
       field.set( gelfAppender, gelfSender );
     }
@@ -128,7 +128,7 @@ public class GelfAppenderTest {
       @Override
       public boolean send( final me.moocar.logbackgelf.GelfMessage message )
       {
-        this.lastMessage = (GelfMessage) message;
+        this.lastMessage = message;
         return super.send( message );
       }
 
