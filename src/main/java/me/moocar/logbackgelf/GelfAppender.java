@@ -70,7 +70,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             InetAddress address = getInetAddress();
 
-            Transport transport = new Transport(graylog2ServerPort, address);
+            Transport transport = new Transport( address, graylog2ServerPort );
 
             if (graylog2ServerVersion.equals("0.9.6")) {
                 messageIdLength = 8;
