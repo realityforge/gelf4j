@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Responsible for communicating with a graylog2 server
  */
-public final class GreylogConnection
+public class GreylogConnection
 {
   public static final int DEFAULT_PORT = 12201;
   private final GelfEncoder _encoder;
