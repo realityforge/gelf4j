@@ -121,7 +121,7 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
             gelfSender = new GelfSender(graylogHost, graylogPort);
         } catch (UnknownHostException e) {
             errorHandler.error("Unknown Graylog2 hostname:" + getGraylogHost(), e, ErrorCode.WRITE_FAILURE);
-        } catch (SocketException e) {
+        } catch (Exception e) {
             errorHandler.error("Socket exception", e, ErrorCode.WRITE_FAILURE);
         }
     }

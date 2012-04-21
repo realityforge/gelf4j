@@ -1,5 +1,7 @@
 package org.graylog2;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
@@ -9,7 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import me.moocar.logbackgelf.Zipper;
+import java.util.zip.GZIPOutputStream;
 import org.json.simple.JSONValue;
 
 public class GelfMessage {
@@ -53,7 +55,46 @@ public class GelfMessage {
         this.file = file;
     }
 
-    public String toJson() {
+  /**
+   * zips up a string into a GZIP format.
+   *
+   * @param str The string to zip
+   * @return The zipped string
+   */
+  private static byte[] zip( final String str )
+  {
+    GZIPOutputStream zipStream = null;
+    try
+    {
+      final ByteArrayOutputStream targetStream = new ByteArrayOutputStream();
+      zipStream = new GZIPOutputStream( targetStream );
+      zipStream.write( str.getBytes() );
+      zipStream.close();
+      final byte[] zipped = targetStream.toByteArray();
+      targetStream.close();
+      return zipped;
+    }
+    catch( final IOException ioe )
+    {
+      throw new RuntimeException( ioe );
+    }
+    finally
+    {
+      try
+      {
+        if( null != zipStream )
+        {
+          zipStream.close();
+        }
+      }
+      catch( final IOException ioe )
+      {
+        throw new RuntimeException( ioe );
+      }
+    }
+  }
+
+  public String toJson() {
         Map<String, Object> map = new HashMap<String, Object>();
 
         map.put("version", getVersion());
@@ -83,7 +124,7 @@ public class GelfMessage {
     }
 
     public List<byte[]> toDatagrams() {
-        byte[] messageBytes = Zipper.zip( toJson() );
+        byte[] messageBytes = zip( toJson() );
         List<byte[]> datagrams = new ArrayList<byte[]>();
         if (messageBytes.length > MAXIMUM_CHUNK_SIZE) {
             sliceDatagrams(messageBytes, datagrams);

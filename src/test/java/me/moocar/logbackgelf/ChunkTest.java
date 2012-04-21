@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 
 public class ChunkTest {
 
-    private PayloadChunker createsPackets;
+    private GelfEncoder _createsPackets;
     private static final byte[] CHUNKED_GELF_ID = new byte[]{0x1e, 0x0f};
     private static final int CHUNKED_GELF_ID_LENGTH = CHUNKED_GELF_ID.length;
     public final static int SEQ_NUM_LENGTH = 2;
@@ -24,8 +24,8 @@ public class ChunkTest {
 
     @Before
     public void setup() throws NoSuchAlgorithmException {
-        createsPackets =
-          new PayloadChunker( GelfVersion.V1_0,
+        _createsPackets =
+          new GelfEncoder( GelfVersion.V1_0,
                               MessageDigest.getInstance( "MD5" ),
                               "localhost" );
     }
@@ -88,7 +88,7 @@ public class ChunkTest {
     }
 
     private List<byte[]> go(byte[] bytes) {
-        return createsPackets.chunkIt(bytes);
+        return _createsPackets.chunkIt(bytes);
     }
 
     private int getNumChunks(byte[] packet) {

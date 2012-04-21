@@ -130,7 +130,7 @@ public class GelfHandler
       {
         reportError( "Unknown Graylog2 hostname:" + graylogHost, e, ErrorManager.WRITE_FAILURE );
       }
-      catch ( SocketException e )
+      catch ( Exception e )
       {
         reportError( "Socket exception", e, ErrorManager.WRITE_FAILURE );
       }

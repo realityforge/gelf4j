@@ -1,9 +1,8 @@
 package org.graylog2;
 
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.List;
+import me.moocar.logbackgelf.GelfVersion;
 import me.moocar.logbackgelf.GreylogConnection;
 
 public class GelfSender
@@ -12,10 +11,10 @@ public class GelfSender
 
   private final GreylogConnection _connection;
 
-  public GelfSender( String host, int port )
-    throws UnknownHostException, SocketException
+  public GelfSender( final String host, final int port )
+    throws Exception
   {
-    _connection = new GreylogConnection( InetAddress.getByName( host ), port );
+    _connection = new GreylogConnection( GelfVersion.V1_0, InetAddress.getByName( host ), port );
   }
 
   public boolean sendMessage( GelfMessage message )

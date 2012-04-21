@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.security.MessageDigest;
 import java.util.List;
 
 /**
@@ -12,48 +13,64 @@ import java.util.List;
  */
 public final class GreylogConnection
 {
+  private final GelfVersion _version;
   private final InetAddress _address;
   private final int _port;
   private DatagramSocket _socket;
+  private final String _hostName;
+  private final GelfEncoder _encoder;
 
-  public GreylogConnection( final InetAddress address, final int port )
+  public GreylogConnection( final GelfVersion version,
+                            final InetAddress address,
+                            final int port )
+    throws Exception
   {
+    _version = version;
     _port = port;
     _address = address;
+    _hostName = InetAddress.getLocalHost().getHostName();
+    _encoder = new GelfEncoder( version, MessageDigest.getInstance( "MD5" ), _hostName );
   }
 
   /**
-   * Sends a single packet GELF message to the graylog2 server
+   * Sends a single GELF message to the graylog2 server
    *
-   * @param data gzipped GELF Message (JSON)
+   * @param message the GELF Message (JSON)
+   * @return false if sending failed
    */
-  public void send( final byte[] data )
+  public boolean send( final String message )
   {
-    sendPacket( new DatagramPacket( data, data.length, _address, _port ) );
+    return send( _encoder.encode( message ) );
   }
 
   /**
    * Sends a bunch of GELF Chunks to the graylog2 server
    *
    * @param packets The packets to send over the wire
+   * @return false if sending failed
    */
-  public void send( final List<byte[]> packets )
+  public boolean send( final List<byte[]> packets )
   {
     for( final byte[] packet : packets )
     {
-      send( packet );
+      if( !sendPacket( new DatagramPacket( packet, packet.length, _address, _port ) ) )
+      {
+        return false;
+      }
     }
+    return true;
   }
 
-  private void sendPacket( final DatagramPacket datagramPacket )
+  private boolean sendPacket( final DatagramPacket datagramPacket )
   {
     try
     {
       getSocket().send( datagramPacket );
+      return true;
     }
     catch( final IOException ioe )
     {
-      throw new RuntimeException( ioe );
+      return false;
     }
   }
 

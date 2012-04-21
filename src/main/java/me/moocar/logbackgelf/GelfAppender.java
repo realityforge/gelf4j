@@ -2,10 +2,8 @@ package me.moocar.logbackgelf;
 
 import ch.qos.logback.core.AppenderBase;
 import com.google.common.base.Throwables;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +25,8 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
     // The following are hidden (not configurable)
     private int shortMessageLength = 255;
-
-    private AppenderExecutor<E> appenderExecutor;
+  private GreylogConnection _connection;
+  private GelfConverter _gelfConverter;
 
     /**
      * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
@@ -41,7 +39,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
         try {
 
-            appenderExecutor.append(logEvent);
+          _connection.send( _gelfConverter.toGelf(logEvent) );
 
         } catch (RuntimeException e) {
             System.out.println(e.getMessage() + ": " + Throwables.getStackTraceAsString(e));
@@ -59,10 +57,10 @@ public class GelfAppender<E> extends AppenderBase<E> {
   @Override
   public void stop()
   {
-    if( null != appenderExecutor )
+    if( null != _connection )
     {
-      appenderExecutor.close();
-      appenderExecutor = null;
+      _connection.close();
+      _connection = null;
     }
     super.stop();
   }
@@ -77,24 +75,16 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             InetAddress address = getInetAddress();
 
-            final GreylogConnection connection = new GreylogConnection( address, graylog2ServerPort );
+          final GelfVersion version = graylog2ServerVersion.equals( "0.9.6" ) ? GelfVersion.V1_0 : GelfVersion.V0_9;
 
-            final GelfVersion version = graylog2ServerVersion.equals( "0.9.6" ) ? GelfVersion.V1_0 : GelfVersion.V0_9;
+            _connection = new GreylogConnection( version, address, graylog2ServerPort );
 
-            String hostname = InetAddress.getLocalHost().getHostName();
-
-            PayloadChunker payloadChunker =
-              new PayloadChunker( version,
-                                  MessageDigest.getInstance( "MD5" ),
-                                  hostname );
-
-            GelfConverter converter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
-
-            appenderExecutor = new AppenderExecutor<E>( connection, payloadChunker, converter, chunkThreshold);
+            final String hostname = InetAddress.getLocalHost().getHostName();
+            _gelfConverter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
 
         } catch (Exception e) {
 
-            throw new RuntimeException("Error initialising appender appenderExecutor", e);
+            throw new RuntimeException("Error initialising appender gelf connection", e);
         }
     }
 
