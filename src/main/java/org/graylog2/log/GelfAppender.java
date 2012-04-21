@@ -5,7 +5,6 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LoggingEvent;
 import org.graylog2.GelfMessage;
-import org.graylog2.GelfSender;
 import org.json.simple.JSONValue;
 
 import java.net.InetAddress;
@@ -25,7 +24,7 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
     private static String originHost;
     private int graylogPort = GreylogConnection.DEFAULT_PORT;
     private String facility;
-    private GelfSender gelfSender;
+    private GreylogConnection _connection;
     private boolean extractStacktrace;
     private boolean addExtendedInformation;
     private Map<String, String> fields;
@@ -110,7 +109,7 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
     @Override
     public void activateOptions() {
         try {
-            gelfSender = new GelfSender(graylogHost, graylogPort);
+            _connection = new GreylogConnection(InetAddress.getByName( graylogHost ), graylogPort);
         } catch (UnknownHostException e) {
             errorHandler.error("Unknown Graylog2 hostname:" + getGraylogHost(), e, ErrorCode.WRITE_FAILURE);
         } catch (Exception e) {
@@ -122,17 +121,13 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
     protected void append(LoggingEvent event) {
         GelfMessage gelfMessage = GelfMessageFactory.makeMessage(event, this);
 
-        if(getGelfSender() == null || !getGelfSender().sendMessage(gelfMessage)) {
+      if( _connection == null || !_connection.send( gelfMessage )) {
             errorHandler.error("Could not send GELF message");
         }
     }
 
-    public GelfSender getGelfSender() {
-        return gelfSender;
-    }
-
-    public void close() {
-        getGelfSender().close();
+  public void close() {
+    _connection.close();
     }
 
     public boolean requiresLayout() {

@@ -14,8 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import me.moocar.logbackgelf.GreylogConnection;
+import me.moocar.logbackgelf.SyslogLevel;
 import org.graylog2.GelfMessage;
-import org.graylog2.GelfSender;
 
 public class GelfHandler
   extends Handler
@@ -26,7 +26,7 @@ public class GelfHandler
   private String originHost;
   private int graylogPort;
   private String facility;
-  private GelfSender gelfSender;
+  private GreylogConnection _connection;
   private boolean extractStacktrace;
   private Map<String, String> fields;
 
@@ -120,11 +120,11 @@ public class GelfHandler
     {
       return;
     }
-    if ( null == gelfSender )
+    if ( null == _connection )
     {
       try
       {
-        gelfSender = new GelfSender( graylogHost, graylogPort );
+        _connection = new GreylogConnection( InetAddress.getByName( graylogHost ), graylogPort );
       }
       catch ( UnknownHostException e )
       {
@@ -135,8 +135,8 @@ public class GelfHandler
         reportError( "Socket exception", e, ErrorManager.WRITE_FAILURE );
       }
     }
-    if ( null == gelfSender ||
-         !gelfSender.sendMessage( makeMessage( record ) ) )
+    if ( null == _connection ||
+         !_connection.send( makeMessage( record ) ) )
     {
       reportError( "Could not send GELF message", null, ErrorManager.WRITE_FAILURE );
     }
@@ -145,10 +145,10 @@ public class GelfHandler
   @Override
   public void close()
   {
-    if ( null != gelfSender )
+    if ( null != _connection )
     {
-      gelfSender.close();
-      gelfSender = null;
+      _connection.close();
+      _connection = null;
     }
   }
 
@@ -177,11 +177,11 @@ public class GelfHandler
       }
     }
 
-    final GelfMessage gelfMessage =
-      new GelfMessage( shortMessage,
-                       message,
-                       new Date( record.getMillis() ),
-                       String.valueOf( levelToSyslogLevel( record.getLevel() ) ) );
+    final GelfMessage gelfMessage = new GelfMessage();
+    gelfMessage.setShortMessage( shortMessage );
+    gelfMessage.setFullMessage( message );
+    gelfMessage.setJavaTimestamp( record.getMillis() );
+    gelfMessage.setLevel( SyslogLevel.values()[levelToSyslogLevel( record.getLevel() )] );
     gelfMessage.getAdditionalFields().put( "SourceClassName", record.getSourceClassName() );
 
     gelfMessage.getAdditionalFields().put( "SourceMethodName", record.getSourceMethodName() );

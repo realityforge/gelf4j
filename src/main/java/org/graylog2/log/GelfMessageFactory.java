@@ -3,6 +3,7 @@ package org.graylog2.log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
+import me.moocar.logbackgelf.SyslogLevel;
 import org.apache.log4j.Level;
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LocationInfo;
@@ -59,10 +60,14 @@ final class GelfMessageFactory {
             }
         }
         
-        GelfMessage gelfMessage =
-          new GelfMessage(shortMessage, renderedMessage, timeStamp,
-                                                  String.valueOf(level.getSyslogEquivalent()), lineNumber, file);
-        
+        final GelfMessage gelfMessage = new GelfMessage();
+        gelfMessage.setShortMessage( shortMessage );
+        gelfMessage.setFullMessage( renderedMessage );
+        gelfMessage.setJavaTimestamp( timeStamp );
+        gelfMessage.setLevel( SyslogLevel.values()[level.getSyslogEquivalent()] );
+        gelfMessage.setLine( lineNumber );
+        gelfMessage.setFile( file );
+
         if (provider.getOriginHost() != null) {
             gelfMessage.setHostname( provider.getOriginHost() );
         }

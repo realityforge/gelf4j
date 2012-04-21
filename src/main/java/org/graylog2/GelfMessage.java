@@ -7,18 +7,15 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
-import me.moocar.logbackgelf.SyslogLevel;
 import org.json.simple.JSONValue;
 
 public class GelfMessage
   extends me.moocar.logbackgelf.GelfMessage
 {
-
   private static final String ID_NAME = "id";
   private static final String GELF_VERSION = "1.0";
   private static final byte[] GELF_CHUNKED_ID = new byte[]{ 0x1e, 0x0f };
@@ -26,28 +23,6 @@ public class GelfMessage
   private static final BigDecimal TIME_DIVISOR = new BigDecimal( 1000 );
 
   private byte[] hostBytes = lastFourAsciiBytes( "none" );
-
-  public GelfMessage()
-  {
-  }
-
-  public GelfMessage( String shortMessage, String fullMessage, Date timestamp, String level )
-  {
-    setShortMessage( shortMessage );
-    setFullMessage( fullMessage );
-    setJavaTimestamp( timestamp.getTime() );
-    setLevel( SyslogLevel.valueOf( level ) );
-  }
-
-  public GelfMessage( String shortMessage, String fullMessage, Long timestamp, String level, int line, String file )
-  {
-    setShortMessage( shortMessage );
-    setFullMessage( fullMessage );
-    setJavaTimestamp( timestamp );
-    setLevel( SyslogLevel.valueOf( level ) );
-    setLine( line );
-    setFile( file );
-  }
 
   /**
    * zips up a string into a GZIP format.

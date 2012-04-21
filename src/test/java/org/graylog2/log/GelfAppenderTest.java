@@ -1,5 +1,9 @@
 package org.graylog2.log;
 
+import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import me.moocar.logbackgelf.GreylogConnection;
 import org.apache.log4j.Category;
 import org.apache.log4j.MDC;
@@ -7,13 +11,8 @@ import org.apache.log4j.NDC;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 import org.graylog2.GelfMessage;
-import org.graylog2.GelfSender;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.net.SocketException;
-import java.net.UnknownHostException;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
@@ -31,20 +30,12 @@ public class GelfAppenderTest {
 
     @Before
     public void setUp() throws Exception {
-        gelfSender = new TestGelfSender("localhost");
+        gelfSender = new TestGelfSender();
 
-        gelfAppender = new GelfAppender() {
-
-            @Override
-            public GelfSender getGelfSender() {
-                return gelfSender;
-            }
-
-            @Override
-            public void append(LoggingEvent event) {
-                super.append(event);
-            }
-        };
+      gelfAppender = new GelfAppender();
+      final Field field = gelfAppender.getClass().getField( "_connection" );
+      field.setAccessible( true );
+      field.set( gelfAppender, gelfSender );
     }
 
     @Test
@@ -126,19 +117,20 @@ public class GelfAppenderTest {
       assertEquals( gelfSender.getLastMessage().getAdditionalFields().get( "logger" ), CLASS_NAME);
     }
 
-    private class TestGelfSender extends GelfSender {
+    private class TestGelfSender extends GreylogConnection {
 
         private GelfMessage lastMessage;
 
-        public TestGelfSender(String host) throws Exception {
-            super(host, GreylogConnection.DEFAULT_PORT);
+        public TestGelfSender() throws Exception {
+            super( InetAddress.getLocalHost(), GreylogConnection.DEFAULT_PORT);
         }
 
-        @Override
-        public boolean sendMessage(GelfMessage message) {
-            this.lastMessage = message;
-            return true;
-        }
+      @Override
+      public boolean send( final me.moocar.logbackgelf.GelfMessage message )
+      {
+        this.lastMessage = (GelfMessage) message;
+        return super.send( message );
+      }
 
         public GelfMessage getLastMessage() {
             return lastMessage;

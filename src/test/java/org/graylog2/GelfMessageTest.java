@@ -1,5 +1,6 @@
 package org.graylog2;
 
+import me.moocar.logbackgelf.SyslogLevel;
 import org.json.simple.JSONValue;
 import org.junit.Test;
 
@@ -14,7 +15,11 @@ public class GelfMessageTest {
 
     @Test
     public void testAdditionalFieldsIds() throws Exception {
-        GelfMessage message = new GelfMessage("Short", "Long", new Date(), "1");
+        final GelfMessage message = new GelfMessage();
+      message.setShortMessage( "Short" );
+      message.setFullMessage( "Long" );
+      message.setJavaTimestamp( System.currentTimeMillis() );
+      message.setLevel( SyslogLevel.ALERT );
       message.getAdditionalFields().put( "id", "LOLCAT" );
 
       message.getAdditionalFields().put( "id", "LOLCAT" );
@@ -34,7 +39,11 @@ public class GelfMessageTest {
         for (int i = 0; i < 15; i++) {
             longString += longString;
         }
-        GelfMessage message = new GelfMessage("Long", longString, new Date(), "1");
+        final GelfMessage message = new GelfMessage();
+        message.setShortMessage( "Short" );
+        message.setFullMessage( longString );
+        message.setJavaTimestamp( System.currentTimeMillis() );
+        message.setLevel( SyslogLevel.ALERT );
         List<byte[]> bytes2 = message.toDatagrams();
         assertEquals(2, bytes2.size());
         assertTrue(Arrays.equals(Arrays.copyOfRange(bytes2.get(0), 10, 11), new byte[] {0x00}));
@@ -45,7 +54,11 @@ public class GelfMessageTest {
 
     @Test
     public void testSimpleMessage() throws Exception {
-        GelfMessage message = new GelfMessage("Short", "Long", new Date(), "1");
+        final GelfMessage message = new GelfMessage();
+        message.setShortMessage( "Short" );
+        message.setFullMessage( "Long" );
+        message.setJavaTimestamp( System.currentTimeMillis() );
+        message.setLevel( SyslogLevel.ALERT );
         List<byte[]> bytes = message.toDatagrams();
         assertEquals(1, bytes.size());
     }
