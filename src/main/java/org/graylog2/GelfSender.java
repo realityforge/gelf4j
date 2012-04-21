@@ -4,18 +4,18 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
-import me.moocar.logbackgelf.Transport;
+import me.moocar.logbackgelf.GreylogConnection;
 
 public class GelfSender
 {
   public static final int DEFAULT_PORT = 12201;
 
-  private final Transport transport;
+  private final GreylogConnection _connection;
 
   public GelfSender( String host, int port )
     throws UnknownHostException, SocketException
   {
-    transport = new Transport( InetAddress.getByName( host ), port );
+    _connection = new GreylogConnection( InetAddress.getByName( host ), port );
   }
 
   public boolean sendMessage( GelfMessage message )
@@ -27,7 +27,7 @@ public class GelfSender
   {
     try
     {
-      transport.send( bytesList );
+      _connection.send( bytesList );
       return true;
     }
     catch( final Throwable t )
@@ -38,6 +38,6 @@ public class GelfSender
 
   public void close()
   {
-    transport.close();
+    _connection.close();
   }
 }

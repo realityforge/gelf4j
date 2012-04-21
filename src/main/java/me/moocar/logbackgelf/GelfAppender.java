@@ -81,7 +81,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             InetAddress address = getInetAddress();
 
-            Transport transport = new Transport( address, graylog2ServerPort );
+            final GreylogConnection connection = new GreylogConnection( address, graylog2ServerPort );
 
             if (graylog2ServerVersion.equals("0.9.6")) {
                 messageIdLength = 8;
@@ -96,7 +96,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             GelfConverter converter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
 
-            appenderExecutor = new AppenderExecutor<E>(transport, payloadChunker, converter, chunkThreshold);
+            appenderExecutor = new AppenderExecutor<E>( connection, payloadChunker, converter, chunkThreshold);
 
         } catch (Exception e) {
 

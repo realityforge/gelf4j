@@ -5,16 +5,16 @@ package me.moocar.logbackgelf;
  */
 public class AppenderExecutor<E> {
 
-    private final Transport transport;
+    private final GreylogConnection _connection;
     private final PayloadChunker payloadChunker;
     private final GelfConverter gelfConverter;
     private final int chunkThreshold;
 
-    public AppenderExecutor(Transport transport,
+    public AppenderExecutor(GreylogConnection connection,
                             PayloadChunker payloadChunker,
                             GelfConverter gelfConverter,
                             int chunkThreshold) {
-        this.transport = transport;
+        this._connection = connection;
         this.payloadChunker = payloadChunker;
         this.gelfConverter = gelfConverter;
         this.chunkThreshold = chunkThreshold;
@@ -33,18 +33,19 @@ public class AppenderExecutor<E> {
         // If we can fit all the information into one packet, then just send it
         if (payload.length < chunkThreshold) {
 
-            transport.send(payload);
+            _connection.send( payload );
 
         // If the message is too long, then slice it up and send multiple packets
-        } else {
+        }
+        else {
 
-            transport.send(payloadChunker.chunkIt(payload));
+            _connection.send( payloadChunker.chunkIt( payload ) );
         }
     }
 
   public void close()
   {
-    transport.close();
+    _connection.close();
   }
 
 
