@@ -1,11 +1,7 @@
-.idea/**/*
-.idea/*
-.gradle/**/*
-.gradle/*
-out/**/*
-out/*
-lib/*
-build/**/*
-build/*
+.idea
+target
 *.iml
-target/**
+*.ipr
+*.iws
+.idea/
+*~
