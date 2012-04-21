@@ -1,5 +1,8 @@
 package org.graylog2.log;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LocationInfo;
@@ -7,13 +10,8 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfMessageProvider;
-import org.graylog2.log.Log4jVersionChecker;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Map;
-
-public class GelfMessageFactory {
+final class GelfMessageFactory {
     private static final int MAX_SHORT_MESSAGE_LENGTH = 250;
     private static final String ORIGIN_HOST_KEY = "originHost";
     private static final String LOGGER_NAME = "logger";
@@ -21,7 +19,7 @@ public class GelfMessageFactory {
     private static final String THREAD_NAME = "thread";
     private static final String JAVA_TIMESTAMP = "timestampMs";
     
-    public static final GelfMessage makeMessage(LoggingEvent event, GelfMessageProvider provider) {
+    public static GelfMessage makeMessage(LoggingEvent event, GelfMessageProvider provider) {
         long timeStamp = Log4jVersionChecker.getTimeStamp(event);
         Level level = event.getLevel();
 
@@ -91,7 +89,7 @@ public class GelfMessageFactory {
           gelfMessage.getAdditionalFields().put( JAVA_TIMESTAMP, Long.toString(gelfMessage.getJavaTimestamp()) );
 
           // Get MDC and add a GELF field for each key/value pair
-            Map<String, Object> mdc = MDC.getContext();
+            @SuppressWarnings( "unchecked" ) Map<String, Object> mdc = (Map<String, Object>) MDC.getContext();
 
             if(mdc != null) {
                 for(Map.Entry<String, Object> entry : mdc.entrySet()) {

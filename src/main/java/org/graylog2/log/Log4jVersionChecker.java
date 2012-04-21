@@ -10,12 +10,12 @@ import java.lang.reflect.Method;
  * @author Anton Yakimov
  * @author Jochen Schalanda
  */
-public class Log4jVersionChecker {
+final class Log4jVersionChecker {
 
     private static boolean hasGetTimeStamp = true;
     private static Method methodGetTimeStamp = null;
 
-    public static long getTimeStamp(LoggingEvent event) {
+    static long getTimeStamp(LoggingEvent event) {
 
         long timeStamp = System.currentTimeMillis();
 
