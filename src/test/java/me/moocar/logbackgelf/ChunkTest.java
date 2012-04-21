@@ -1,97 +1,115 @@
 package me.moocar.logbackgelf;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class ChunkTest {
+public class ChunkTest
+{
+  @Test
+  public void test1ByteMoreThanThreshold()
+    throws Exception
+  {
+    final int byteCount = GelfEncoder.PAYLOAD_THRESHOLD + 1;
 
-    private GelfEncoder _createsPackets;
-    private static final byte[] CHUNKED_GELF_ID = new byte[]{0x1e, 0x0f};
-    private static final int CHUNKED_GELF_ID_LENGTH = CHUNKED_GELF_ID.length;
-    public final static int SEQ_NUM_LENGTH = 2;
-    public final static int SEQ_LENGTH = 2;
-    public final static int MESSAGE_ID_LENGTH = 8;
-    private static final int HEADER_LENGTH = CHUNKED_GELF_ID_LENGTH + MESSAGE_ID_LENGTH + SEQ_NUM_LENGTH + SEQ_LENGTH;
-    private static final int DEFAULT_THRESHOLD = 3;
-    private static final int MAX_CHUNKS = 127;
+    final List<byte[]> packets = encoder().encode( createGelfMessage( byteCount ) );
+    assertNotNull( packets );
+    assertEquals( 2, packets.size() );
 
-    @Before
-    public void setup() throws NoSuchAlgorithmException {
-        _createsPackets =
-          new GelfEncoder( MessageDigest.getInstance( "MD5" ), "localhost" );
+    final byte[] packet1 = packets.get( 0 );
+    assertEquals( GelfEncoder.HEADER_SIZE + GelfEncoder.PAYLOAD_THRESHOLD, packet1.length );
+    assertEquals( GelfEncoder.HEADER_SIZE + 1, packets.get( 1 ).length );
+
+    assertArrayEquals( GelfEncoder.CHUNKED_GELF_ID, Arrays.copyOfRange( packet1, 0, GelfEncoder.CHUNKED_GELF_ID.length ) );
+
+    int count = 0;
+    for( final byte[] packet : packets )
+    {
+      assertEquals( count, getSeqNumber( packets, count ) );
+      assertEquals( 2, getNumChunks( packet ) );
+      count++;
     }
 
-    @Test
-    public void test1ByteMoreThanThreshold() {
-        List<byte[]> packets = go(new byte[]{1,2,3,4,5});
+  }
 
-        assertEquals(2, packets.size());
+  @Test
+  public void testThreeChunks()
+    throws Exception
+  {
+    final int byteCount = 3 * GelfEncoder.PAYLOAD_THRESHOLD;
 
-        byte[] firstPacket = packets.get(0);
-        assertTrue(DEFAULT_THRESHOLD != firstPacket.length);
-        assertEquals(DEFAULT_THRESHOLD + HEADER_LENGTH, firstPacket.length);
+    final List<byte[]> packets = encoder().encode( createGelfMessage( byteCount ) );
+    assertNotNull( packets );
+    assertEquals( 3, packets.size() );
 
-        assertArrayEquals(CHUNKED_GELF_ID, Arrays.copyOfRange(firstPacket, 0, CHUNKED_GELF_ID_LENGTH));
-
-        int count = 0;
-        for(byte[] packet : packets) {
-            assertEquals(count, getSeqNumber(packets, count));
-            assertEquals(2, getNumChunks(packet));
-            count++;
-        }
-
+    for( final byte[] packet : packets )
+    {
+      assertEquals( GelfEncoder.PAYLOAD_THRESHOLD + GelfEncoder.HEADER_SIZE, packet.length );
     }
+  }
 
-    @Test
-    public void testThreeChunks() {
-        List<byte[]> packets = go(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9});
+  @Test
+  public void testMessageIdsDifferent()
+    throws Exception
+  {
+    final List<byte[]> packets1 = encoder().encode( createGelfMessage( 1 ) );
+    final List<byte[]> packets2 = encoder().encode( createGelfMessage( 1 ) );
 
-        assertEquals(3, packets.size());
+    byte[] messageId1 = Arrays.copyOfRange( packets1.get( 0 ), 2, 10 );
+    byte[] messageId2 = Arrays.copyOfRange( packets2.get( 0 ), 2, 10 );
 
-        for(byte[] packet : packets) {
-            assertEquals(DEFAULT_THRESHOLD + HEADER_LENGTH, packet.length);
-        }
+    assertFalse( Arrays.equals( messageId1, messageId2 ) );
+  }
+
+  @Test
+  public void shouldCutoffAfterMaxChunks()
+    throws Exception
+  {
+    final int byteCount = ( GelfEncoder.MAX_SEQ_NUMBER + 2 ) * GelfEncoder.PAYLOAD_THRESHOLD;
+
+    final List<byte[]> packets = encoder().encode( createGelfMessage( byteCount ) );
+    assertNull( packets );
+  }
+
+  private GelfMessage createGelfMessage( final int byteCount )
+  {
+    final GelfMessage message = new GelfMessage();
+    message.setShortMessage( "X" );
+    message.setFullMessage( createMessage( byteCount ) );
+    return message;
+  }
+
+  private String createMessage( final int byteCount )
+  {
+    final StringBuilder sb = new StringBuilder();
+    for( int i = 0; i < byteCount; i++ )
+    {
+      sb.append( "z" );
     }
+    return sb.toString();
+  }
 
-    @Test
-    public void testMessageIdsDifferent() {
-        List<byte[]> packets1 = go(new byte[]{1,2,3,4,5,6});
-        List<byte[]> packets2 = go(new byte[]{1, 2, 3, 4, 5, 6});
+  private int getNumChunks( byte[] packet )
+  {
+    return packet[ GelfEncoder.CHUNKED_GELF_ID.length +
+                   GelfEncoder.MESSAGE_ID_LENGTH +
+                   GelfEncoder.SEQUENCE_LENGTH +
+                   GelfEncoder.SEQUENCE_LENGTH -
+                   1 ];
+  }
 
-        byte[] messageId1 = Arrays.copyOfRange(packets1.get(0), 2, 10);
-        byte[] messageId2 = Arrays.copyOfRange(packets2.get(0), 2, 10);
+  private int getSeqNumber( List<byte[]> packets, int packetNum )
+  {
+    return packets.get( packetNum )[ GelfEncoder.CHUNKED_GELF_ID.length +
+                                     GelfEncoder.MESSAGE_ID_LENGTH +
+                                     GelfEncoder.SEQUENCE_LENGTH -
+                                     1 ];
+  }
 
-        assertFalse(Arrays.equals(messageId1, messageId2));
-    }
-
-    @Test
-    public void shouldCutoffAfterMaxChunks() {
-        byte[] payload = createMassivePayload();
-        List<byte[]> packets = go(payload);
-
-        assertEquals(MAX_CHUNKS, packets.size());
-    }
-
-    private byte[] createMassivePayload() {
-        byte[] massiveArray = new byte[(MAX_CHUNKS + 2) * DEFAULT_THRESHOLD];
-        Arrays.fill(massiveArray, (byte)9);
-        return massiveArray;
-    }
-
-    private List<byte[]> go(byte[] bytes) {
-        return _createsPackets.chunkIt(bytes);
-    }
-
-    private int getNumChunks(byte[] packet) {
-        return packet[CHUNKED_GELF_ID.length + MESSAGE_ID_LENGTH + SEQ_NUM_LENGTH + SEQ_LENGTH - 1];
-    }
-
-    private int getSeqNumber(List<byte[]> packets, int packetNum) {
-        return packets.get(packetNum)[CHUNKED_GELF_ID.length + MESSAGE_ID_LENGTH + SEQ_NUM_LENGTH - 1];
-    }
+  private GelfEncoder encoder()
+    throws Exception
+  {
+    return new GelfEncoder();
+  }
 }

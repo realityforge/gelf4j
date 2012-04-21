@@ -20,16 +20,16 @@ import org.json.simple.JSONValue;
  */
 public final class GelfEncoder
 {
-  private static final String ID_NAME = "id";
-  private static final String GELF_VERSION = "1.0";
-  private static final int ID_LENGTH = 8;
-  private static final int SEQUENCE_LENGTH = 1;
-  private static final byte[] CHUNKED_GELF_ID = new byte[]{ 0x1e, 0x0f };
-  private static final int HEADER_SIZE =
-    CHUNKED_GELF_ID.length + ID_LENGTH + SEQUENCE_LENGTH + SEQUENCE_LENGTH;
-  private static final int MAX_PACKET_SIZE = 1024;
-  private static final int PAYLOAD_THRESHOLD = MAX_PACKET_SIZE - HEADER_SIZE;
-  private static final int MAX_SEQ_NUMBER = Byte.MAX_VALUE;
+  static final String ID_NAME = "id";
+  static final String GELF_VERSION = "1.0";
+  static final int MESSAGE_ID_LENGTH = 8;
+  static final int SEQUENCE_LENGTH = 1;
+  static final byte[] CHUNKED_GELF_ID = new byte[]{ 0x1e, 0x0f };
+  static final int HEADER_SIZE =
+    CHUNKED_GELF_ID.length + MESSAGE_ID_LENGTH + SEQUENCE_LENGTH + SEQUENCE_LENGTH;
+  static final int MAX_PACKET_SIZE = 1024;
+  static final int PAYLOAD_THRESHOLD = MAX_PACKET_SIZE - HEADER_SIZE;
+  static final int MAX_SEQ_NUMBER = Byte.MAX_VALUE;
 
   private static final BigDecimal TIME_DIVISOR = new BigDecimal( 1000 );
   private static final String DEFAULT_FACILITY = "GELF";
@@ -132,7 +132,7 @@ public final class GelfEncoder
     // selecting the first x bytes of the result
     final String timestamp = String.valueOf( System.nanoTime() );
     final byte[] digestString = ( _hostname + timestamp ).getBytes();
-    return Arrays.copyOf( _messageDigest.digest( digestString ), ID_LENGTH );
+    return Arrays.copyOf( _messageDigest.digest( digestString ), MESSAGE_ID_LENGTH );
   }
 
   /**
