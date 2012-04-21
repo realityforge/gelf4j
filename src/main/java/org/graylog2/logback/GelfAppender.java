@@ -6,11 +6,11 @@ import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.util.LevelToSyslogSeverity;
 import ch.qos.logback.core.AppenderBase;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Map;
 import org.graylog2.GelfConnection;
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfMessageUtil;
+import org.graylog2.GelfTargetConfig;
 import org.graylog2.SyslogLevel;
 
 /**
@@ -19,16 +19,7 @@ import org.graylog2.SyslogLevel;
  */
 public class GelfAppender<E> extends AppenderBase<E>
 {
-  // The following are configurable via logback configuration
-  private String _facility;
-  private String _graylog2ServerHost = "localhost";
-  private int _graylog2ServerPort = GelfConnection.DEFAULT_PORT;
-  private boolean _useLoggerName = false;
-  private boolean _useThreadName = false;
-  private Map<String, String> _additionalFields = new HashMap<String, String>();
-
-  // The following are hidden (not configurable)
-  private String _hostname;
+  private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
 
   /**
@@ -57,8 +48,7 @@ public class GelfAppender<E> extends AppenderBase<E>
     super.start();
     try
     {
-      _connection = new GelfConnection( InetAddress.getByName( _graylog2ServerHost ), _graylog2ServerPort );
-      _hostname = InetAddress.getLocalHost().getHostName();
+      _connection = new GelfConnection( InetAddress.getByName( _config.getHost() ), _config.getPort() );
     }
     catch( final Exception e )
     {
@@ -77,71 +67,34 @@ public class GelfAppender<E> extends AppenderBase<E>
     super.stop();
   }
 
-  /**
-   * The name of your service. Appears in facility column in graylog2-web-interface
-   */
   public String getFacility()
   {
-    return _facility;
+    return _config.getFacility();
   }
 
   public void setFacility( final String facility )
   {
-    _facility = facility;
+    _config.setFacility( facility );
   }
 
-  /**
-   * The hostname of the graylog2 server to send messages to
-   */
   public String getGraylog2ServerHost()
   {
-    return _graylog2ServerHost;
+    return _config.getHost();
   }
 
   public void setGraylog2ServerHost( final String graylog2ServerHost )
   {
-    _graylog2ServerHost = graylog2ServerHost;
+    _config.setHost( graylog2ServerHost );
   }
 
-  /**
-   * The port of the graylog2 server to send messages to
-   */
   public int getGraylog2ServerPort()
   {
-    return _graylog2ServerPort;
+    return _config.getPort();
   }
 
   public void setGraylog2ServerPort( final int graylog2ServerPort )
   {
-    _graylog2ServerPort = graylog2ServerPort;
-  }
-
-  /**
-   * If true, an additional field call "_loggerName" will be added to each gelf message. Its contents will be the
-   * fully qualified name of the logger. e.g: com.company.Thingo.
-   */
-  public boolean isUseLoggerName()
-  {
-    return _useLoggerName;
-  }
-
-  public void setUseLoggerName( final boolean useLoggerName )
-  {
-    _useLoggerName = useLoggerName;
-  }
-
-  /**
-   * If true, an additional field call "_threadName" will be added to each gelf message. Its contents will be the
-   * Name of the thread. Defaults to "false".
-   */
-  public boolean isUseThreadName()
-  {
-    return _useThreadName;
-  }
-
-  public void setUseThreadName( final boolean useThreadName )
-  {
-    _useThreadName = useThreadName;
+    _config.setPort( graylog2ServerPort );
   }
 
   /**
@@ -155,12 +108,7 @@ public class GelfAppender<E> extends AppenderBase<E>
    */
   public Map<String, String> getAdditionalFields()
   {
-    return _additionalFields;
-  }
-
-  public void setAdditionalFields( final Map<String, String> additionalFields )
-  {
-    _additionalFields = additionalFields;
+    return _config.getAdditionalFields();
   }
 
   /**
@@ -180,7 +128,7 @@ public class GelfAppender<E> extends AppenderBase<E>
                                           + "key, and value is the GELF field name. But found '" + keyValue + "' instead." );
     }
 
-    _additionalFields.put( splitted[ 0 ], splitted[ 1 ] );
+    _config.getAdditionalFields().put( splitted[ 0 ], splitted[ 1 ] );
   }
 
   /**
@@ -194,8 +142,8 @@ public class GelfAppender<E> extends AppenderBase<E>
     final ILoggingEvent event = (ILoggingEvent) logEvent;
 
     final GelfMessage message = new GelfMessage();
-    message.setFacility( _facility );
-    message.setHostname( _hostname );
+    message.setHostname( _config.getOriginHost() );
+    message.setFacility( _config.getFacility() );
     message.setJavaTimestamp( event.getTimeStamp() );
     message.setLevel( SyslogLevel.values()[ LevelToSyslogSeverity.convert( event ) ] );
 
@@ -216,28 +164,33 @@ public class GelfAppender<E> extends AppenderBase<E>
       message.setShortMessage( GelfMessageUtil.truncateShortMessage( formattedMessage ) );
     }
 
-    if( _useLoggerName )
-    {
-      message.getAdditionalFields().put( "_loggerName", event.getLoggerName() );
-    }
-
-    if( _useThreadName )
-    {
-      message.getAdditionalFields().put( "_threadName", event.getThreadName() );
-    }
-
     final Map<String, String> mdc = event.getMDCPropertyMap();
-    if( null != mdc )
+    for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
     {
-      for( final String key : _additionalFields.keySet() )
+      final String fieldName = entry.getKey();
+      final String key = entry.getKey();
+      if( GelfTargetConfig.FIELD_LOGGER_NAME.equals( fieldName ) )
       {
-        String field = mdc.get( key );
-        if( field != null )
+        message.getAdditionalFields().put( key, event.getLoggerName() );
+      }
+      else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, event.getThreadName() );
+      }
+      else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, message.getJavaTimestamp() );
+      }
+      else if( null != mdc )
+      {
+        final String value = mdc.get( key );
+        if( null != value )
         {
-          message.getAdditionalFields().put( _additionalFields.get( key ), field );
+          message.getAdditionalFields().put( key, value );
         }
       }
     }
+    message.getAdditionalFields().putAll( _config.getAdditionalData() );
 
     return message;
   }
