@@ -48,7 +48,7 @@ final class GelfEncoder
    */
   List<byte[]> encode( final String message )
   {
-    final byte[] encodedPayload = zip( message );
+    final byte[] encodedPayload = gzip( message );
     return null == encodedPayload ? null : createChunks( generateMessageID(), splitPayload( encodedPayload ) );
   }
 
@@ -173,27 +173,19 @@ final class GelfEncoder
   }
 
   /**
-   * Returns an array of sequence numbers for each chunk.
+   * Compresses a string using the GZIP compression scheme.
    *
-   * @param seqNum    The Sequence Number
-   * @param numChunks The number of chunks that will be sent
-   * @return An array of sequence numbers for each chunk.
+   * @param message The message to compress.
+   * @return The encoded message.
    */
-
-  /**
-   * zips up a string into a GZIP format.
-   *
-   * @param str The string to zip
-   * @return The zipped string
-   */
-  private byte[] zip( final String str )
+  private byte[] gzip( final String message )
   {
     GZIPOutputStream zipStream = null;
     try
     {
       final ByteArrayOutputStream targetStream = new ByteArrayOutputStream();
       zipStream = new GZIPOutputStream( targetStream );
-      zipStream.write( str.getBytes() );
+      zipStream.write( message.getBytes() );
       zipStream.close();
       final byte[] zipped = targetStream.toByteArray();
       targetStream.close();
