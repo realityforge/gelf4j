@@ -27,10 +27,6 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
     // The following are hidden (not configurable)
     private int shortMessageLength = 255;
-    private static final int maxChunks = 127;
-    private int messageIdLength = 32;
-    private boolean padSeq = true;
-    private final byte[] chunkedGelfId = new byte[]{0x1e, 0x0f};
 
     private AppenderExecutor<E> appenderExecutor;
 
@@ -83,16 +79,14 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             final GreylogConnection connection = new GreylogConnection( address, graylog2ServerPort );
 
-            if (graylog2ServerVersion.equals("0.9.6")) {
-                messageIdLength = 8;
-                padSeq = false;
-            }
+            final GelfVersion version = graylog2ServerVersion.equals( "0.9.6" ) ? GelfVersion.V1_0 : GelfVersion.V0_9;
 
             String hostname = InetAddress.getLocalHost().getHostName();
 
-            PayloadChunker payloadChunker = new PayloadChunker(chunkThreshold, maxChunks,
-                    new MessageIdProvider(messageIdLength, MessageDigest.getInstance("MD5"), hostname),
-                    new ChunkFactory(chunkedGelfId, padSeq));
+            PayloadChunker payloadChunker =
+              new PayloadChunker( version,
+                                  MessageDigest.getInstance( "MD5" ),
+                                  hostname );
 
             GelfConverter converter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
 

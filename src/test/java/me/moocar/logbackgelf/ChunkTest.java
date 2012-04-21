@@ -24,7 +24,10 @@ public class ChunkTest {
 
     @Before
     public void setup() throws NoSuchAlgorithmException {
-        createsPackets = new PayloadChunker(DEFAULT_THRESHOLD, MAX_CHUNKS, new MessageIdProvider(MESSAGE_ID_LENGTH, MessageDigest.getInstance("MD5"), "localhost"), new ChunkFactory(CHUNKED_GELF_ID, true));
+        createsPackets =
+          new PayloadChunker( GelfVersion.V1_0,
+                              MessageDigest.getInstance( "MD5" ),
+                              "localhost" );
     }
 
     @Test
