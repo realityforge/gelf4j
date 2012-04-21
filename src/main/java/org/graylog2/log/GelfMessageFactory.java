@@ -9,7 +9,6 @@ import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
 import org.graylog2.GelfMessage;
-import org.graylog2.GelfMessageProvider;
 
 final class GelfMessageFactory {
     private static final int MAX_SHORT_MESSAGE_LENGTH = 250;

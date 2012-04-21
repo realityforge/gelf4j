@@ -4,7 +4,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.graylog2.GelfMessage;
-import org.graylog2.GelfMessageProvider;
 import org.json.simple.JSONValue;
 
 import java.util.Collections;
