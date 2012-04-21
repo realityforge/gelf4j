@@ -18,7 +18,7 @@ final class GelfMessageFactory {
     private static final String LOGGER_NDC = "loggerNdc";
     private static final String THREAD_NAME = "thread";
     private static final String JAVA_TIMESTAMP = "timestampMs";
-    
+
     public static GelfMessage makeMessage(LoggingEvent event, GelfMessageProvider provider) {
         long timeStamp = Log4jVersionChecker.getTimeStamp(event);
         Level level = event.getLevel();
@@ -59,14 +59,20 @@ final class GelfMessageFactory {
                 renderedMessage += "\n\r" + extractStacktrace(throwableInformation);
             }
         }
-        
+
         final GelfMessage gelfMessage = new GelfMessage();
         gelfMessage.setShortMessage( shortMessage );
         gelfMessage.setFullMessage( renderedMessage );
         gelfMessage.setJavaTimestamp( timeStamp );
         gelfMessage.setLevel( SyslogLevel.values()[ level.getSyslogEquivalent() ] );
-        gelfMessage.setLine( lineNumber );
-        gelfMessage.setFile( file );
+        if( null != lineNumber )
+        {
+          gelfMessage.setLine( lineNumber );
+        }
+        if( null != file )
+        {
+          gelfMessage.setFile( file );
+        }
 
         if (provider.getOriginHost() != null) {
             gelfMessage.setHostname( provider.getOriginHost() );
@@ -115,7 +121,7 @@ final class GelfMessageFactory {
 
         return gelfMessage;
     }
-    
+
     private static String extractStacktrace(ThrowableInformation throwableInformation) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
