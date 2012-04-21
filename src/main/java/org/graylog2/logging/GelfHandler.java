@@ -91,20 +91,6 @@ public class GelfHandler
   {
   }
 
-  private String getLocalHostName()
-  {
-    try
-    {
-      return InetAddress.getLocalHost().getHostName();
-    }
-    catch( final UnknownHostException uhe )
-    {
-      reportError( "Unknown local hostname", uhe, ErrorManager.GENERIC_FAILURE );
-    }
-
-    return null;
-  }
-
   @Override
   public synchronized void publish( final LogRecord record )
   {
