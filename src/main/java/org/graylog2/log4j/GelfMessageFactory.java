@@ -2,6 +2,8 @@ package org.graylog2.log4j;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.MDC;
@@ -11,6 +13,10 @@ import org.apache.log4j.spi.ThrowableInformation;
 import org.graylog2.GelfMessage;
 import org.graylog2.SyslogLevel;
 
+/**
+ * @author Anton Yakimov
+ * @author Jochen Schalanda
+ */
 final class GelfMessageFactory {
     private static final int MAX_SHORT_MESSAGE_LENGTH = 250;
     private static final String ORIGIN_HOST_KEY = "originHost";
@@ -19,8 +25,12 @@ final class GelfMessageFactory {
     private static final String THREAD_NAME = "thread";
     private static final String JAVA_TIMESTAMP = "timestampMs";
 
+  private static boolean hasGetTimeStamp = true;
+  private static Method methodGetTimeStamp = null;
+
+
     public static GelfMessage makeMessage(LoggingEvent event, GelfMessageProvider provider) {
-        long timeStamp = Log4jVersionChecker.getTimeStamp(event);
+        long timeStamp = getTimeStamp(event);
         Level level = event.getLevel();
 
         LocationInfo locationInformation = event.getLocationInformation();
@@ -128,4 +138,37 @@ final class GelfMessageFactory {
         throwableInformation.getThrowable().printStackTrace(pw);
         return sw.toString();
     }
+
+  static long getTimeStamp(LoggingEvent event) {
+
+    long timeStamp = System.currentTimeMillis();
+
+    if(hasGetTimeStamp && methodGetTimeStamp == null) {
+
+      hasGetTimeStamp = false;
+
+      Method[] declaredMethods = event.getClass().getDeclaredMethods();
+      for(Method m : declaredMethods) {
+        if (m.getName().equals("getTimeStamp")) {
+          methodGetTimeStamp = m;
+          hasGetTimeStamp = true;
+
+          break;
+        }
+      }
+    }
+
+    if(hasGetTimeStamp) {
+
+      try {
+        timeStamp = (Long) methodGetTimeStamp.invoke(event);
+      } catch (IllegalAccessException e) {
+        // Just return the current timestamp
+      } catch (InvocationTargetException e) {
+        // Just return the current timestamp
+      }
+    }
+
+    return timeStamp;
+  }
 }
