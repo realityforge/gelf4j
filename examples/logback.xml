@@ -1,5 +1,5 @@
 <configuration>
-  <appender name="GELF" class="me.moocar.logbackgelf.GelfAppender">
+  <appender name="GELF" class="org.graylog2.logback.GelfAppender">
     <facility>logback-gelf-test</facility>
     <graylog2ServerHost>localhost</graylog2ServerHost>
     <graylog2ServerPort>12201</graylog2ServerPort>

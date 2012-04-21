@@ -5,11 +5,11 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import me.moocar.logbackgelf.GelfMessage;
-import me.moocar.logbackgelf.GreylogConnection;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LoggingEvent;
+import org.graylog2.GelfMessage;
+import org.graylog2.GreylogConnection;
 import org.json.simple.JSONValue;
 
 /**

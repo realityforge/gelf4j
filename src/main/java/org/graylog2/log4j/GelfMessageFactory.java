@@ -3,13 +3,13 @@ package org.graylog2.log4j;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
-import me.moocar.logbackgelf.GelfMessage;
-import me.moocar.logbackgelf.SyslogLevel;
 import org.apache.log4j.Level;
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
+import org.graylog2.GelfMessage;
+import org.graylog2.SyslogLevel;
 
 final class GelfMessageFactory {
     private static final int MAX_SHORT_MESSAGE_LENGTH = 250;

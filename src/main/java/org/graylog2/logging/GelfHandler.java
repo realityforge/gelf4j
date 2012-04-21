@@ -12,9 +12,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
-import me.moocar.logbackgelf.GelfMessage;
-import me.moocar.logbackgelf.GreylogConnection;
-import me.moocar.logbackgelf.SyslogLevel;
+import org.graylog2.GelfMessage;
+import org.graylog2.GreylogConnection;
+import org.graylog2.SyslogLevel;
 
 public class GelfHandler
   extends Handler

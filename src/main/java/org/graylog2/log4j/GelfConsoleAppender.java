@@ -3,11 +3,11 @@ package org.graylog2.log4j;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import me.moocar.logbackgelf.GelfEncoder;
-import me.moocar.logbackgelf.GelfMessage;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
+import org.graylog2.GelfEncoder;
+import org.graylog2.GelfMessage;
 import org.json.simple.JSONValue;
 
 /**

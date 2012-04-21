@@ -4,13 +4,13 @@ import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import me.moocar.logbackgelf.GreylogConnection;
 import org.apache.log4j.Category;
 import org.apache.log4j.MDC;
 import org.apache.log4j.NDC;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
-import me.moocar.logbackgelf.GelfMessage;
+import org.graylog2.GelfMessage;
+import org.graylog2.GreylogConnection;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
@@ -126,7 +126,7 @@ public class GelfAppenderTest {
         }
 
       @Override
-      public boolean send( final me.moocar.logbackgelf.GelfMessage message )
+      public boolean send( final GelfMessage message )
       {
         this.lastMessage = message;
         return super.send( message );
