@@ -13,6 +13,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
+import me.moocar.logbackgelf.GreylogConnection;
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfSender;
 
@@ -36,7 +37,7 @@ public class GelfHandler
 
     graylogHost = manager.getProperty( prefix + ".graylogHost" );
     final String port = manager.getProperty( prefix + ".graylogPort" );
-    graylogPort = null == port ? 12201 : Integer.parseInt( port );
+    graylogPort = null == port ? GreylogConnection.DEFAULT_PORT : Integer.parseInt( port );
     extractStacktrace = "true".equalsIgnoreCase( manager.getProperty( prefix + ".extractStacktrace" ) );
     int fieldNumber = 0;
     fields = new HashMap<String, String>(  );

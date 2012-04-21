@@ -18,7 +18,7 @@ public class GelfAppender<E> extends AppenderBase<E>
   // The following are configurable via logback configuration
   private String _facility;
   private String _graylog2ServerHost = "localhost";
-  private int _graylog2ServerPort = 12201;
+  private int _graylog2ServerPort = GreylogConnection.DEFAULT_PORT;
   private boolean _useLoggerName = false;
   private boolean _useThreadName = false;
   private Map<String, String> _additionalFields = new HashMap<String, String>();

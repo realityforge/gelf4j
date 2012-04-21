@@ -1,5 +1,6 @@
 package org.graylog2.log;
 
+import me.moocar.logbackgelf.GreylogConnection;
 import org.apache.log4j.Category;
 import org.apache.log4j.MDC;
 import org.apache.log4j.NDC;
@@ -130,7 +131,7 @@ public class GelfAppenderTest {
         private GelfMessage lastMessage;
 
         public TestGelfSender(String host) throws Exception {
-            super(host, GelfSender.DEFAULT_PORT);
+            super(host, GreylogConnection.DEFAULT_PORT);
         }
 
         @Override

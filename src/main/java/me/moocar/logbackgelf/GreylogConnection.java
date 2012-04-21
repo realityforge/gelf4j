@@ -13,6 +13,7 @@ import java.util.List;
  */
 public final class GreylogConnection
 {
+  public static final int DEFAULT_PORT = 12201;
   private final GelfEncoder _encoder;
   private final InetAddress _address;
   private final int _port;

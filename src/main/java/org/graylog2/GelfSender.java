@@ -6,8 +6,6 @@ import me.moocar.logbackgelf.GreylogConnection;
 
 public class GelfSender
 {
-  public static final int DEFAULT_PORT = 12201;
-
   private final GreylogConnection _connection;
 
   public GelfSender( final String host, final int port )

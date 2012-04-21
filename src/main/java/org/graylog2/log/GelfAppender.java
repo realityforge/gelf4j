@@ -1,5 +1,6 @@
 package org.graylog2.log;
 
+import me.moocar.logbackgelf.GreylogConnection;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LoggingEvent;
@@ -23,7 +24,7 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
 
     private String graylogHost;
     private static String originHost;
-    private int graylogPort = 12201;
+    private int graylogPort = GreylogConnection.DEFAULT_PORT;
     private String facility;
     private GelfSender gelfSender;
     private boolean extractStacktrace;
