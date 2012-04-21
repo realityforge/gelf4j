@@ -3,9 +3,9 @@ package org.graylog2;
 import java.util.Map;
 
 public interface GelfMessageProvider {
-    public boolean isExtractStacktrace();
-    public String getOriginHost();
-    public String getFacility();
-    public Map<String, String> getFields();
-    public boolean isAddExtendedInformation();
+    boolean isExtractStacktrace();
+    String getOriginHost();
+    String getFacility();
+    Map<String, String> getFields();
+    boolean isAddExtendedInformation();
 }
