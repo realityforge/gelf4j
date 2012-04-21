@@ -1,7 +1,5 @@
 package org.graylog2.logging;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -12,14 +10,14 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
-import org.graylog2.GelfMessage;
 import org.graylog2.GelfConnection;
+import org.graylog2.GelfMessage;
+import org.graylog2.GelfMessageUtil;
 import org.graylog2.SyslogLevel;
 
 public class GelfHandler
   extends Handler
 {
-  private static final int MAX_SHORT_MESSAGE_LENGTH = 250;
 
   private String graylogHost;
   private String originHost;
@@ -155,24 +153,14 @@ public class GelfHandler
   {
     String message = record.getMessage();
 
-    final String shortMessage;
-    if ( message.length() > MAX_SHORT_MESSAGE_LENGTH )
-    {
-      shortMessage = message.substring( 0, MAX_SHORT_MESSAGE_LENGTH - 1 );
-    }
-    else
-    {
-      shortMessage = message;
-    }
+    final String shortMessage = GelfMessageUtil.truncateShortMessage( message );
 
     if ( extractStacktrace )
     {
       final Throwable thrown = record.getThrown();
       if ( null != thrown )
       {
-        final StringWriter sw = new StringWriter();
-        thrown.printStackTrace( new PrintWriter( sw ) );
-        message += "\n\r" + sw.toString();
+        message += "\n\r" + GelfMessageUtil.extractStacktrace( thrown );
       }
     }
 

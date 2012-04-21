@@ -8,8 +8,9 @@ import ch.qos.logback.core.AppenderBase;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
-import org.graylog2.GelfMessage;
 import org.graylog2.GelfConnection;
+import org.graylog2.GelfMessage;
+import org.graylog2.GelfMessageUtil;
 import org.graylog2.SyslogLevel;
 
 /**
@@ -27,7 +28,6 @@ public class GelfAppender<E> extends AppenderBase<E>
   private Map<String, String> _additionalFields = new HashMap<String, String>();
 
   // The following are hidden (not configurable)
-  private int _shortMessageLength = 255;
   private String _hostname;
   private GelfConnection _connection;
 
@@ -184,19 +184,6 @@ public class GelfAppender<E> extends AppenderBase<E>
   }
 
   /**
-   * The length of the message to truncate to
-   */
-  public int getShortMessageLength()
-  {
-    return _shortMessageLength;
-  }
-
-  public void setShortMessageLength( final int shortMessageLength )
-  {
-    _shortMessageLength = shortMessageLength;
-  }
-
-  /**
    * Converts a log event into GELF JSON.
    *
    * @param logEvent The log event we're converting
@@ -218,18 +205,15 @@ public class GelfAppender<E> extends AppenderBase<E>
     final IThrowableProxy proxy = event.getThrowableProxy();
     if( null != proxy )
     {
-      final String fullMessage =
-        formattedMessage + "\n" + proxy.getClassName() + ": " + proxy.getMessage() + "\n" +
-        toStackTraceString( proxy.getStackTraceElementProxyArray() );
+      final String messageHead = formattedMessage + "\n " + proxy.getClassName() + ": " + proxy.getMessage();
+      final String fullMessage = messageHead + "\n" + toStackTraceString( proxy.getStackTraceElementProxyArray() );
       message.setFullMessage( fullMessage );
-      final String shortMessage =
-        truncateToShortMessage( formattedMessage + ", " + proxy.getClassName() + ": " + proxy.getMessage() );
-      message.setShortMessage( shortMessage );
+      message.setShortMessage( GelfMessageUtil.truncateShortMessage( messageHead ) );
     }
     else
     {
       message.setFullMessage( formattedMessage );
-      message.setShortMessage( truncateToShortMessage( formattedMessage ) );
+      message.setShortMessage( GelfMessageUtil.truncateShortMessage( formattedMessage ) );
     }
 
     if( _useLoggerName )
@@ -266,14 +250,5 @@ public class GelfAppender<E> extends AppenderBase<E>
       str.append( element.getSTEAsString() );
     }
     return str.toString();
-  }
-
-  private String truncateToShortMessage( String fullMessage )
-  {
-    if( fullMessage.length() > _shortMessageLength )
-    {
-      return fullMessage.substring( 0, _shortMessageLength );
-    }
-    return fullMessage;
   }
 }
