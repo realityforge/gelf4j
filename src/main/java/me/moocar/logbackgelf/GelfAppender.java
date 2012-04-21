@@ -19,7 +19,6 @@ public class GelfAppender<E> extends AppenderBase<E> {
     private int graylog2ServerPort = 12201;
     private boolean useLoggerName = false;
     private boolean useThreadName = false;
-    private String graylog2ServerVersion = "0.9.5";
     private int chunkThreshold = 1000;
     private Map<String, String> additionalFields = new HashMap<String, String>();
 
@@ -75,9 +74,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             InetAddress address = getInetAddress();
 
-          final GelfVersion version = graylog2ServerVersion.equals( "0.9.6" ) ? GelfVersion.V1_0 : GelfVersion.V0_9;
-
-            _connection = new GreylogConnection( version, address, graylog2ServerPort );
+            _connection = new GreylogConnection( address, graylog2ServerPort );
 
             final String hostname = InetAddress.getLocalHost().getHostName();
             _gelfConverter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
@@ -205,14 +202,6 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
     public void setShortMessageLength(int shortMessageLength) {
         this.shortMessageLength = shortMessageLength;
-    }
-
-    public String getGraylog2ServerVersion() {
-        return graylog2ServerVersion;
-    }
-
-    public void setGraylog2ServerVersion(String graylog2ServerVersion) {
-        this.graylog2ServerVersion = graylog2ServerVersion;
     }
 
     public int getChunkThreshold() {

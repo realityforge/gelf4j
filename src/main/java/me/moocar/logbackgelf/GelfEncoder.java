@@ -16,35 +16,26 @@ import java.util.zip.GZIPOutputStream;
  */
 final class GelfEncoder
 {
-  private static final int PROTOCOL_VERSION_0_9_ID_LENGTH = 32;
   private static final int PROTOCOL_VERSION_1_0_ID_LENGTH = 8;
 
-  private static final int PROTOCOL_VERSION_0_9_SEQUENCE_LENGTH = 2;
   private static final int PROTOCOL_VERSION_1_0_SEQUENCE_LENGTH = 1;
 
   private static final byte[] CHUNKED_GELF_ID = new byte[]{ 0x1e, 0x0f };
 
-  private static final int PROTOCOL_VERSION_0_9_HEADER_SIZE =
-    CHUNKED_GELF_ID.length + getMessageIdLength( GelfVersion.V0_9 ) + PROTOCOL_VERSION_0_9_SEQUENCE_LENGTH * 2;
   @SuppressWarnings( "PointlessArithmeticExpression" )
   private static final int PROTOCOL_VERSION_1_0_HEADER_SIZE =
-    CHUNKED_GELF_ID.length + getMessageIdLength( GelfVersion.V1_0 ) + PROTOCOL_VERSION_1_0_SEQUENCE_LENGTH * 2;
+    CHUNKED_GELF_ID.length + PROTOCOL_VERSION_1_0_ID_LENGTH + PROTOCOL_VERSION_1_0_SEQUENCE_LENGTH * 2;
 
-  private static final int PROTOCOL_VERSION_0_9_PAYLOAD_THRESHOLD = 1024 - PROTOCOL_VERSION_0_9_HEADER_SIZE;
   private static final int PROTOCOL_VERSION_1_0_PAYLOAD_THRESHOLD = 1024 - PROTOCOL_VERSION_1_0_HEADER_SIZE;
 
-  // Take the smaller sequence size of version 1.0 of protocol
   public static final int MAX_SEQ_NUMBER = Byte.MAX_VALUE;
 
   private final MessageDigest _messageDigest;
   private final String _hostname;
-  private final GelfVersion _version;
 
-  GelfEncoder( final GelfVersion version,
-                      final MessageDigest messageDigest,
+  GelfEncoder( final MessageDigest messageDigest,
                       final String hostname )
   {
-    _version = version;
     _messageDigest = messageDigest;
     _hostname = hostname;
   }
@@ -53,11 +44,12 @@ final class GelfEncoder
    * Converts a GELF message into a number of GELF chunks.
    *
    * @param message The GELF Message (JSON)
-   * @return A list of chunks that should be sent to the graylog2 server
+   * @return A list of chunks that should be sent to the graylog2 server, or null if failed to encode
    */
   List<byte[]> encode( final String message )
   {
-    return createChunks( generateMessageID(), splitPayload( zip( message ) ) );
+    final byte[] encodedPayload = zip( message );
+    return null == encodedPayload ? null : createChunks( generateMessageID(), splitPayload( encodedPayload ) );
   }
 
   /**
@@ -85,19 +77,7 @@ final class GelfEncoder
     // selecting the first x bytes of the result
     final String timestamp = String.valueOf( System.nanoTime() );
     final byte[] digestString = ( _hostname + timestamp ).getBytes();
-    return Arrays.copyOf( _messageDigest.digest( digestString ), getMessageIdLength( _version ) );
-  }
-
-  private static int getMessageIdLength( final GelfVersion version )
-  {
-    return version == GelfVersion.V1_0 ? PROTOCOL_VERSION_1_0_ID_LENGTH : PROTOCOL_VERSION_0_9_ID_LENGTH;
-  }
-
-  private static int getPayloadThreshold( final GelfVersion version )
-  {
-    return version == GelfVersion.V1_0 ?
-      PROTOCOL_VERSION_1_0_PAYLOAD_THRESHOLD :
-      PROTOCOL_VERSION_0_9_PAYLOAD_THRESHOLD;
+    return Arrays.copyOf( _messageDigest.digest( digestString ), PROTOCOL_VERSION_1_0_ID_LENGTH );
   }
 
   /**
@@ -135,9 +115,8 @@ final class GelfEncoder
   {
     final List<byte[]> subPayloads = new ArrayList<byte[]>();
 
-    final int payloadThreshold = getPayloadThreshold( _version );
-    final int numFullSubs = payload.length / payloadThreshold;
-    final int lastSubLength = payload.length % payloadThreshold;
+    final int numFullSubs = payload.length / PROTOCOL_VERSION_1_0_PAYLOAD_THRESHOLD;
+    final int lastSubLength = payload.length % PROTOCOL_VERSION_1_0_PAYLOAD_THRESHOLD;
 
     for( int subPayload = 0; subPayload < numFullSubs; subPayload++ )
     {
@@ -159,8 +138,9 @@ final class GelfEncoder
    */
   private byte[] extractSubPayload( final byte[] payload, final int subPaylod )
   {
-    final int payloadThreshold = getPayloadThreshold( _version );
-    return Arrays.copyOfRange( payload, subPaylod * payloadThreshold, ( subPaylod + 1 ) * payloadThreshold );
+    return Arrays.copyOfRange( payload,
+                               subPaylod * PROTOCOL_VERSION_1_0_PAYLOAD_THRESHOLD,
+                               ( subPaylod + 1 ) * PROTOCOL_VERSION_1_0_PAYLOAD_THRESHOLD );
   }
 
 
@@ -193,7 +173,7 @@ final class GelfEncoder
   }
 
   /**
-   * Returns an array of sequence numbers for each chunk. Needed because apparently we need to pad this for 0.9.5??
+   * Returns an array of sequence numbers for each chunk.
    *
    * @param seqNum    The Sequence Number
    * @param numChunks The number of chunks that will be sent
@@ -201,7 +181,7 @@ final class GelfEncoder
    */
   private byte[] getSeqNumbers( final byte seqNum, final byte numChunks )
   {
-    return _version == GelfVersion.V0_9 ? new byte[]{ 0x00, seqNum, 0x00, numChunks } : new byte[]{ seqNum, numChunks };
+    return new byte[]{ seqNum, numChunks };
   }
 
   /**
@@ -225,7 +205,7 @@ final class GelfEncoder
     }
     catch( final IOException ioe )
     {
-      throw new RuntimeException( ioe );
+      return null;
     }
     finally
     {

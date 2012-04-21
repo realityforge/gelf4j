@@ -9,27 +9,23 @@ import java.security.MessageDigest;
 import java.util.List;
 
 /**
- * Responsible for sending packet(s) to the graylog2 server
+ * Responsible for communicating with a graylog2 server
  */
 public final class GreylogConnection
 {
-  private final GelfVersion _version;
+  private final GelfEncoder _encoder;
   private final InetAddress _address;
   private final int _port;
   private DatagramSocket _socket;
-  private final String _hostName;
-  private final GelfEncoder _encoder;
 
-  public GreylogConnection( final GelfVersion version,
-                            final InetAddress address,
+  public GreylogConnection( final InetAddress address,
                             final int port )
     throws Exception
   {
-    _version = version;
     _port = port;
     _address = address;
-    _hostName = InetAddress.getLocalHost().getHostName();
-    _encoder = new GelfEncoder( version, MessageDigest.getInstance( "MD5" ), _hostName );
+    final String hostName = InetAddress.getLocalHost().getHostName();
+    _encoder = new GelfEncoder( MessageDigest.getInstance( "MD5" ), hostName );
   }
 
   /**
@@ -40,7 +36,9 @@ public final class GreylogConnection
    */
   public boolean send( final String message )
   {
-    return send( _encoder.encode( message ) );
+    final List<byte[]> packets = _encoder.encode( message );
+    // Note: Returning false when encoding fails for whatever reason
+    return null != packets && send( packets );
   }
 
   /**

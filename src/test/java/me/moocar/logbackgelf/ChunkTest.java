@@ -1,13 +1,11 @@
 package me.moocar.logbackgelf;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
-
+import org.junit.Before;
+import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ChunkTest {
@@ -25,9 +23,7 @@ public class ChunkTest {
     @Before
     public void setup() throws NoSuchAlgorithmException {
         _createsPackets =
-          new GelfEncoder( GelfVersion.V1_0,
-                              MessageDigest.getInstance( "MD5" ),
-                              "localhost" );
+          new GelfEncoder( MessageDigest.getInstance( "MD5" ), "localhost" );
     }
 
     @Test
