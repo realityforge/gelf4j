@@ -130,7 +130,7 @@ public class GelfAppenderTest {
         private GelfMessage lastMessage;
 
         public TestGelfSender(String host) throws UnknownHostException, SocketException {
-            super(host);
+            super(host, GelfSender.DEFAULT_PORT);
         }
 
         @Override
