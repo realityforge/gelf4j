@@ -33,8 +33,7 @@ final class GelfEncoder
   private final MessageDigest _messageDigest;
   private final String _hostname;
 
-  GelfEncoder( final MessageDigest messageDigest,
-                      final String hostname )
+  GelfEncoder( final MessageDigest messageDigest, final String hostname )
   {
     _messageDigest = messageDigest;
     _hostname = hostname;
@@ -57,7 +56,7 @@ final class GelfEncoder
    *
    * @param payload The original gzipped payload
    * @return A list of chunks that should be sent to the graylog2 server
-   * TODO: Remove me
+   *         TODO: Remove me
    */
   @Deprecated
   List<byte[]> chunkIt( final byte[] payload )
