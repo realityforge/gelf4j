@@ -85,7 +85,7 @@ public class GelfAppender<E> extends AppenderBase<E> {
 
             GelfConverter converter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
 
-            appenderExecutor = new AppenderExecutor<E>(transport, payloadChunker, converter, new Zipper(), chunkThreshold);
+            appenderExecutor = new AppenderExecutor<E>(transport, payloadChunker, converter, chunkThreshold);
 
         } catch (Exception e) {
 

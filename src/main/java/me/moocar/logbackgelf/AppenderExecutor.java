@@ -8,18 +8,15 @@ public class AppenderExecutor<E> {
     private final Transport transport;
     private final PayloadChunker payloadChunker;
     private final GelfConverter gelfConverter;
-    private final Zipper zipper;
     private final int chunkThreshold;
 
     public AppenderExecutor(Transport transport,
                             PayloadChunker payloadChunker,
                             GelfConverter gelfConverter,
-                            Zipper zipper,
                             int chunkThreshold) {
         this.transport = transport;
         this.payloadChunker = payloadChunker;
         this.gelfConverter = gelfConverter;
-        this.zipper = zipper;
         this.chunkThreshold = chunkThreshold;
     }
 
@@ -31,7 +28,7 @@ public class AppenderExecutor<E> {
      */
     public void append(E logEvent) {
 
-        byte[] payload = zipper.zip(gelfConverter.toGelf(logEvent));
+        byte[] payload = Zipper.zip(gelfConverter.toGelf(logEvent));
 
         // If we can fit all the information into one packet, then just send it
         if (payload.length < chunkThreshold) {

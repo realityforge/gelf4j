@@ -1,15 +1,16 @@
 package org.graylog2;
 
-import org.json.simple.JSONValue;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.zip.GZIPOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import me.moocar.logbackgelf.Zipper;
+import org.json.simple.JSONValue;
 
 public class GelfMessage {
 
@@ -82,7 +83,7 @@ public class GelfMessage {
     }
 
     public List<byte[]> toDatagrams() {
-        byte[] messageBytes = gzipMessage(toJson());
+        byte[] messageBytes = Zipper.zip( toJson() );
         List<byte[]> datagrams = new ArrayList<byte[]>();
         if (messageBytes.length > MAXIMUM_CHUNK_SIZE) {
             sliceDatagrams(messageBytes, datagrams);
@@ -109,22 +110,6 @@ public class GelfMessage {
             }
             byte[] datagram = concatByteArray(header, Arrays.copyOfRange(messageBytes, from, to));
             datagrams.add(datagram);
-        }
-    }
-
-    private byte[] gzipMessage(String message) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try {
-            GZIPOutputStream stream = new GZIPOutputStream(bos);
-            stream.write(message.getBytes());
-            stream.finish();
-            stream.close();
-            byte[] zipped = bos.toByteArray();
-            bos.close();
-            return zipped;
-        } catch (IOException e) {
-            return null;
         }
     }
 
