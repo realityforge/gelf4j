@@ -25,7 +25,19 @@ public class GelfMessageFactory {
 
         LocationInfo locationInformation = event.getLocationInformation();
         String file = locationInformation.getFileName();
-        String lineNumber = locationInformation.getLineNumber();
+        Integer lineNumber = null;
+        try
+        {
+          final String lineInfo = locationInformation.getLineNumber();
+          if( null != lineInfo )
+          {
+            lineNumber = Integer.parseInt( lineInfo );
+          }
+        }
+        catch( final NumberFormatException nfe )
+        {
+          //ignore
+        }
 
         String renderedMessage = event.getRenderedMessage();
         String shortMessage;
@@ -48,11 +60,12 @@ public class GelfMessageFactory {
             }
         }
         
-        GelfMessage gelfMessage = new GelfMessage(shortMessage, renderedMessage, timeStamp,
+        GelfMessage gelfMessage =
+          new GelfMessage(shortMessage, renderedMessage, timeStamp,
                                                   String.valueOf(level.getSyslogEquivalent()), lineNumber, file);
         
         if (provider.getOriginHost() != null) {
-            gelfMessage.setHost(provider.getOriginHost());
+            gelfMessage.setHostname( provider.getOriginHost() );
         }
 
         if (provider.getFacility() != null) {
@@ -61,26 +74,28 @@ public class GelfMessageFactory {
 
         Map<String, String> fields = provider.getFields();
         for (Map.Entry<String, String> entry : fields.entrySet()) {
-            if (entry.getKey().equals(ORIGIN_HOST_KEY) && gelfMessage.getHost() == null) {
-                gelfMessage.setHost(fields.get(ORIGIN_HOST_KEY));
+            if (entry.getKey().equals(ORIGIN_HOST_KEY) && gelfMessage.getHostname() == null) {
+                gelfMessage.setHostname( fields.get( ORIGIN_HOST_KEY ) );
             } else {
-                gelfMessage.addField(entry.getKey(), entry.getValue());
+                gelfMessage.getAdditionalFields().put( entry.getKey(), entry.getValue() );
             }
         }
 
         if (provider.isAddExtendedInformation()) {
 
-            gelfMessage.addField(THREAD_NAME, event.getThreadName());
-            gelfMessage.addField(LOGGER_NAME, event.getLoggerName());
-            gelfMessage.addField(JAVA_TIMESTAMP, Long.toString(gelfMessage.getJavaTimestamp()));
+            gelfMessage.getAdditionalFields().put( THREAD_NAME, event.getThreadName() );
+          gelfMessage.getAdditionalFields().put( LOGGER_NAME, event.getLoggerName() );
 
-            // Get MDC and add a GELF field for each key/value pair
+          gelfMessage.getAdditionalFields().put( JAVA_TIMESTAMP, Long.toString(gelfMessage.getJavaTimestamp()) );
+
+          // Get MDC and add a GELF field for each key/value pair
             Map<String, Object> mdc = MDC.getContext();
 
             if(mdc != null) {
                 for(Map.Entry<String, Object> entry : mdc.entrySet()) {
 
-                    gelfMessage.addField(entry.getKey(), entry.getValue().toString());
+                  gelfMessage.getAdditionalFields().put( entry.getKey(), entry.getValue().toString() );
+
                 }
             }
 
@@ -89,7 +104,8 @@ public class GelfMessageFactory {
 
             if(ndc != null) {
 
-                gelfMessage.addField(LOGGER_NDC, ndc);
+              gelfMessage.getAdditionalFields().put( LOGGER_NDC, ndc );
+
             }
         }
 

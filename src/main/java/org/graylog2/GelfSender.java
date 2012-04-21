@@ -18,7 +18,7 @@ public class GelfSender
 
   public boolean sendMessage( GelfMessage message )
   {
-    return message.isValid() && sendDatagrams( message.toDatagrams() );
+    return sendDatagrams( message.toDatagrams() );
   }
 
   public boolean sendDatagrams( List<byte[]> bytesList )

@@ -3,7 +3,6 @@ package org.graylog2.logging;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashMap;
@@ -182,12 +181,13 @@ public class GelfHandler
                        message,
                        new Date( record.getMillis() ),
                        String.valueOf( levelToSyslogLevel( record.getLevel() ) ) );
-    gelfMessage.addField( "SourceClassName", record.getSourceClassName() );
-    gelfMessage.addField( "SourceMethodName", record.getSourceMethodName() );
+    gelfMessage.getAdditionalFields().put( "SourceClassName", record.getSourceClassName() );
+
+    gelfMessage.getAdditionalFields().put( "SourceMethodName", record.getSourceMethodName() );
 
     if ( null != getOriginHost() )
     {
-      gelfMessage.setHost( getOriginHost() );
+      gelfMessage.setHostname( getOriginHost() );
     }
 
     if ( null != facility )
@@ -199,7 +199,8 @@ public class GelfHandler
     {
       for ( final Map.Entry<String, String> entry : fields.entrySet() )
       {
-        gelfMessage.addField( entry.getKey(), entry.getValue() );
+        gelfMessage.getAdditionalFields().put( entry.getKey(), entry.getValue() );
+
       }
     }
 

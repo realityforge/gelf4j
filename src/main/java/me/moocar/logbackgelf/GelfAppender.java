@@ -1,9 +1,11 @@
 package me.moocar.logbackgelf;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.util.LevelToSyslogSeverity;
 import ch.qos.logback.core.AppenderBase;
-import com.google.common.base.Throwables;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,47 +13,55 @@ import java.util.Map;
  * Responsible for Formatting a log event and sending it to a Graylog2 Server. Note that you can't swap in a different
  * Layout since the GELF format is static.
  */
-public class GelfAppender<E> extends AppenderBase<E> {
+public class GelfAppender<E> extends AppenderBase<E>
+{
+  // The following are configurable via logback configuration
+  private String _facility;
+  private String _graylog2ServerHost = "localhost";
+  private int _graylog2ServerPort = 12201;
+  private boolean _useLoggerName = false;
+  private boolean _useThreadName = false;
+  private Map<String, String> _additionalFields = new HashMap<String, String>();
 
-    // The following are configurable via logback configuration
-    private String facility = "GELF";
-    private String graylog2ServerHost = "localhost";
-    private int graylog2ServerPort = 12201;
-    private boolean useLoggerName = false;
-    private boolean useThreadName = false;
-    private int chunkThreshold = 1000;
-    private Map<String, String> additionalFields = new HashMap<String, String>();
-
-    // The following are hidden (not configurable)
-    private int shortMessageLength = 255;
+  // The following are hidden (not configurable)
+  private int _shortMessageLength = 255;
+  private String _hostname;
   private GreylogConnection _connection;
-  private GelfConverter _gelfConverter;
 
-    /**
-     * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
-     * to the log server
-     *
-     * @param logEvent The event that we are logging
-     */
-    @Override
-    protected void append(E logEvent) {
-
-        try {
-
-          _connection.send( _gelfConverter.toGelf(logEvent) );
-
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage() + ": " + Throwables.getStackTraceAsString(e));
-            this.addError("Error occurred: ", e);
-            throw e;
-        }
+  /**
+   * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
+   * to the log server
+   *
+   * @param logEvent The event that we are logging
+   */
+  @Override
+  protected void append( final E logEvent )
+  {
+    try
+    {
+      _connection.send( toGelf( logEvent ) );
     }
-
-    @Override
-    public void start() {
-        super.start();
-        initExecutor();
+    catch( RuntimeException e )
+    {
+      addError( "Error occurred: ", e );
+      throw e;
     }
+  }
+
+  @Override
+  public void start()
+  {
+    super.start();
+    try
+    {
+      _connection = new GreylogConnection( InetAddress.getByName( _graylog2ServerHost ), _graylog2ServerPort );
+      _hostname = InetAddress.getLocalHost().getHostName();
+    }
+    catch( final Exception e )
+    {
+      throw new RuntimeException( "Error initialising gelf connection", e );
+    }
+  }
 
   @Override
   public void stop()
@@ -65,150 +75,202 @@ public class GelfAppender<E> extends AppenderBase<E> {
   }
 
   /**
-     * This is an ad-hoc dependency injection mechanism. We don't want create all these classes every time a message is
-     * logged. They will hang around for the lifetime of the appender.
-     */
-    private void initExecutor() {
+   * The name of your service. Appears in facility column in graylog2-web-interface
+   */
+  public String getFacility()
+  {
+    return _facility;
+  }
 
-        try {
+  public void setFacility( final String facility )
+  {
+    _facility = facility;
+  }
 
-            InetAddress address = getInetAddress();
+  /**
+   * The hostname of the graylog2 server to send messages to
+   */
+  public String getGraylog2ServerHost()
+  {
+    return _graylog2ServerHost;
+  }
 
-            _connection = new GreylogConnection( address, graylog2ServerPort );
+  public void setGraylog2ServerHost( final String graylog2ServerHost )
+  {
+    _graylog2ServerHost = graylog2ServerHost;
+  }
 
-            final String hostname = InetAddress.getLocalHost().getHostName();
-            _gelfConverter = new GelfConverter(facility, useLoggerName, useThreadName, additionalFields, shortMessageLength, hostname);
+  /**
+   * The port of the graylog2 server to send messages to
+   */
+  public int getGraylog2ServerPort()
+  {
+    return _graylog2ServerPort;
+  }
 
-        } catch (Exception e) {
+  public void setGraylog2ServerPort( final int graylog2ServerPort )
+  {
+    _graylog2ServerPort = graylog2ServerPort;
+  }
 
-            throw new RuntimeException("Error initialising appender gelf connection", e);
+  /**
+   * If true, an additional field call "_loggerName" will be added to each gelf message. Its contents will be the
+   * fully qualified name of the logger. e.g: com.company.Thingo.
+   */
+  public boolean isUseLoggerName()
+  {
+    return _useLoggerName;
+  }
+
+  public void setUseLoggerName( final boolean useLoggerName )
+  {
+    _useLoggerName = useLoggerName;
+  }
+
+  /**
+   * If true, an additional field call "_threadName" will be added to each gelf message. Its contents will be the
+   * Name of the thread. Defaults to "false".
+   */
+  public boolean isUseThreadName()
+  {
+    return _useThreadName;
+  }
+
+  public void setUseThreadName( final boolean useThreadName )
+  {
+    _useThreadName = useThreadName;
+  }
+
+  /**
+   * additional fields to add to the gelf message. Here's how these work: <br/> Let's take an example. I want to log
+   * the client's ip address of every request that comes into my web server. To do this, I add the ipaddress to the
+   * slf4j MDC on each request as follows: <code> ... MDC.put("ipAddress", "44.556.345.657"); ... </code> Now, to
+   * include the ip address in the gelf message, i just add the following to my logback.groovy: <code>
+   * appender("GELF", GelfAppender) { ... additionalFields = [identity:"_identity"] ... } </code> in the
+   * additionalFields map, the key is the name of the MDC to look up. the value is the name that should be given to
+   * the key in the additional field in the gelf message.
+   */
+  public Map<String, String> getAdditionalFields()
+  {
+    return _additionalFields;
+  }
+
+  public void setAdditionalFields( final Map<String, String> additionalFields )
+  {
+    _additionalFields = additionalFields;
+  }
+
+  /**
+   * Add an additional field. This is mainly here for compatibility with logback.xml
+   *
+   * @param keyValue This must be in format key:value where key is the MDC key, and value is the GELF field
+   *                 name. e.g "ipAddress:_ip_address"
+   */
+  public void addAdditionalField( final String keyValue )
+  {
+    final String[] splitted = keyValue.split( ":" );
+
+    if( splitted.length != 2 )
+    {
+
+      throw new IllegalArgumentException( "additionalField must be of the format key:value, where key is the MDC "
+                                          + "key, and value is the GELF field name. But found '" + keyValue + "' instead." );
+    }
+
+    _additionalFields.put( splitted[ 0 ], splitted[ 1 ] );
+  }
+
+  /**
+   * The length of the message to truncate to
+   */
+  public int getShortMessageLength()
+  {
+    return _shortMessageLength;
+  }
+
+  public void setShortMessageLength( final int shortMessageLength )
+  {
+    _shortMessageLength = shortMessageLength;
+  }
+
+  /**
+   * Converts a log event into GELF JSON.
+   *
+   * @param logEvent The log event we're converting
+   * @return The log event converted into GELF JSON
+   */
+  private GelfMessage toGelf( final E logEvent )
+  {
+    final ILoggingEvent event = (ILoggingEvent) logEvent;
+
+    final GelfMessage message = new GelfMessage();
+    message.setFacility( _facility );
+    message.setHostname( _hostname );
+    message.setJavaTimestamp( event.getTimeStamp() );
+    message.setLevel( SyslogLevel.values()[ LevelToSyslogSeverity.convert( event ) ] );
+
+    final String formattedMessage = event.getFormattedMessage();
+
+    // Format up the stack trace
+    final IThrowableProxy proxy = event.getThrowableProxy();
+    if( null != proxy )
+    {
+      final String fullMessage =
+        formattedMessage + "\n" + proxy.getClassName() + ": " + proxy.getMessage() + "\n" +
+        toStackTraceString( proxy.getStackTraceElementProxyArray() );
+      message.setFullMessage( fullMessage );
+      final String shortMessage =
+        truncateToShortMessage( formattedMessage + ", " + proxy.getClassName() + ": " + proxy.getMessage() );
+      message.setShortMessage( shortMessage );
+    }
+    else
+    {
+      message.setFullMessage( formattedMessage );
+      message.setShortMessage( truncateToShortMessage( formattedMessage ) );
+    }
+
+    if( _useLoggerName )
+    {
+      message.getAdditionalFields().put( "_loggerName", event.getLoggerName() );
+    }
+
+    if( _useThreadName )
+    {
+      message.getAdditionalFields().put( "_threadName", event.getThreadName() );
+    }
+
+    final Map<String, String> mdc = event.getMDCPropertyMap();
+    if( null != mdc )
+    {
+      for( final String key : _additionalFields.keySet() )
+      {
+        String field = mdc.get( key );
+        if( field != null )
+        {
+          message.getAdditionalFields().put( _additionalFields.get( key ), field );
         }
+      }
     }
 
-    /**
-     * Gets the Inet address for the graylog2ServerHost and gives a specialised error message if an exception is thrown
-     *
-     * @return The Inet address for graylog2ServerHost
-     */
-    private InetAddress getInetAddress() {
-        try {
-            return InetAddress.getByName(graylog2ServerHost);
-        } catch (UnknownHostException e) {
-            throw new IllegalStateException("Unknown host: " + e.getMessage() +
-                    ". Make sure you have specified the 'graylog2ServerHost' property correctly in your logback.xml'");
-        }
+    return message;
+  }
+
+  private String toStackTraceString( StackTraceElementProxy[] elements )
+  {
+    StringBuilder str = new StringBuilder();
+    for( StackTraceElementProxy element : elements )
+    {
+      str.append( element.getSTEAsString() );
     }
+    return str.toString();
+  }
 
-    //////////// Logback Property Getter/Setters ////////////////
-
-    /**
-     * The name of your service. Appears in facility column in graylog2-web-interface
-     */
-    public String getFacility() {
-        return facility;
+  private String truncateToShortMessage( String fullMessage )
+  {
+    if( fullMessage.length() > _shortMessageLength )
+    {
+      return fullMessage.substring( 0, _shortMessageLength );
     }
-
-    public void setFacility(String facility) {
-        this.facility = facility;
-    }
-
-    /**
-     * The hostname of the graylog2 server to send messages to
-     */
-    public String getGraylog2ServerHost() {
-        return graylog2ServerHost;
-    }
-
-    public void setGraylog2ServerHost(String graylog2ServerHost) {
-        this.graylog2ServerHost = graylog2ServerHost;
-    }
-
-    /**
-     * The port of the graylog2 server to send messages to
-     */
-    public int getGraylog2ServerPort() {
-        return graylog2ServerPort;
-    }
-
-    public void setGraylog2ServerPort(int graylog2ServerPort) {
-        this.graylog2ServerPort = graylog2ServerPort;
-    }
-
-    /**
-     * If true, an additional field call "_loggerName" will be added to each gelf message. Its contents will be the
-     * fully qualified name of the logger. e.g: com.company.Thingo.
-     */
-    public boolean isUseLoggerName() {
-        return useLoggerName;
-    }
-
-    public void setUseLoggerName(boolean useLoggerName) {
-        this.useLoggerName = useLoggerName;
-    }
-    
-    /**
-     * If true, an additional field call "_threadName" will be added to each gelf message. Its contents will be the
-     * Name of the thread. Defaults to "false".
-     */
-    public boolean isUseThreadName() {
-    	return useThreadName;
-    }
-    
-    public void setUseThreadName(boolean useThreadName) {
-    	this.useThreadName = useThreadName;
-    }
-
-    /**
-     * additional fields to add to the gelf message. Here's how these work: <br/> Let's take an example. I want to log
-     * the client's ip address of every request that comes into my web server. To do this, I add the ipaddress to the
-     * slf4j MDC on each request as follows: <code> ... MDC.put("ipAddress", "44.556.345.657"); ... </code> Now, to
-     * include the ip address in the gelf message, i just add the following to my logback.groovy: <code>
-     * appender("GELF", GelfAppender) { ... additionalFields = [identity:"_identity"] ... } </code> in the
-     * additionalFields map, the key is the name of the MDC to look up. the value is the name that should be given to
-     * the key in the additional field in the gelf message.
-     */
-    public Map<String, String> getAdditionalFields() {
-        return additionalFields;
-    }
-
-    public void setAdditionalFields(Map<String, String> additionalFields) {
-        this.additionalFields = additionalFields;
-    }
-
-    /**
-     * Add an additional field. This is mainly here for compatibility with logback.xml
-     *
-     * @param keyValue This must be in format key:value where key is the MDC key, and value is the GELF field
-     * name. e.g "ipAddress:_ip_address"
-     */
-    public void addAdditionalField(String keyValue) {
-        String[] splitted = keyValue.split(":");
-
-        if (splitted.length != 2) {
-
-            throw new IllegalArgumentException("additionalField must be of the format key:value, where key is the MDC "
-                    + "key, and value is the GELF field name. But found '" + keyValue + "' instead.");
-        }
-
-        additionalFields.put(splitted[0], splitted[1]);
-    }
-
-    /**
-     * The length of the message to truncate to
-     */
-    public int getShortMessageLength() {
-        return shortMessageLength;
-    }
-
-    public void setShortMessageLength(int shortMessageLength) {
-        this.shortMessageLength = shortMessageLength;
-    }
-
-    public int getChunkThreshold() {
-        return chunkThreshold;
-    }
-
-    public void setChunkThreshold(int chunkThreshold) {
-        this.chunkThreshold = chunkThreshold;
-    }
+    return fullMessage;
+  }
 }

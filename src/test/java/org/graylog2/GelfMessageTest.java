@@ -15,7 +15,12 @@ public class GelfMessageTest {
     @Test
     public void testAdditionalFieldsIds() throws Exception {
         GelfMessage message = new GelfMessage("Short", "Long", new Date(), "1");
-        message.addField("id", "LOLCAT").addField("_id", "typos in my closet");
+      message.getAdditionalFields().put( "id", "LOLCAT" );
+
+      message.getAdditionalFields().put( "id", "LOLCAT" );
+
+      message.getAdditionalFields().put("id", "LOLCAT");
+      message.getAdditionalFields().put("_id", "typos in my closet");
 
         String data = message.toJson();
         Map resultingMap = (Map) JSONValue.parse(data);
@@ -49,7 +54,14 @@ public class GelfMessageTest {
     public void testAdditionalFields() throws Exception {
         GelfMessage message = new GelfMessage();
         message.setJavaTimestamp(1L);
-        message.addField("one", "two").addField("three", 4).addField("five", 6.0).addField("seven",8);
+      message.getAdditionalFields().put( "one", "two" );
+
+      message.getAdditionalFields().put( "one", "two" );
+
+      message.getAdditionalFields().put("one", "two");
+      message.getAdditionalFields().put("three", 4);
+      message.getAdditionalFields().put("five", 6.0);
+      message.getAdditionalFields().put("seven",8);
 
         String json = message.toJson();
 

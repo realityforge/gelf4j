@@ -31,10 +31,10 @@ public final class GreylogConnection
   /**
    * Sends a single GELF message to the graylog2 server
    *
-   * @param message the GELF Message (JSON)
+   * @param message the GELF Message
    * @return false if sending failed
    */
-  public boolean send( final String message )
+  public boolean send( final GelfMessage message )
   {
     final List<byte[]> packets = _encoder.encode( message );
     // Note: Returning false when encoding fails for whatever reason

@@ -53,11 +53,11 @@ public class GelfAppenderTest {
                                               new RuntimeException("LOL"));
         gelfAppender.append(event);
 
-        assertThat("Message hostname", gelfSender.getLastMessage().getHost(), notNullValue());
+        assertThat("Message hostname", gelfSender.getLastMessage().getHostname(), notNullValue());
 
         gelfAppender.setOriginHost("example.com");
         gelfAppender.append(event);
-        assertThat(gelfSender.getLastMessage().getHost(), is("example.com"));
+        assertThat(gelfSender.getLastMessage().getHostname(), is("example.com"));
     }
 
     @Test
@@ -80,8 +80,8 @@ public class GelfAppenderTest {
 
         gelfAppender.append(event);
 
-        assertEquals("bar", gelfSender.getLastMessage().getAdditonalFields().get("foo"));
-        assertNull(gelfSender.getLastMessage().getAdditonalFields().get("non-existent"));
+      assertEquals("bar", gelfSender.getLastMessage().getAdditionalFields().get( "foo" ));
+      assertNull( gelfSender.getLastMessage().getAdditionalFields().get( "non-existent" ));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class GelfAppenderTest {
 
         gelfAppender.append(event);
 
-        assertEquals("Foobar", gelfSender.getLastMessage().getAdditonalFields().get("loggerNdc"));
+      assertEquals("Foobar", gelfSender.getLastMessage().getAdditionalFields().get( "loggerNdc" ));
     }
 
     @Test
@@ -109,8 +109,8 @@ public class GelfAppenderTest {
 
         gelfAppender.append(event);
 
-        assertNull(gelfSender.getLastMessage().getAdditonalFields().get("loggerNdc"));
-        assertNull(gelfSender.getLastMessage().getAdditonalFields().get("foo"));
+      assertNull( gelfSender.getLastMessage().getAdditionalFields().get( "loggerNdc" ));
+      assertNull( gelfSender.getLastMessage().getAdditionalFields().get( "foo" ));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class GelfAppenderTest {
 
         gelfAppender.append(event);
 
-        assertEquals(gelfSender.getLastMessage().getAdditonalFields().get("logger"), CLASS_NAME);
+      assertEquals( gelfSender.getLastMessage().getAdditionalFields().get( "logger" ), CLASS_NAME);
     }
 
     private class TestGelfSender extends GelfSender {
