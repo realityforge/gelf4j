@@ -10,7 +10,7 @@ import org.apache.log4j.NDC;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 import org.graylog2.GelfMessage;
-import org.graylog2.GreylogConnection;
+import org.graylog2.GelfConnection;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
@@ -117,12 +117,13 @@ public class GelfAppenderTest {
       assertEquals( gelfSender.getLastMessage().getAdditionalFields().get( "logger" ), CLASS_NAME);
     }
 
-    private class TestGelfSender extends GreylogConnection {
+    private class TestGelfSender extends GelfConnection
+    {
 
         private GelfMessage lastMessage;
 
         public TestGelfSender() throws Exception {
-            super( InetAddress.getLocalHost(), GreylogConnection.DEFAULT_PORT);
+            super( InetAddress.getLocalHost(), GelfConnection.DEFAULT_PORT);
         }
 
       @Override

@@ -9,7 +9,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LoggingEvent;
 import org.graylog2.GelfMessage;
-import org.graylog2.GreylogConnection;
+import org.graylog2.GelfConnection;
 import org.json.simple.JSONValue;
 
 /**
@@ -21,9 +21,9 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
 
     private String graylogHost;
     private static String originHost;
-    private int graylogPort = GreylogConnection.DEFAULT_PORT;
+    private int graylogPort = GelfConnection.DEFAULT_PORT;
     private String facility;
-    private GreylogConnection _connection;
+    private GelfConnection _connection;
     private boolean extractStacktrace;
     private boolean addExtendedInformation;
     private Map<String, String> fields;
@@ -108,7 +108,7 @@ public class GelfAppender extends AppenderSkeleton implements GelfMessageProvide
     @Override
     public void activateOptions() {
         try {
-            _connection = new GreylogConnection(InetAddress.getByName( graylogHost ), graylogPort);
+            _connection = new GelfConnection(InetAddress.getByName( graylogHost ), graylogPort);
         } catch (UnknownHostException e) {
             errorHandler.error("Unknown Graylog2 hostname:" + getGraylogHost(), e, ErrorCode.WRITE_FAILURE);
         } catch (Exception e) {

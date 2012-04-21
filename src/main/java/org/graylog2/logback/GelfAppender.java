@@ -9,7 +9,7 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import org.graylog2.GelfMessage;
-import org.graylog2.GreylogConnection;
+import org.graylog2.GelfConnection;
 import org.graylog2.SyslogLevel;
 
 /**
@@ -21,7 +21,7 @@ public class GelfAppender<E> extends AppenderBase<E>
   // The following are configurable via logback configuration
   private String _facility;
   private String _graylog2ServerHost = "localhost";
-  private int _graylog2ServerPort = GreylogConnection.DEFAULT_PORT;
+  private int _graylog2ServerPort = GelfConnection.DEFAULT_PORT;
   private boolean _useLoggerName = false;
   private boolean _useThreadName = false;
   private Map<String, String> _additionalFields = new HashMap<String, String>();
@@ -29,7 +29,7 @@ public class GelfAppender<E> extends AppenderBase<E>
   // The following are hidden (not configurable)
   private int _shortMessageLength = 255;
   private String _hostname;
-  private GreylogConnection _connection;
+  private GelfConnection _connection;
 
   /**
    * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
@@ -57,7 +57,7 @@ public class GelfAppender<E> extends AppenderBase<E>
     super.start();
     try
     {
-      _connection = new GreylogConnection( InetAddress.getByName( _graylog2ServerHost ), _graylog2ServerPort );
+      _connection = new GelfConnection( InetAddress.getByName( _graylog2ServerHost ), _graylog2ServerPort );
       _hostname = InetAddress.getLocalHost().getHostName();
     }
     catch( final Exception e )

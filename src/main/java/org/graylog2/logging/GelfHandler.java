@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import org.graylog2.GelfMessage;
-import org.graylog2.GreylogConnection;
+import org.graylog2.GelfConnection;
 import org.graylog2.SyslogLevel;
 
 public class GelfHandler
@@ -25,7 +25,7 @@ public class GelfHandler
   private String originHost;
   private int graylogPort;
   private String facility;
-  private GreylogConnection _connection;
+  private GelfConnection _connection;
   private boolean extractStacktrace;
   private Map<String, String> fields;
 
@@ -36,7 +36,7 @@ public class GelfHandler
 
     graylogHost = manager.getProperty( prefix + ".graylogHost" );
     final String port = manager.getProperty( prefix + ".graylogPort" );
-    graylogPort = null == port ? GreylogConnection.DEFAULT_PORT : Integer.parseInt( port );
+    graylogPort = null == port ? GelfConnection.DEFAULT_PORT : Integer.parseInt( port );
     extractStacktrace = "true".equalsIgnoreCase( manager.getProperty( prefix + ".extractStacktrace" ) );
     int fieldNumber = 0;
     fields = new HashMap<String, String>(  );
@@ -123,7 +123,7 @@ public class GelfHandler
     {
       try
       {
-        _connection = new GreylogConnection( InetAddress.getByName( graylogHost ), graylogPort );
+        _connection = new GelfConnection( InetAddress.getByName( graylogHost ), graylogPort );
       }
       catch ( UnknownHostException e )
       {
