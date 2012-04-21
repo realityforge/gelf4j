@@ -155,7 +155,7 @@ final class GelfEncoder
    */
   public byte[] create( final byte[] messageId, final byte seqNum, final byte numChunks, final byte[] subPayload )
   {
-    return concatArrays( concatArrays( concatArrays( CHUNKED_GELF_ID, messageId ), getSeqNumbers( seqNum, numChunks ) ), subPayload );
+    return concatArrays( concatArrays( concatArrays( CHUNKED_GELF_ID, messageId ), new byte[]{ seqNum, numChunks } ), subPayload );
   }
 
   /**
@@ -179,10 +179,6 @@ final class GelfEncoder
    * @param numChunks The number of chunks that will be sent
    * @return An array of sequence numbers for each chunk.
    */
-  private byte[] getSeqNumbers( final byte seqNum, final byte numChunks )
-  {
-    return new byte[]{ seqNum, numChunks };
-  }
 
   /**
    * zips up a string into a GZIP format.
