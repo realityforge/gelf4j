@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.simple.JSONValue;
 
 /**
  * Configuration about how to create GELF messages in a particular logging framework.
@@ -13,6 +14,7 @@ public class GelfTargetConfig
   public static final String FIELD_THREAD_NAME = "threadName";
   public static final String FIELD_TIMESTAMP_MS = "timestampMs";
   public static final String FIELD_LOGGER_NAME = "loggerName";
+  public static final String FIELD_EXCEPTION = "exception";
 
   private String _host = "localhost";
   private int _port = GelfConnection.DEFAULT_PORT;
@@ -20,7 +22,7 @@ public class GelfTargetConfig
   private String _originHost;
   private String _facility;
   private final Map<String, String> _additionalData = new HashMap<String, String>();
-  private final Map<String, String> _additionalFields = new HashMap<String, String>();
+  private final Map<String, String> _additionalFields;
 
   public GelfTargetConfig()
   {
@@ -32,6 +34,8 @@ public class GelfTargetConfig
     {
       //ignore
     }
+    _additionalFields = new HashMap<String, String>();
+    _additionalFields.put( FIELD_EXCEPTION, FIELD_EXCEPTION );
   }
 
   public String getOriginHost()
@@ -80,11 +84,22 @@ public class GelfTargetConfig
    * 
    * <p>There are some common fields recognized by multiple frameworks (See FIELD_* constants) but in most cases
    * this will result in access to data such as Mapped Diagnostic Contexts (MDC) in Log4j and Logback</p>
-   * 
    */
   public Map<String, String> getAdditionalFields()
   {
     return _additionalFields;
+  }
+
+  public void setAdditionalFields( final String additionalFields )
+  {
+    _additionalFields.clear();
+    _additionalFields.putAll( parseJsonObject( additionalFields ) );
+  }
+
+  @SuppressWarnings( "unchecked" )
+  private Map<String, String> parseJsonObject( final String additionalFields )
+  {
+    return (Map<String, String>) JSONValue.parse( additionalFields.replaceAll( "'", "\"" ) );
   }
 
   /**
