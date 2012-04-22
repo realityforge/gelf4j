@@ -3,7 +3,6 @@ package gelf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.List;
 
@@ -12,19 +11,40 @@ import java.util.List;
  */
 public class GelfConnection
 {
-  public static final int DEFAULT_PORT = 12201;
+  private static final int MAX_SHORT_MESSAGE_LENGTH = 250;
+
+  private final GelfTargetConfig _config;
   private final GelfEncoder _encoder;
-  private final InetAddress _address;
-  private final int _port;
   private DatagramSocket _socket;
 
-  public GelfConnection( final InetAddress address,
-                         final int port )
+  public GelfConnection( final GelfTargetConfig config )
     throws Exception
   {
-    _port = port;
-    _address = address;
+    _config = config;
     _encoder = new GelfEncoder();
+  }
+
+  public void close()
+  {
+    if( null != _socket )
+    {
+      _socket.close();
+      _socket = null;
+    }
+  }
+
+  public GelfMessage newMessage( final SyslogLevel level,
+                                 final String message,
+                                 final long timestamp )
+  {
+    final GelfMessage gelfMessage = new GelfMessage();
+    gelfMessage.setHostname( _config.getOriginHost() );
+    gelfMessage.setFacility( _config.getFacility() );
+    gelfMessage.setJavaTimestamp( timestamp );
+    gelfMessage.setLevel( level );
+    gelfMessage.setFullMessage( message );
+    gelfMessage.setShortMessage( truncateShortMessage( message ) );
+    return gelfMessage;
   }
 
   /**
@@ -35,6 +55,7 @@ public class GelfConnection
    */
   public boolean send( final GelfMessage message )
   {
+    message.getAdditionalFields().putAll( _config.getAdditionalData() );
     final List<byte[]> packets = _encoder.encode( message );
     // Note: Returning false when encoding fails for whatever reason
     return null != packets && send( packets );
@@ -46,11 +67,11 @@ public class GelfConnection
    * @param packets The packets to send over the wire
    * @return false if sending failed
    */
-  public boolean send( final List<byte[]> packets )
+  private boolean send( final List<byte[]> packets )
   {
     for( final byte[] packet : packets )
     {
-      if( !sendPacket( new DatagramPacket( packet, packet.length, _address, _port ) ) )
+      if( !sendPacket( new DatagramPacket( packet, packet.length, _config.getHostAddress(), _config.getPort() ) ) )
       {
         return false;
       }
@@ -87,12 +108,17 @@ public class GelfConnection
     }
   }
 
-  public void close()
+  private static String truncateShortMessage( final String message )
   {
-    if( null != _socket )
+    final String shortMessage;
+    if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
     {
-      _socket.close();
-      _socket = null;
+      shortMessage = message.substring( 0, MAX_SHORT_MESSAGE_LENGTH - 1 );
     }
+    else
+    {
+      shortMessage = message;
+    }
+    return shortMessage;
   }
 }

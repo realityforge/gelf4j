@@ -101,9 +101,7 @@ public class GelfAppender
   @Override
   protected void append( LoggingEvent event )
   {
-    GelfMessage gelfMessage = makeMessage( event );
-
-    if( _connection == null || !_connection.send( gelfMessage ) )
+    if( _connection == null || !_connection.send( makeMessage( event ) ) )
     {
       errorHandler.error( "Could not send GELF message" );
     }
@@ -137,7 +135,7 @@ public class GelfAppender
     final String renderedMessage = event.getRenderedMessage();
     final SyslogLevel level = SyslogLevel.values()[ event.getLevel().getSyslogEquivalent() ];
     final GelfMessage message =
-      GelfMessageUtil.newMessage( _config, level, renderedMessage == null ? "" : renderedMessage, timestamp );
+      _connection.newMessage( level, renderedMessage == null ? "" : renderedMessage, timestamp );
     if( null != lineNumber )
     {
       message.setLine( lineNumber );

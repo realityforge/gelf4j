@@ -2,8 +2,8 @@ package gelf4j.log4j;
 
 import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
+import gelf4j.GelfTargetConfig;
 import java.lang.reflect.Field;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import org.apache.log4j.Category;
@@ -115,7 +115,7 @@ public class GelfAppenderTest {
         private GelfMessage lastMessage;
 
         public TestGelfSender() throws Exception {
-            super( InetAddress.getLocalHost(), GelfConnection.DEFAULT_PORT);
+            super( new GelfTargetConfig() );
         }
 
       @Override

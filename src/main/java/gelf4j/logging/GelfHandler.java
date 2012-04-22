@@ -128,7 +128,7 @@ public class GelfHandler
   {
     final String renderedMessage = record.getMessage();
     final SyslogLevel level = levelToSyslogLevel( record.getLevel() );
-    final GelfMessage message = GelfMessageUtil.newMessage( _config, level, renderedMessage, record.getMillis() );
+    final GelfMessage message = _connection.newMessage( level, renderedMessage, record.getMillis() );
 
     for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
     {

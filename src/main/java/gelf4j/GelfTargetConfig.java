@@ -17,7 +17,9 @@ public class GelfTargetConfig
   public static final String FIELD_EXCEPTION = "exception";
 
   private String _host = "localhost";
-  private int _port = GelfConnection.DEFAULT_PORT;
+  private InetAddress _hostAddress;
+  public static final int DEFAULT_PORT = 12201;
+  private int _port = DEFAULT_PORT;
 
   private String _originHost;
   private String _facility;
@@ -66,9 +68,26 @@ public class GelfTargetConfig
     return _host;
   }
 
+  public InetAddress getHostAddress()
+  {
+    if( null == _hostAddress && null != _host )
+    {
+      try
+      {
+        _hostAddress = InetAddress.getByName( _host );
+      }
+      catch( final UnknownHostException uhe )
+      {
+        //Ignored
+      }
+    }
+    return _hostAddress;
+  }
+
   public void setHost( final String host )
   {
     _host = host;
+    _hostAddress = null;
   }
 
   public int getPort()
@@ -86,11 +105,7 @@ public class GelfTargetConfig
   {
     try
     {
-      return new GelfConnection( InetAddress.getByName( getHost() ), getPort() );
-    }
-    catch( final UnknownHostException uhe )
-    {
-      throw new Exception( "Unknown GELF host " + getHost(), uhe );
+      return new GelfConnection( this );
     }
     catch( final Exception e )
     {

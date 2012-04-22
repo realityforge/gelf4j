@@ -7,7 +7,6 @@ import ch.qos.logback.classic.util.LevelToSyslogSeverity;
 import ch.qos.logback.core.AppenderBase;
 import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
-import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
 import java.util.Map;
@@ -128,7 +127,7 @@ public class GelfAppender<E> extends AppenderBase<E>
 
     final String formattedMessage = event.getFormattedMessage();
     final SyslogLevel level = SyslogLevel.values()[ LevelToSyslogSeverity.convert( event ) ];
-    final GelfMessage message = GelfMessageUtil.newMessage( _config, level, formattedMessage, event.getTimeStamp() );
+    final GelfMessage message = _connection.newMessage( level, formattedMessage, event.getTimeStamp() );
 
     final Map<String, String> mdc = event.getMDCPropertyMap();
     for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
