@@ -30,7 +30,7 @@ public class GelfTargetConfig
   {
     try
     {
-      _originHost = InetAddress.getLocalHost().getHostName();
+      _originHost = InetAddress.getLocalHost().getCanonicalHostName();
     }
     catch( final UnknownHostException uhe )
     {

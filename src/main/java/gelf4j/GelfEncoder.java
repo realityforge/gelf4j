@@ -41,7 +41,7 @@ public final class GelfEncoder
   public GelfEncoder()
     throws Exception
   {
-    this( MessageDigest.getInstance( "MD5" ), InetAddress.getLocalHost().getHostName() );
+    this( MessageDigest.getInstance( "MD5" ), InetAddress.getLocalHost().getCanonicalHostName() );
   }
 
   public GelfEncoder( final MessageDigest messageDigest, final String hostname )
