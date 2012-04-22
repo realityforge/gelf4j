@@ -2,11 +2,8 @@ package org.graylog2.log4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
 import org.apache.log4j.MDC;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LocationInfo;
@@ -79,15 +76,11 @@ public class GelfAppender
   {
     try
     {
-      _connection = new GelfConnection( InetAddress.getByName( _config.getHost() ), _config.getPort() );
+      _connection = _config.createConnection();
     }
-    catch( UnknownHostException e )
+    catch( final Exception e )
     {
-      errorHandler.error( "Unknown Graylog2 hostname:" + getGraylogHost(), e, ErrorCode.WRITE_FAILURE );
-    }
-    catch( Exception e )
-    {
-      errorHandler.error( "Socket exception", e, ErrorCode.WRITE_FAILURE );
+      errorHandler.error( "Error initialising gelf connection", e, ErrorCode.WRITE_FAILURE );
     }
   }
 
@@ -132,14 +125,10 @@ public class GelfAppender
       //ignore
     }
 
-    String renderedMessage = event.getRenderedMessage();
-    if( null == renderedMessage )
-    {
-      renderedMessage = "";
-    }
-
+    final String renderedMessage = event.getRenderedMessage();
     final SyslogLevel level = SyslogLevel.values()[ event.getLevel().getSyslogEquivalent() ];
-    final GelfMessage message = GelfMessageUtil.newMessage( _config, level, renderedMessage, timestamp );
+    final GelfMessage message =
+      GelfMessageUtil.newMessage( _config, level, renderedMessage == null ? "" : renderedMessage, timestamp );
     if( null != lineNumber )
     {
       message.setLine( lineNumber );

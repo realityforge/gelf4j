@@ -5,7 +5,6 @@ import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.util.LevelToSyslogSeverity;
 import ch.qos.logback.core.AppenderBase;
-import java.net.InetAddress;
 import java.util.Map;
 import org.graylog2.GelfConnection;
 import org.graylog2.GelfMessage;
@@ -48,7 +47,7 @@ public class GelfAppender<E> extends AppenderBase<E>
     super.start();
     try
     {
-      _connection = new GelfConnection( InetAddress.getByName( _config.getHost() ), _config.getPort() );
+      _connection = _config.createConnection();
     }
     catch( final Exception e )
     {

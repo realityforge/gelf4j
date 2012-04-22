@@ -1,7 +1,5 @@
 package org.graylog2.logging;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
@@ -103,15 +101,11 @@ public class GelfHandler
     {
       try
       {
-        _connection = new GelfConnection( InetAddress.getByName( _config.getHost() ), _config.getPort() );
-      }
-      catch( final UnknownHostException e )
-      {
-        reportError( "Unknown Graylog2 hostname:" + _config.getHost(), e, ErrorManager.WRITE_FAILURE );
+        _connection = _config.createConnection();
       }
       catch( final Exception e )
       {
-        reportError( "Socket exception", e, ErrorManager.WRITE_FAILURE );
+        reportError( "Error initialising gelf connection: " + e.getMessage(), e, ErrorManager.WRITE_FAILURE );
       }
     }
     if( null == _connection ||

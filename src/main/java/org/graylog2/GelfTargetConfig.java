@@ -78,6 +78,23 @@ public class GelfTargetConfig
     _port = port;
   }
 
+  public GelfConnection createConnection()
+    throws Exception
+  {
+    try
+    {
+      return new GelfConnection( InetAddress.getByName( getHost() ), getPort() );
+    }
+    catch( final UnknownHostException uhe )
+    {
+      throw new Exception( "Unknown GELF host " + getHost(), uhe );
+    }
+    catch( final Exception e )
+    {
+      throw new Exception( "Error connecting to GELF host " + getHost() + " on port " + getPort(), e );
+    }
+  }
+
   /**
    * Additional fields to add to the gelf message. The keys correspond to a symbol recognized by the underlying log
    * system and the value represents the key under which the value will be added to the GELF message.
