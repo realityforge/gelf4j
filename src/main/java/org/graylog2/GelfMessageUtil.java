@@ -14,6 +14,21 @@ public final class GelfMessageUtil
   {
   }
 
+  public static GelfMessage newMessage( final GelfTargetConfig config,
+                                        final SyslogLevel level,
+                                        final String message,
+                                        final long timestamp )
+  {
+    final GelfMessage gelfMessage = new GelfMessage();
+    gelfMessage.setHostname( config.getOriginHost() );
+    gelfMessage.setFacility( config.getFacility() );
+    gelfMessage.setJavaTimestamp( timestamp );
+    gelfMessage.setLevel( level );
+    gelfMessage.setFullMessage( message );
+    gelfMessage.setShortMessage( truncateShortMessage( message ) );
+    return gelfMessage;
+  }
+
   public static String extractStacktrace( final Throwable throwable )
   {
     StringWriter sw = new StringWriter();
@@ -25,7 +40,7 @@ public final class GelfMessageUtil
   public static String truncateShortMessage( final String message )
   {
     final String shortMessage;
-    if ( message.length() > MAX_SHORT_MESSAGE_LENGTH )
+    if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
     {
       shortMessage = message.substring( 0, MAX_SHORT_MESSAGE_LENGTH - 1 );
     }

@@ -18,10 +18,12 @@ import org.graylog2.SyslogLevel;
 public class GelfHandler
   extends Handler
 {
+  public static final String FIELD_SOURCE_CLASS_NAME = "SourceClassName";
+  public static final String FIELD_SOURCE_METHOD_NAME = "SourceMethodName";
+
   private final GelfTargetConfig _config = new GelfTargetConfig();
 
   private GelfConnection _connection;
-  private boolean extractStacktrace;
 
   public GelfHandler()
   {
@@ -38,7 +40,6 @@ public class GelfHandler
     {
       _config.setPort( Integer.parseInt( port ) );
     }
-    extractStacktrace = "true".equalsIgnoreCase( manager.getProperty( prefix + ".extractStacktrace" ) );
     int fieldNumber = 0;
     while( true )
     {
@@ -132,60 +133,66 @@ public class GelfHandler
 
   private GelfMessage makeMessage( final LogRecord record )
   {
-    String renderedMessage = record.getMessage();
+    final String renderedMessage = record.getMessage();
+    final SyslogLevel level = levelToSyslogLevel( record.getLevel() );
+    final GelfMessage message = GelfMessageUtil.newMessage( _config, level, renderedMessage, record.getMillis() );
 
-    final String shortMessage = GelfMessageUtil.truncateShortMessage( renderedMessage );
-
-    if( extractStacktrace )
+    for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
     {
-      final Throwable thrown = record.getThrown();
-      if( null != thrown )
+      final String fieldName = entry.getKey();
+      final String key = entry.getKey();
+      if( GelfTargetConfig.FIELD_LOGGER_NAME.equals( fieldName ) )
       {
-        renderedMessage += "\n\r" + GelfMessageUtil.extractStacktrace( thrown );
+        message.getAdditionalFields().put( key, record.getLoggerName() );
       }
-    }
-
-    final GelfMessage message = new GelfMessage();
-    message.setHostname( _config.getOriginHost() );
-    message.setShortMessage( shortMessage );
-    message.setFullMessage( renderedMessage );
-    message.setJavaTimestamp( record.getMillis() );
-    message.setLevel( SyslogLevel.values()[ levelToSyslogLevel( record.getLevel() ) ] );
-    message.getAdditionalFields().put( "SourceClassName", record.getSourceClassName() );
-
-    message.getAdditionalFields().put( "SourceMethodName", record.getSourceMethodName() );
-
-    message.setFacility( _config.getFacility() );
-
-    for( final Map.Entry<String, String> entry : _config.getAdditionalData().entrySet() )
-    {
-      message.getAdditionalFields().put( entry.getKey(), entry.getValue() );
+      else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, record.getThreadID() );
+      }
+      else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, message.getJavaTimestamp() );
+      }
+      else if( GelfTargetConfig.FIELD_EXCEPTION.equals( fieldName ) )
+      {
+        final Throwable throwable = record.getThrown();
+        if( null != throwable )
+        {
+          message.getAdditionalFields().put( key, GelfMessageUtil.extractStacktrace( throwable ) );
+        }
+      }
+      else if( FIELD_SOURCE_CLASS_NAME.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, record.getSourceClassName() );
+      }
+      else if( FIELD_SOURCE_METHOD_NAME.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, record.getSourceMethodName() );
+      }
     }
     message.getAdditionalFields().putAll( _config.getAdditionalData() );
 
     return message;
   }
 
-  private int levelToSyslogLevel( final Level level )
+  private SyslogLevel levelToSyslogLevel( final Level level )
   {
-    final int syslogLevel;
-    if( level == Level.SEVERE )
+    if( Level.SEVERE == level )
     {
-      syslogLevel = 3;
+      return SyslogLevel.ERR;
     }
-    else if( level == Level.WARNING )
+    else if( Level.WARNING == level )
     {
-      syslogLevel = 4;
+      return SyslogLevel.WARNING;
     }
-    else if( level == Level.INFO )
+    else if( Level.INFO == level )
     {
-      syslogLevel = 6;
+      return SyslogLevel.INFO;
     }
     else
     {
-      syslogLevel = 7;
+      return SyslogLevel.DEBUG;
     }
-    return syslogLevel;
   }
 
 }

@@ -17,7 +17,6 @@ import org.graylog2.GelfMessage;
 import org.graylog2.GelfMessageUtil;
 import org.graylog2.GelfTargetConfig;
 import org.graylog2.SyslogLevel;
-import org.json.simple.JSONValue;
 
 /**
  * @author Anton Yakimov
@@ -31,15 +30,13 @@ public class GelfAppender
   private static boolean hasGetTimeStamp = true;
   private static Method methodGetTimeStamp = null;
 
-
   private final GelfTargetConfig _config = new GelfTargetConfig();
 
   private GelfConnection _connection;
-  private boolean _extractStacktrace;
 
-  public void setAdditionalFields( String additionalFields )
+  public void setAdditionalFields( final String additionalFields )
   {
-    _config.getAdditionalFields().putAll( (Map<String, String>) JSONValue.parse( additionalFields.replaceAll( "'", "\"" ) ) );
+    _config.setAdditionalFields( additionalFields );
   }
 
   public int getGraylogPort()
@@ -70,16 +67,6 @@ public class GelfAppender
   public void setFacility( String facility )
   {
     _config.setFacility( facility );
-  }
-
-  public boolean isExtractStacktrace()
-  {
-    return _extractStacktrace;
-  }
-
-  public void setExtractStacktrace( boolean extractStacktrace )
-  {
-    this._extractStacktrace = extractStacktrace;
   }
 
   public Map<String, String> getFields()
@@ -127,8 +114,7 @@ public class GelfAppender
 
   private GelfMessage makeMessage( LoggingEvent event )
   {
-    long timeStamp = getTimeStamp( event );
-    Level level = event.getLevel();
+    long timestamp = getTimeStamp( event );
 
     LocationInfo locationInformation = event.getLocationInformation();
     String file = locationInformation.getFileName();
@@ -147,28 +133,13 @@ public class GelfAppender
     }
 
     String renderedMessage = event.getRenderedMessage();
-    if( renderedMessage == null )
+    if( null == renderedMessage )
     {
       renderedMessage = "";
     }
 
-    final String shortMessage = GelfMessageUtil.truncateShortMessage( renderedMessage );
-
-    if( isExtractStacktrace() )
-    {
-      ThrowableInformation throwableInformation = event.getThrowableInformation();
-      if( throwableInformation != null )
-      {
-        renderedMessage += "\n\r" + GelfMessageUtil.extractStacktrace( throwableInformation.getThrowable() );
-      }
-    }
-
-    final GelfMessage message = new GelfMessage();
-    message.setHostname( _config.getOriginHost() );
-    message.setShortMessage( shortMessage );
-    message.setFullMessage( renderedMessage );
-    message.setJavaTimestamp( timeStamp );
-    message.setLevel( SyslogLevel.values()[ level.getSyslogEquivalent() ] );
+    final SyslogLevel level = SyslogLevel.values()[ event.getLevel().getSyslogEquivalent() ];
+    final GelfMessage message = GelfMessageUtil.newMessage( _config, level, renderedMessage, timestamp );
     if( null != lineNumber )
     {
       message.setLine( lineNumber );
@@ -194,6 +165,14 @@ public class GelfAppender
       else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
       {
         message.getAdditionalFields().put( key, message.getJavaTimestamp() );
+      }
+      else if( GelfTargetConfig.FIELD_EXCEPTION.equals( fieldName ) )
+      {
+        final ThrowableInformation throwable = event.getThrowableInformation();
+        if( null != throwable )
+        {
+          message.getAdditionalFields().put( key, GelfMessageUtil.extractStacktrace( throwable.getThrowable() ) );
+        }
       }
       else if( FIELD_LOGGER_NDC.equals( fieldName ) )
       {

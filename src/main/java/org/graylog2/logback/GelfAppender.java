@@ -141,28 +141,9 @@ public class GelfAppender<E> extends AppenderBase<E>
   {
     final ILoggingEvent event = (ILoggingEvent) logEvent;
 
-    final GelfMessage message = new GelfMessage();
-    message.setHostname( _config.getOriginHost() );
-    message.setFacility( _config.getFacility() );
-    message.setJavaTimestamp( event.getTimeStamp() );
-    message.setLevel( SyslogLevel.values()[ LevelToSyslogSeverity.convert( event ) ] );
-
     final String formattedMessage = event.getFormattedMessage();
-
-    // Format up the stack trace
-    final IThrowableProxy proxy = event.getThrowableProxy();
-    if( null != proxy )
-    {
-      final String messageHead = formattedMessage + "\n " + proxy.getClassName() + ": " + proxy.getMessage();
-      final String fullMessage = messageHead + "\n" + toStackTraceString( proxy.getStackTraceElementProxyArray() );
-      message.setFullMessage( fullMessage );
-      message.setShortMessage( GelfMessageUtil.truncateShortMessage( messageHead ) );
-    }
-    else
-    {
-      message.setFullMessage( formattedMessage );
-      message.setShortMessage( GelfMessageUtil.truncateShortMessage( formattedMessage ) );
-    }
+    final SyslogLevel level = SyslogLevel.values()[ LevelToSyslogSeverity.convert( event ) ];
+    final GelfMessage message = GelfMessageUtil.newMessage( _config, level, formattedMessage, event.getTimeStamp() );
 
     final Map<String, String> mdc = event.getMDCPropertyMap();
     for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
@@ -181,6 +162,14 @@ public class GelfAppender<E> extends AppenderBase<E>
       {
         message.getAdditionalFields().put( key, message.getJavaTimestamp() );
       }
+      else if( GelfTargetConfig.FIELD_EXCEPTION.equals( fieldName ) )
+      {
+        final IThrowableProxy proxy = event.getThrowableProxy();
+        if( null != proxy )
+        {
+          message.getAdditionalFields().put( key, toStackTraceString( proxy.getStackTraceElementProxyArray() ) );
+        }
+      }
       else if( null != mdc )
       {
         final String value = mdc.get( key );
@@ -195,10 +184,10 @@ public class GelfAppender<E> extends AppenderBase<E>
     return message;
   }
 
-  private String toStackTraceString( StackTraceElementProxy[] elements )
+  private String toStackTraceString( final StackTraceElementProxy[] elements )
   {
-    StringBuilder str = new StringBuilder();
-    for( StackTraceElementProxy element : elements )
+    final StringBuilder str = new StringBuilder();
+    for( final StackTraceElementProxy element : elements )
     {
       str.append( element.getSTEAsString() );
     }
