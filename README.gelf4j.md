@@ -20,7 +20,7 @@ GelfAppender will use the log message as a short message and a stacktrace (if ex
 
 To use GELF Facility as appender in Log4j (XML configuration format):
 
-    <appender name="graylog2" class="org.graylog2.log.GelfAppender">
+    <appender name="graylog2" class="gelf4j.graylog2.log.GelfAppender">
         <param name="graylogHost" value="192.168.0.201"/>
         <param name="originHost" value="my.machine.example.com"/>
         <param name="extractStacktrace" value="true"/>
@@ -40,7 +40,7 @@ and then add it as a one of appenders:
 Or, in the log4j.properties format:
 
     # Define the graylog2 destination
-    log4j.appender.graylog2=org.graylog2.log.GelfAppender
+    log4j.appender.graylog2=gelf4j.graylog2.log.GelfAppender
     log4j.appender.graylog2.graylogHost=graylog2.example.com
     log4j.appender.graylog2.originHost=my.machine.example.com
     log4j.appender.graylog2.facility=gelf-java
@@ -70,19 +70,19 @@ Logging Handler
 
 Configured via properties as a standard Handler like
 
-  handlers = org.graylog2.logging.GelfHandler
+  handlers = gelf4j.logging.GelfHandler
 
   .level = ALL
 
-  org.graylog2.logging.GelfHandler.level = ALL
-  org.graylog2.logging.GelfHandler.graylogHost = syslog.example.com
-  #org.graylog2.logging.GelfHandler.graylogPort = 12201
-  #org.graylog2.logging.GelfHandler.extractStacktrace = true
-  #org.graylog2.logging.GelfHandler.additionalField.0 = foo=bah
-  #org.graylog2.logging.GelfHandler.additionalField.1 = foo2=bah2
-  #org.graylog2.logging.GelfHandler.facility = local0
+  gelf4j.logging.GelfHandler.level = ALL
+  gelf4j.logging.GelfHandler.graylogHost = syslog.example.com
+  #gelf4j.logging.GelfHandler.graylogPort = 12201
+  #gelf4j.logging.GelfHandler.extractStacktrace = true
+  #gelf4j.logging.GelfHandler.additionalField.0 = foo=bah
+  #gelf4j.logging.GelfHandler.additionalField.1 = foo2=bah2
+  #gelf4j.logging.GelfHandler.facility = local0
 
-  .handlers=org.graylog2.logging.GelfHandler
+  .handlers=gelf4j.logging.GelfHandler
 
 What is GELF
 ------------

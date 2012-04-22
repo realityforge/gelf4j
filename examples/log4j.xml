@@ -9,7 +9,7 @@
         </layout>
     </appender>
 
-    <appender name="graylog" class="org.graylog2.log4j.GelfAppender">
+    <appender name="graylog" class="gelf4j.log4j.GelfAppender">
         <param name="host" value="192.168.0.201"/>
         <param name="originHost" value="my.machine.example.com"/>
         <param name="additionalFields" value="{'environment': 'DEV', 'application': 'MyAPP'}"/>

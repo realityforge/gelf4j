@@ -1,5 +1,5 @@
 <configuration>
-  <appender name="GELF" class="org.graylog2.logback.GelfAppender">
+  <appender name="GELF" class="gelf4j.logback.GelfAppender">
     <facility>logback-gelf-test</facility>
     <host>localhost</host>
     <port>12201</port>

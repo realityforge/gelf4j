@@ -56,7 +56,7 @@ The following assumes you are using groovy for your logback configuration.
 
     /* src/main/resources/logback.groovy */
 
-    import org.graylog2.logback.GelfAppender
+    import gelf4j.logback.GelfAppender
     import static ch.qos.logback.classic.Level.DEBUG
 
     appender("GELF", GelfAppender) {
@@ -77,7 +77,7 @@ Or, if you're using logback.xml, here's the equivalent.
     /* src/main/resources/logback.xml */
 
     <configuration>
-        <appender name="GELF" class="org.graylog2.logback.GelfAppender">
+        <appender name="GELF" class="gelf4j.logback.GelfAppender">
             <facility>logback-gelf-test</facility>
             <graylog2ServerHost>localhost</graylog2ServerHost>
             <graylog2ServerPort>12201</graylog2ServerPort>
