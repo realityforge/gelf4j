@@ -37,7 +37,7 @@ public final class GelfMessageUtil
     return sw.toString();
   }
 
-  public static String truncateShortMessage( final String message )
+  private static String truncateShortMessage( final String message )
   {
     final String shortMessage;
     if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
