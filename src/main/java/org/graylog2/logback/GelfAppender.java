@@ -13,7 +13,7 @@ import org.graylog2.GelfTargetConfig;
 import org.graylog2.SyslogLevel;
 
 /**
- * Responsible for Formatting a log event and sending it to a Graylog2 Server. Note that you can't swap in a different
+ * Responsible for Formatting a log event and sending it to the Server. Note that you can't swap in a different
  * Layout since the GELF format is static.
  */
 public class GelfAppender<E> extends AppenderBase<E>
@@ -76,24 +76,24 @@ public class GelfAppender<E> extends AppenderBase<E>
     _config.setFacility( facility );
   }
 
-  public String getGraylog2ServerHost()
+  public String getHost()
   {
     return _config.getHost();
   }
 
-  public void setGraylog2ServerHost( final String graylog2ServerHost )
+  public void setHost( final String host )
   {
-    _config.setHost( graylog2ServerHost );
+    _config.setHost( host );
   }
 
-  public int getGraylog2ServerPort()
+  public int getPort()
   {
     return _config.getPort();
   }
 
-  public void setGraylog2ServerPort( final int graylog2ServerPort )
+  public void setPort( final int port )
   {
-    _config.setPort( graylog2ServerPort );
+    _config.setPort( port );
   }
 
   /**

@@ -36,24 +36,24 @@ public class GelfAppender
     _config.setAdditionalFields( additionalFields );
   }
 
-  public int getGraylogPort()
+  public int getPort()
   {
     return _config.getPort();
   }
 
-  public void setGraylogPort( int graylogPort )
+  public void setPort( final int port )
   {
-    _config.setPort( graylogPort );
+    _config.setPort( port );
   }
 
-  public String getGraylogHost()
+  public String getHost()
   {
     return _config.getHost();
   }
 
-  public void setGraylogHost( String graylogHost )
+  public void setHost( final String host )
   {
-    _config.setHost( graylogHost );
+    _config.setHost( host );
   }
 
   public String getFacility()
@@ -61,7 +61,7 @@ public class GelfAppender
     return _config.getFacility();
   }
 
-  public void setFacility( String facility )
+  public void setFacility( final String facility )
   {
     _config.setFacility( facility );
   }

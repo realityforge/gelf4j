@@ -28,12 +28,12 @@ public class GelfHandler
     final LogManager manager = LogManager.getLogManager();
     final String prefix = getClass().getName();
 
-    final String host = manager.getProperty( prefix + ".graylogHost" );
+    final String host = manager.getProperty( prefix + ".host" );
     if( null != host )
     {
       _config.setHost( host );
     }
-    final String port = manager.getProperty( prefix + ".graylogPort" );
+    final String port = manager.getProperty( prefix + ".port" );
     if( null != port )
     {
       _config.setPort( Integer.parseInt( port ) );

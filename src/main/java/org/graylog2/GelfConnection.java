@@ -8,7 +8,7 @@ import java.net.SocketException;
 import java.util.List;
 
 /**
- * Responsible for communicating with a graylog2 server
+ * Responsible for communicating with a GELF compliant server.
  */
 public class GelfConnection
 {
@@ -28,7 +28,7 @@ public class GelfConnection
   }
 
   /**
-   * Sends a single GELF message to the graylog2 server
+   * Sends a single GELF message to the server.
    *
    * @param message the GELF Message
    * @return false if sending failed
@@ -41,7 +41,7 @@ public class GelfConnection
   }
 
   /**
-   * Sends a bunch of GELF Chunks to the graylog2 server
+   * Sends a bunch of GELF Chunks to the server
    *
    * @param packets The packets to send over the wire
    * @return false if sending failed
