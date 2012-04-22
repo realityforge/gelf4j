@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * A set of utility methods for costructing the Gelf messages.
+ * A set of utility methods for constructing the Gelf messages.
  */
 public final class GelfMessageUtil
 {
