@@ -65,8 +65,6 @@ public class GelfAppenderTest {
     @Test
     public void handleMDC() {
 
-        gelfAppender.setAddExtendedInformation(true);
-
         LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, "", new RuntimeException("LOL"));
         MDC.put("foo", "bar");
 
@@ -79,8 +77,6 @@ public class GelfAppenderTest {
     @Test
     public void handleNDC() {
 
-        gelfAppender.setAddExtendedInformation(true);
-
         LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, "", new RuntimeException("LOL"));
         NDC.push("Foobar");
 
@@ -91,8 +87,6 @@ public class GelfAppenderTest {
 
     @Test
     public void disableExtendedInformation() {
-
-        gelfAppender.setAddExtendedInformation(false);
 
         LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, "", new RuntimeException("LOL"));
 
@@ -107,8 +101,6 @@ public class GelfAppenderTest {
 
     @Test
     public void checkExtendedInformation() throws UnknownHostException, SocketException {
-
-        gelfAppender.setAddExtendedInformation(true);
 
         LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(GelfAppenderTest.class), 123L, Priority.INFO, "Das Auto", new RuntimeException("LOL"));
 
