@@ -21,7 +21,7 @@ public class GelfTargetConfig
 
   private String _originHost;
   private String _facility;
-  private final Map<String, String> _additionalData = new HashMap<String, String>();
+  private final Map<String, Object> _additionalData = new HashMap<String, Object>();
   private final Map<String, String> _additionalFields;
 
   public GelfTargetConfig()
@@ -96,11 +96,12 @@ public class GelfTargetConfig
   }
 
   /**
-   * Additional fields to add to the gelf message. The keys correspond to a symbol recognized by the underlying log
-   * system and the value represents the key under which the value will be added to the GELF message.
+   * Additional fields to add to the gelf message. The keys are the key in the GELF message and the value corresponds
+   * to a symbol recognized by the underlying log system.
    * 
    * <p>There are some common fields recognized by multiple frameworks (See FIELD_* constants) but in most cases
-   * this will result in access to data such as Mapped Diagnostic Contexts (MDC) in Log4j and Logback</p>
+   * this will result in access to application specific data such as Mapped Diagnostic Contexts (MDC) in Log4j and
+   * Logback.</p>
    */
   public Map<String, String> getAdditionalFields()
   {
@@ -110,20 +111,58 @@ public class GelfTargetConfig
   public void setAdditionalFields( final String additionalFields )
   {
     _additionalFields.clear();
-    _additionalFields.putAll( parseJsonObject( additionalFields ) );
+    for( Map.Entry<String, Object> entry : parseJsonObject( additionalFields ).entrySet() )
+    {
+      _additionalFields.put( entry.getKey(), String.valueOf( entry.getValue() ) );
+    }
   }
 
-  @SuppressWarnings( "unchecked" )
-  private Map<String, String> parseJsonObject( final String additionalFields )
+  /**
+   * Add an additional field. The format is mostly of use for logback configurator.
+   *
+   * @param fieldSpec This must be in format key=value where key is the GELF field, and value is symbolic key. e.g "ip_address=ipAddress"
+   */
+  public void addAdditionalField( final String fieldSpec )
   {
-    return (Map<String, String>) JSONValue.parse( additionalFields.replaceAll( "'", "\"" ) );
+    final String[] field = parseField( fieldSpec );
+    getAdditionalFields().put( field[0], field[1] );
   }
 
   /**
    * @return the set of data fields that will be added to the GELF message.
    */
-  public Map<String, String> getAdditionalData()
+  public Map<String, Object> getAdditionalData()
   {
     return _additionalData;
+  }
+
+  public void setAdditionalData( final String additionalData )
+  {
+    _additionalData.clear();
+    _additionalData.putAll( parseJsonObject( additionalData ) );
+  }
+
+  public void addAdditionalData( final String fieldSpec )
+  {
+    final String[] field = parseField( fieldSpec );
+    getAdditionalData().put( field[0], field[1] );
+  }
+
+  @SuppressWarnings( "unchecked" )
+  private Map<String, Object> parseJsonObject( final String additionalFields )
+  {
+    return (Map<String, Object>) JSONValue.parse( additionalFields.replaceAll( "'", "\"" ) );
+  }
+
+  private String[] parseField( final String fieldSpec )
+  {
+    final int index = fieldSpec.indexOf( "=" );
+    if( -1 == index )
+    {
+      throw new IllegalArgumentException( "Expected value to be of form a=b but found '" + fieldSpec + "' instead." );
+    }
+    final String key = fieldSpec.substring( 0, index );
+    final String value = fieldSpec.substring( index + 1 );
+    return new String[]{ key, value };
   }
 }

@@ -20,7 +20,6 @@ public class GelfHandler
   public static final String FIELD_SOURCE_METHOD_NAME = "SourceMethodName";
 
   private final GelfTargetConfig _config = new GelfTargetConfig();
-
   private GelfConnection _connection;
 
   public GelfHandler()
@@ -86,6 +85,16 @@ public class GelfHandler
   }
 
   @Override
+  public void close()
+  {
+    if( null != _connection )
+    {
+      _connection.close();
+      _connection = null;
+    }
+  }
+
+  @Override
   public synchronized void flush()
   {
   }
@@ -112,16 +121,6 @@ public class GelfHandler
         !_connection.send( makeMessage( record ) ) )
     {
       reportError( "Could not send GELF message", null, ErrorManager.WRITE_FAILURE );
-    }
-  }
-
-  @Override
-  public void close()
-  {
-    if( null != _connection )
-    {
-      _connection.close();
-      _connection = null;
     }
   }
 

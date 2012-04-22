@@ -28,12 +28,16 @@ public class GelfAppender
   private static Method methodGetTimeStamp = null;
 
   private final GelfTargetConfig _config = new GelfTargetConfig();
-
   private GelfConnection _connection;
 
-  public void setAdditionalFields( final String additionalFields )
+  public String getOriginHost()
   {
-    _config.setAdditionalFields( additionalFields );
+    return _config.getOriginHost();
+  }
+
+  public void setOriginHost( final String originHost )
+  {
+    _config.setOriginHost( originHost );
   }
 
   public int getPort()
@@ -66,9 +70,24 @@ public class GelfAppender
     _config.setFacility( facility );
   }
 
-  public Map<String, String> getFields()
+  public void setAdditionalFields( final String additionalFields )
   {
-    return _config.getAdditionalFields();
+    _config.setAdditionalFields( additionalFields );
+  }
+
+  public void addAdditionalField( final String fieldSpec )
+  {
+    _config.addAdditionalField( fieldSpec );
+  }
+
+  public void setAdditionalData( final String additionalData )
+  {
+    _config.setAdditionalData( additionalData );
+  }
+
+  public void addAdditionalData( final String fieldSpec )
+  {
+    _config.addAdditionalData( fieldSpec );
   }
 
   @Override
@@ -84,6 +103,11 @@ public class GelfAppender
     }
   }
 
+  public void close()
+  {
+    _connection.close();
+  }
+
   @Override
   protected void append( LoggingEvent event )
   {
@@ -93,11 +117,6 @@ public class GelfAppender
     {
       errorHandler.error( "Could not send GELF message" );
     }
-  }
-
-  public void close()
-  {
-    _connection.close();
   }
 
   public boolean requiresLayout()

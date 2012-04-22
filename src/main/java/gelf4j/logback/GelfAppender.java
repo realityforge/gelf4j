@@ -21,24 +21,64 @@ public class GelfAppender<E> extends AppenderBase<E>
   private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
 
-  /**
-   * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
-   * to the log server
-   *
-   * @param logEvent The event that we are logging
-   */
-  @Override
-  protected void append( final E logEvent )
+  public String getOriginHost()
   {
-    try
-    {
-      _connection.send( toGelf( logEvent ) );
-    }
-    catch( RuntimeException e )
-    {
-      addError( "Error occurred: ", e );
-      throw e;
-    }
+    return _config.getOriginHost();
+  }
+
+  public void setOriginHost( final String originHost )
+  {
+    _config.setOriginHost( originHost );
+  }
+
+  public int getPort()
+  {
+    return _config.getPort();
+  }
+
+  public void setPort( final int port )
+  {
+    _config.setPort( port );
+  }
+
+  public String getHost()
+  {
+    return _config.getHost();
+  }
+
+  public void setHost( final String host )
+  {
+    _config.setHost( host );
+  }
+
+  public String getFacility()
+  {
+    return _config.getFacility();
+  }
+
+  public void setFacility( final String facility )
+  {
+    _config.setFacility( facility );
+  }
+
+  public void setAdditionalFields( final String additionalFields )
+  {
+    _config.setAdditionalFields( additionalFields );
+  }
+
+  public void addAdditionalField( final String fieldSpec )
+  {
+    _config.addAdditionalField( fieldSpec );
+  }
+
+  public void setAdditionalData( final String additionalData )
+  {
+    _config.setAdditionalData( additionalData );
+  }
+
+  public void addAdditionalData( final String fieldSpec )
+  {
+    _config.addAdditionalData( fieldSpec );
   }
 
   @Override
@@ -66,68 +106,24 @@ public class GelfAppender<E> extends AppenderBase<E>
     super.stop();
   }
 
-  public String getFacility()
-  {
-    return _config.getFacility();
-  }
-
-  public void setFacility( final String facility )
-  {
-    _config.setFacility( facility );
-  }
-
-  public String getHost()
-  {
-    return _config.getHost();
-  }
-
-  public void setHost( final String host )
-  {
-    _config.setHost( host );
-  }
-
-  public int getPort()
-  {
-    return _config.getPort();
-  }
-
-  public void setPort( final int port )
-  {
-    _config.setPort( port );
-  }
-
   /**
-   * additional fields to add to the gelf message. Here's how these work: <br/> Let's take an example. I want to log
-   * the client's ip address of every request that comes into my web server. To do this, I add the ipaddress to the
-   * slf4j MDC on each request as follows: <code> ... MDC.put("ipAddress", "44.556.345.657"); ... </code> Now, to
-   * include the ip address in the gelf message, i just add the following to my logback.groovy: <code>
-   * appender("GELF", GelfAppender) { ... additionalFields = [identity:"_identity"] ... } </code> in the
-   * additionalFields map, the key is the name of the MDC to look up. the value is the name that should be given to
-   * the key in the additional field in the gelf message.
-   */
-  public Map<String, String> getAdditionalFields()
-  {
-    return _config.getAdditionalFields();
-  }
-
-  /**
-   * Add an additional field. This is mainly here for compatibility with logback.xml
+   * The main append method. Takes the event that is being logged, formats if for GELF and then sends it over the wire
+   * to the log server
    *
-   * @param keyValue This must be in format key:value where key is the MDC key, and value is the GELF field
-   *                 name. e.g "ipAddress:_ip_address"
+   * @param logEvent The event that we are logging
    */
-  public void addAdditionalField( final String keyValue )
+  @Override
+  protected void append( final E logEvent )
   {
-    final String[] splitted = keyValue.split( ":" );
-
-    if( splitted.length != 2 )
+    try
     {
-
-      throw new IllegalArgumentException( "additionalField must be of the format key:value, where key is the MDC "
-                                          + "key, and value is the GELF field name. But found '" + keyValue + "' instead." );
+      _connection.send( toGelf( logEvent ) );
     }
-
-    _config.getAdditionalFields().put( splitted[ 0 ], splitted[ 1 ] );
+    catch( RuntimeException e )
+    {
+      addError( "Error occurred: ", e );
+      throw e;
+    }
   }
 
   /**
