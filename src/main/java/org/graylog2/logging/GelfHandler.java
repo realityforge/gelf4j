@@ -188,5 +188,4 @@ public class GelfHandler
       return SyslogLevel.DEBUG;
     }
   }
-
 }
