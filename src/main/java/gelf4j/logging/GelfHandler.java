@@ -37,22 +37,22 @@ public class GelfHandler
     {
       _config.setPort( Integer.parseInt( port ) );
     }
-    int fieldNumber = 0;
-    while( true )
+    final String originHost = manager.getProperty( prefix + ".originHost" );
+    if( null != originHost )
     {
-      final String property = manager.getProperty( prefix + ".additionalField." + fieldNumber );
-      if( null == property )
-      {
-        break;
-      }
-      final int index = property.indexOf( '=' );
-      if( -1 != index )
-      {
-        _config.getAdditionalFields().put( property.substring( 0, index ), property.substring( index + 1 ) );
-      }
-
-      fieldNumber++;
+      _config.setOriginHost( originHost );
     }
+    final String additionalFields = manager.getProperty( prefix + ".additionalFields" );
+    if( null != additionalFields )
+    {
+      _config.setAdditionalFields( additionalFields );
+    }
+    final String additionalData = manager.getProperty( prefix + ".additionalData" );
+    if( null != additionalData )
+    {
+      _config.setAdditionalData( additionalData );
+    }
+
     final String facility = manager.getProperty( prefix + ".facility" );
     if( null != facility )
     {
