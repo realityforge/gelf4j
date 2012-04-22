@@ -12,7 +12,8 @@
     <appender name="graylog" class="gelf4j.log4j.GelfAppender">
         <param name="host" value="192.168.0.201"/>
         <param name="originHost" value="my.machine.example.com"/>
-        <param name="additionalFields" value="{'environment': 'DEV', 'application': 'MyAPP'}"/>
+        <param name="additionalData" value='{"environment": "DEV", "application": "MyAPP"}'/>
+        <param name="additionalData" value='{"threadName": "threadName", "timestamp_in_millis": "timestampMs", "logger_name": "loggerName", "exception": "exception"}'/>
         <param name="Facility" value="USER"/>
         <param name="Threshold" value="INFO"/>
     </appender>

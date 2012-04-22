@@ -75,19 +75,9 @@ public class GelfAppender
     _config.setAdditionalFields( additionalFields );
   }
 
-  public void addAdditionalField( final String fieldSpec )
-  {
-    _config.addAdditionalField( fieldSpec );
-  }
-
   public void setAdditionalData( final String additionalData )
   {
     _config.setAdditionalData( additionalData );
-  }
-
-  public void addAdditionalData( final String fieldSpec )
-  {
-    _config.addAdditionalData( fieldSpec );
   }
 
   @Override

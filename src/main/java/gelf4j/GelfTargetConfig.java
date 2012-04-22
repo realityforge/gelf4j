@@ -36,6 +36,9 @@ public class GelfTargetConfig
     }
     _additionalFields = new HashMap<String, String>();
     _additionalFields.put( FIELD_EXCEPTION, FIELD_EXCEPTION );
+    _additionalFields.put( FIELD_THREAD_NAME, FIELD_THREAD_NAME );
+    _additionalFields.put( FIELD_LOGGER_NAME, FIELD_LOGGER_NAME );
+    _additionalFields.put( FIELD_TIMESTAMP_MS, FIELD_TIMESTAMP_MS );
   }
 
   public String getOriginHost()
@@ -118,17 +121,6 @@ public class GelfTargetConfig
   }
 
   /**
-   * Add an additional field. The format is mostly of use for logback configurator.
-   *
-   * @param fieldSpec This must be in format key=value where key is the GELF field, and value is symbolic key. e.g "ip_address=ipAddress"
-   */
-  public void addAdditionalField( final String fieldSpec )
-  {
-    final String[] field = parseField( fieldSpec );
-    getAdditionalFields().put( field[0], field[1] );
-  }
-
-  /**
    * @return the set of data fields that will be added to the GELF message.
    */
   public Map<String, Object> getAdditionalData()
@@ -142,27 +134,9 @@ public class GelfTargetConfig
     _additionalData.putAll( parseJsonObject( additionalData ) );
   }
 
-  public void addAdditionalData( final String fieldSpec )
-  {
-    final String[] field = parseField( fieldSpec );
-    getAdditionalData().put( field[0], field[1] );
-  }
-
   @SuppressWarnings( "unchecked" )
   private Map<String, Object> parseJsonObject( final String additionalFields )
   {
-    return (Map<String, Object>) JSONValue.parse( additionalFields.replaceAll( "'", "\"" ) );
-  }
-
-  private String[] parseField( final String fieldSpec )
-  {
-    final int index = fieldSpec.indexOf( "=" );
-    if( -1 == index )
-    {
-      throw new IllegalArgumentException( "Expected value to be of form a=b but found '" + fieldSpec + "' instead." );
-    }
-    final String key = fieldSpec.substring( 0, index );
-    final String value = fieldSpec.substring( index + 1 );
-    return new String[]{ key, value };
+    return (Map<String, Object>) JSONValue.parse( additionalFields );
   }
 }

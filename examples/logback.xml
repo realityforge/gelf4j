@@ -1,10 +1,10 @@
 <configuration>
   <appender name="GELF" class="gelf4j.logback.GelfAppender">
-    <facility>logback-gelf-test</facility>
-    <host>localhost</host>
-    <port>12201</port>
-    <additionalField>ipAddress:_ip_address</additionalField>
-    <additionalField>requestId:_request_id</additionalField>
+    <facility>LOGBACK_TEST</facility>
+    <!--<host>localhost</host>-->
+    <!--<port>12201</port>-->
+    <additionalFields>{"threadName": "threadName", "timestamp_in_millis": "timestampMs", "logger_name": "loggerName", "exception": "exception"}</additionalFields>
+    <additionalData>{"environment": "DEV", "application": "MyAPP"}</additionalData>
   </appender>
 
   <root level="debug">
