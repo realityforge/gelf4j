@@ -152,7 +152,7 @@ public final class GelfEncoder
   private List<byte[]> createPackets( final byte[] messageId, final byte[] payload )
   {
     final List<byte[]> packets = new ArrayList<byte[]>();
-    if ( false && payload.length < PAYLOAD_THRESHOLD )
+    if ( payload.length < PAYLOAD_THRESHOLD )
     {
       packets.add( payload );
     }
