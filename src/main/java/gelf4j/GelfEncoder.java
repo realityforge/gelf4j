@@ -22,13 +22,18 @@ public final class GelfEncoder
 {
   static final String ID_NAME = "id";
   static final String GELF_VERSION = "1.0";
-  static final int MESSAGE_ID_LENGTH = 8;
-  static final int SEQUENCE_LENGTH = 1;
+
+  static final int MESSAGE_ID_LENGTH = 32;
+  static final int SEQUENCE_LENGTH = 2;
+  static final int COMPRESSED_MESSAGE_ID_LENGTH = 8;
+
   static final byte[] CHUNKED_GELF_ID = new byte[]{ 0x1e, 0x0f };
-  static final int HEADER_SIZE =
-    CHUNKED_GELF_ID.length + MESSAGE_ID_LENGTH + SEQUENCE_LENGTH + SEQUENCE_LENGTH;
-  static final int MAX_PACKET_SIZE = 1024;
-  static final int PAYLOAD_THRESHOLD = MAX_PACKET_SIZE - HEADER_SIZE;
+
+  // Arbitrary size to avoid too much fragmentation
+  static final int MAX_PACKET_SIZE = 2 * 1024;
+
+  // Payload threshold (Maximum packet size minus the size of uncompressed header)
+  static final int PAYLOAD_THRESHOLD = MAX_PACKET_SIZE - 38;
   static final int MAX_SEQ_NUMBER = Byte.MAX_VALUE;
 
   private static final BigDecimal TIME_DIVISOR = new BigDecimal( 1000 );
@@ -37,17 +42,19 @@ public final class GelfEncoder
 
   private final MessageDigest _messageDigest;
   private final String _hostname;
+  private final boolean _compressed;
 
-  public GelfEncoder()
+  public GelfEncoder( final String hostname, final boolean compressed )
     throws Exception
   {
-    this( MessageDigest.getInstance( "MD5" ), InetAddress.getLocalHost().getCanonicalHostName() );
+    this( MessageDigest.getInstance( "MD5" ), hostname, compressed );
   }
 
-  public GelfEncoder( final MessageDigest messageDigest, final String hostname )
+  public GelfEncoder( final MessageDigest messageDigest, final String hostname, final boolean compressed )
   {
     _messageDigest = messageDigest;
     _hostname = hostname;
+    _compressed = compressed;
   }
 
   public String toJson( final GelfMessage message )
@@ -90,7 +97,6 @@ public final class GelfEncoder
       map.put( "line", line );
     }
 
-
     final String hostname = message.getHostname();
     map.put( "host", null == hostname ? _hostname : hostname );
 
@@ -110,6 +116,7 @@ public final class GelfEncoder
   List<byte[]> encode( final GelfMessage message )
   {
     final String json = toJson( message );
+    System.out.println( json );
     final byte[] encodedPayload = gzip( json );
     final byte[] messageId = generateMessageID();
     return null == encodedPayload ? null : createPackets( messageId, encodedPayload );
@@ -132,7 +139,7 @@ public final class GelfEncoder
     // selecting the first x bytes of the result
     final String timestamp = String.valueOf( System.nanoTime() );
     final byte[] digestString = ( _hostname + timestamp ).getBytes();
-    return Arrays.copyOf( _messageDigest.digest( digestString ), MESSAGE_ID_LENGTH );
+    return Arrays.copyOf( _messageDigest.digest( digestString ), getMessageIDLength() );
   }
 
   /**
@@ -144,41 +151,72 @@ public final class GelfEncoder
    */
   private List<byte[]> createPackets( final byte[] messageId, final byte[] payload )
   {
-    final List<byte[]> subPayloads = new ArrayList<byte[]>();
+    final List<byte[]> packets = new ArrayList<byte[]>();
+    if ( false && payload.length < PAYLOAD_THRESHOLD )
+    {
+      packets.add( payload );
+    }
+    else
+    {
+      final int fullChunksCount = payload.length / PAYLOAD_THRESHOLD;
+      if ( fullChunksCount > MAX_SEQ_NUMBER )
+      {
+        return null;
+      }
+      final int remainingBytes = payload.length % PAYLOAD_THRESHOLD;
+      final int chunkCount = fullChunksCount + ( remainingBytes != 0 ? 1 : 0 );
 
-    final int fullChunksCount = payload.length / PAYLOAD_THRESHOLD;
-    if( fullChunksCount > MAX_SEQ_NUMBER )
-    {
-      return null;
-    }
-    final int remainingBytes = payload.length % PAYLOAD_THRESHOLD;
-    final int chunkCount = fullChunksCount + ( fullChunksCount != 0 ? 1 : 0 );
+      final int headerSize = CHUNKED_GELF_ID.length + getMessageIDLength() + (_compressed ? 2 : 4);
+      
+      for ( int chunk = 0; chunk < fullChunksCount; chunk++ )
+      {
+        
+        final ByteBuffer buffer = ByteBuffer.allocate( PAYLOAD_THRESHOLD + headerSize );
+        buffer.put( CHUNKED_GELF_ID );
+        buffer.put( messageId );
+        if ( !_compressed )
+        {
+          buffer.put( (byte) 0 );
+        }
+        buffer.put( (byte) chunk );
+        if ( !_compressed )
+        {
+          buffer.put( (byte) 0 );
+        }
+        buffer.put( (byte) chunkCount );
+        buffer.put( payload, chunk * PAYLOAD_THRESHOLD, PAYLOAD_THRESHOLD );
+        packets.add( buffer.array() );
 
-    for( int chunk = 0; chunk < fullChunksCount; chunk++ )
-    {
-      final byte[] packet =
-        ByteBuffer.allocate( MAX_PACKET_SIZE ).
-          put( CHUNKED_GELF_ID ).
-          put( messageId ).
-          put( (byte) ( chunk + 1 ) ).
-          put( (byte) chunkCount ).
-          put( payload, chunk * PAYLOAD_THRESHOLD, PAYLOAD_THRESHOLD ).
-          array();
-      subPayloads.add( packet );
+      }
+      if ( remainingBytes > 0 )
+      {
+        final ByteBuffer buffer = ByteBuffer.allocate( remainingBytes + headerSize );
+        buffer.put( CHUNKED_GELF_ID );
+        buffer.put( messageId );
+        if ( !_compressed )
+        {
+          buffer.put( (byte) 0 );
+        }
+        buffer.put( (byte) (chunkCount - 1) );
+        if ( !_compressed )
+        {
+          buffer.put( (byte) 0 );
+        }
+        buffer.put( (byte) chunkCount );
+        buffer.put( payload, fullChunksCount * PAYLOAD_THRESHOLD, remainingBytes );
+        packets.add( buffer.array() );
+      }
     }
-    if( remainingBytes > 0 )
-    {
-      final byte[] packet =
-        ByteBuffer.allocate( remainingBytes ).
-          put( CHUNKED_GELF_ID ).
-          put( messageId ).
-          put( (byte) chunkCount ).
-          put( (byte) chunkCount ).
-          put( payload, chunkCount * PAYLOAD_THRESHOLD, remainingBytes ).
-          array();
-      subPayloads.add( packet );
-    }
-    return subPayloads;
+    return packets;
+  }
+
+  /**
+   * @return the length of the message ID that depends on whether chunking was done in compressed or non
+   * compressed format
+   */
+  private int getMessageIDLength()
+  {
+    return _compressed ? COMPRESSED_MESSAGE_ID_LENGTH : MESSAGE_ID_LENGTH;
   }
 
   /**

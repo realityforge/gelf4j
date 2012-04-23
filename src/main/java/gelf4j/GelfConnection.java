@@ -3,7 +3,9 @@ package gelf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.security.MessageDigest;
 import java.util.List;
 
 /**
@@ -21,7 +23,7 @@ public class GelfConnection
     throws Exception
   {
     _config = config;
-    _encoder = new GelfEncoder();
+    _encoder = new GelfEncoder( MessageDigest.getInstance( "MD5" ), _config.getOriginHost(), _config.isCompressedChunking() );
   }
 
   public void close()

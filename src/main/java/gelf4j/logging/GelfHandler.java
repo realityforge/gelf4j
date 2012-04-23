@@ -59,6 +59,12 @@ public class GelfHandler
       _config.setFacility( facility );
     }
 
+    final String compressedChunking = manager.getProperty( prefix + ".compressedChunking" );
+    if( null != compressedChunking )
+    {
+      _config.setCompressedChunking( "true".equals( compressedChunking ) );
+    }
+
     final String level = manager.getProperty( prefix + ".level" );
     if( null != level )
     {

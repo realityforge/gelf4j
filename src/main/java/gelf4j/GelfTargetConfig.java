@@ -20,6 +20,7 @@ public class GelfTargetConfig
   private InetAddress _hostAddress;
   public static final int DEFAULT_PORT = 12201;
   private int _port = DEFAULT_PORT;
+  private boolean _compressedChunking = true;
 
   private String _originHost;
   private String _facility;
@@ -41,6 +42,16 @@ public class GelfTargetConfig
     _additionalFields.put( FIELD_THREAD_NAME, FIELD_THREAD_NAME );
     _additionalFields.put( FIELD_LOGGER_NAME, FIELD_LOGGER_NAME );
     _additionalFields.put( FIELD_TIMESTAMP_MS, FIELD_TIMESTAMP_MS );
+  }
+
+  public boolean isCompressedChunking()
+  {
+    return _compressedChunking;
+  }
+
+  public void setCompressedChunking( final boolean compressedChunking )
+  {
+    _compressedChunking = compressedChunking;
   }
 
   public String getOriginHost()

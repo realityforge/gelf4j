@@ -30,6 +30,16 @@ public class GelfAppender
   private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
 
+  public boolean isCompressedChunking()
+  {
+    return _config.isCompressedChunking();
+  }
+
+  public void setCompressedChunking( final boolean compressedChunking )
+  {
+    _config.setCompressedChunking( compressedChunking );
+  }
+
   public String getOriginHost()
   {
     return _config.getOriginHost();
