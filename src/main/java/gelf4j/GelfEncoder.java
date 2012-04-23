@@ -169,7 +169,7 @@ public final class GelfEncoder
     if( remainingBytes > 0 )
     {
       final byte[] packet =
-        ByteBuffer.allocate( MAX_PACKET_SIZE ).
+        ByteBuffer.allocate( remainingBytes ).
           put( CHUNKED_GELF_ID ).
           put( messageId ).
           put( (byte) chunkCount ).
