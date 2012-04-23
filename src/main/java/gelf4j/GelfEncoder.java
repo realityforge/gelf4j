@@ -3,7 +3,6 @@ package gelf4j;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -22,12 +21,18 @@ public final class GelfEncoder
 {
   static final String ID_NAME = "id";
   static final String GELF_VERSION = "1.0";
+  static final byte[] CHUNKED_GELF_ID = new byte[]{ 0x1e, 0x0f };
 
   static final int MESSAGE_ID_LENGTH = 32;
   static final int SEQUENCE_LENGTH = 2;
   static final int COMPRESSED_MESSAGE_ID_LENGTH = 8;
+  static final int COMPRESSED_SEQUENCE_LENGTH = 1;
 
-  static final byte[] CHUNKED_GELF_ID = new byte[]{ 0x1e, 0x0f };
+  static final int COMPRESSED_HEADER_SIZE =
+    CHUNKED_GELF_ID.length + COMPRESSED_MESSAGE_ID_LENGTH + COMPRESSED_SEQUENCE_LENGTH + COMPRESSED_SEQUENCE_LENGTH;
+
+  static final int HEADER_SIZE =
+    CHUNKED_GELF_ID.length + MESSAGE_ID_LENGTH + SEQUENCE_LENGTH + SEQUENCE_LENGTH;
 
   // Arbitrary size to avoid too much fragmentation
   static final int MAX_PACKET_SIZE = 2 * 1024;
@@ -135,11 +140,12 @@ public final class GelfEncoder
    */
   private byte[] generateMessageID()
   {
-    // Uniqueness is guaranteed by combining the hostname and the current nano second, hashing the result, and
+    // Uniqueness is guaranteed by combining the hostname and the current nanosecond, hashing the result, and
     // selecting the first x bytes of the result
     final String timestamp = String.valueOf( System.nanoTime() );
     final byte[] digestString = ( _hostname + timestamp ).getBytes();
-    return Arrays.copyOf( _messageDigest.digest( digestString ), getMessageIDLength() );
+    final int messageIdLength = _compressed ? COMPRESSED_MESSAGE_ID_LENGTH : MESSAGE_ID_LENGTH;
+    return Arrays.copyOf( _messageDigest.digest( digestString ), messageIdLength );
   }
 
   /**
@@ -152,7 +158,7 @@ public final class GelfEncoder
   private List<byte[]> createPackets( final byte[] messageId, final byte[] payload )
   {
     final List<byte[]> packets = new ArrayList<byte[]>();
-    if ( payload.length < PAYLOAD_THRESHOLD )
+    if ( payload.length <= MAX_PACKET_SIZE )
     {
       packets.add( payload );
     }
@@ -165,8 +171,7 @@ public final class GelfEncoder
       }
       final int remainingBytes = payload.length % PAYLOAD_THRESHOLD;
       final int chunkCount = fullChunksCount + ( remainingBytes != 0 ? 1 : 0 );
-
-      final int headerSize = CHUNKED_GELF_ID.length + getMessageIDLength() + (_compressed ? 2 : 4);
+      final int headerSize = _compressed ? COMPRESSED_HEADER_SIZE : HEADER_SIZE;
       
       for ( int chunk = 0; chunk < fullChunksCount; chunk++ )
       {
@@ -208,15 +213,6 @@ public final class GelfEncoder
       }
     }
     return packets;
-  }
-
-  /**
-   * @return the length of the message ID that depends on whether chunking was done in compressed or non
-   * compressed format
-   */
-  private int getMessageIDLength()
-  {
-    return _compressed ? COMPRESSED_MESSAGE_ID_LENGTH : MESSAGE_ID_LENGTH;
   }
 
   /**
