@@ -11,26 +11,26 @@ public class ChunkTest
   public void test1ByteMoreThanThreshold()
     throws Exception
   {
-    final int byteCount = GelfEncoder.PAYLOAD_THRESHOLD + 1;
+    final int byteCount = GelfEncoder.MAX_PACKET_SIZE + 1;
 
     final List<byte[]> packets = encoder().encode( createGelfMessage( byteCount ) );
     assertNotNull( packets );
     assertEquals( 2, packets.size() );
 
     final byte[] packet1 = packets.get( 0 );
-    assertEquals( GelfEncoder.HEADER_SIZE + GelfEncoder.PAYLOAD_THRESHOLD, packet1.length );
-    assertEquals( GelfEncoder.HEADER_SIZE + 1, packets.get( 1 ).length );
+    assertEquals( GelfEncoder.COMPRESSED_HEADER_SIZE + GelfEncoder.PAYLOAD_THRESHOLD, packet1.length );
+    assertEquals( GelfEncoder.COMPRESSED_HEADER_SIZE + 1, packets.get( 1 ).length );
 
-    assertArrayEquals( GelfEncoder.CHUNKED_GELF_ID, Arrays.copyOfRange( packet1, 0, GelfEncoder.CHUNKED_GELF_ID.length ) );
+    assertArrayEquals( GelfEncoder.CHUNKED_GELF_ID,
+                       Arrays.copyOfRange( packet1, 0, GelfEncoder.CHUNKED_GELF_ID.length ) );
 
     int count = 0;
-    for( final byte[] packet : packets )
+    for ( final byte[] packet : packets )
     {
       assertEquals( count, getSeqNumber( packets, count ) );
       assertEquals( 2, getNumChunks( packet ) );
       count++;
     }
-
   }
 
   @Test
@@ -43,9 +43,9 @@ public class ChunkTest
     assertNotNull( packets );
     assertEquals( 3, packets.size() );
 
-    for( final byte[] packet : packets )
+    for ( final byte[] packet : packets )
     {
-      assertEquals( GelfEncoder.PAYLOAD_THRESHOLD + GelfEncoder.HEADER_SIZE, packet.length );
+      assertEquals( GelfEncoder.PAYLOAD_THRESHOLD + GelfEncoder.COMPRESSED_HEADER_SIZE, packet.length );
     }
   }
 
@@ -83,7 +83,7 @@ public class ChunkTest
   private String createMessage( final int byteCount )
   {
     final StringBuilder sb = new StringBuilder();
-    for( int i = 0; i < byteCount; i++ )
+    for ( int i = 0; i < byteCount; i++ )
     {
       sb.append( "z" );
     }
@@ -93,23 +93,23 @@ public class ChunkTest
   private int getNumChunks( byte[] packet )
   {
     return packet[ GelfEncoder.CHUNKED_GELF_ID.length +
-                   GelfEncoder.MESSAGE_ID_LENGTH +
-                   GelfEncoder.SEQUENCE_LENGTH +
-                   GelfEncoder.SEQUENCE_LENGTH -
+                   GelfEncoder.COMPRESSED_MESSAGE_ID_LENGTH +
+                   GelfEncoder.COMPRESSED_SEQUENCE_LENGTH +
+                   GelfEncoder.COMPRESSED_SEQUENCE_LENGTH -
                    1 ];
   }
 
   private int getSeqNumber( List<byte[]> packets, int packetNum )
   {
     return packets.get( packetNum )[ GelfEncoder.CHUNKED_GELF_ID.length +
-                                     GelfEncoder.MESSAGE_ID_LENGTH +
-                                     GelfEncoder.SEQUENCE_LENGTH -
+                                     GelfEncoder.COMPRESSED_MESSAGE_ID_LENGTH +
+                                     GelfEncoder.COMPRESSED_SEQUENCE_LENGTH -
                                      1 ];
   }
 
   private GelfEncoder encoder()
     throws Exception
   {
-    return new GelfEncoder();
+    return new GelfEncoder( "localhost", true );
   }
 }
