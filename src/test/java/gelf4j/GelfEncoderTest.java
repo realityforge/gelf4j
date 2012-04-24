@@ -107,7 +107,7 @@ public class GelfEncoderTest
   public void ensureTooLargePayloadIsDropped()
     throws Exception
   {
-    final int payloadSize = GelfEncoder.PAYLOAD_THRESHOLD * (GelfEncoder.MAX_SEQ_NUMBER + 1);
+    final int payloadSize = GelfEncoder.PAYLOAD_THRESHOLD * ( GelfEncoder.MAX_SEQ_NUMBER + 1 );
     final byte[] payload = createData( payloadSize );
     final List<byte[]> packets = encoder( true ).createPackets( payload );
     assertNull( packets );
