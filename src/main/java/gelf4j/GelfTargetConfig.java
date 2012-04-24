@@ -16,9 +16,10 @@ public class GelfTargetConfig
   public static final String FIELD_LOGGER_NAME = "loggerName";
   public static final String FIELD_EXCEPTION = "exception";
 
+  public static final int DEFAULT_PORT = 12201;
+
   private String _host = "localhost";
   private InetAddress _hostAddress;
-  public static final int DEFAULT_PORT = 12201;
   private int _port = DEFAULT_PORT;
   private boolean _compressedChunking = true;
 
