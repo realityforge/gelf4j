@@ -18,7 +18,7 @@ public class GelfConnection
   private final GelfEncoder _encoder;
   private DatagramSocket _socket;
 
-  public GelfConnection( final GelfTargetConfig config )
+  protected GelfConnection( final GelfTargetConfig config )
     throws Exception
   {
     _config = config;
