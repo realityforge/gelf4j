@@ -88,48 +88,6 @@ public class GelfEncoderTest
     assertEquals( "zing", object.get( "_zang" ) );
     assertEquals( 10, object.size() );
   }
-/*
-
-    if( null != fullMessage )
-    {
-      map.put( "full_message", fullMessage );
-    }
-
-    final Long timestamp = message.getJavaTimestamp();
-    map.put( "timestamp", encodeTimestamp( null != timestamp ? timestamp : System.currentTimeMillis() ) );
-    final String facility = message.getFacility();
-    map.put( "facility", null != facility ? facility : DEFAULT_FACILITY );
-
-    final SyslogLevel level = message.getLevel();
-    if( null != level )
-    {
-      map.put( "level", level.ordinal() );
-    }
-
-    final String file = message.getFile();
-    if( null != file )
-    {
-      map.put( "file", file );
-    }
-    final Long line = message.getLine();
-    if( null != line )
-    {
-      map.put( "line", line );
-    }
-
-    final String hostname = message.getHostname();
-    map.put( "host", null == hostname ? _hostname : hostname );
-
-    final Map<String, Object> fields = message.getAdditionalFields();
-    for( final Map.Entry<String, Object> entry : fields.entrySet() )
-    {
-      final String key = entry.getKey();
-      if( !key.equals( ID_NAME ) )
-      {
-        map.put( "_" + key, entry.getValue() );
-      }
-    }
-*/
 
   @SuppressWarnings( "unchecked" )
   private Map<String, Object> parseJsonObject( final String json )
