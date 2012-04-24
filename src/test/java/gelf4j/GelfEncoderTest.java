@@ -10,6 +10,14 @@ import static org.junit.Assert.*;
 public class GelfEncoderTest
 {
   @Test
+  public void generateMessageID()
+    throws Exception
+  {
+    assertEquals( 8, encoder( true ).generateMessageID().length );
+    assertEquals( 32, encoder( false ).generateMessageID().length );
+  }
+
+  @Test
   public void ensurePayloadUnderThresholdCreatesASinglePacket()
     throws Exception
   {
