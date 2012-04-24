@@ -175,7 +175,6 @@ public final class GelfEncoder
       
       for ( int chunk = 0; chunk < fullChunksCount; chunk++ )
       {
-        
         final ByteBuffer buffer = ByteBuffer.allocate( PAYLOAD_THRESHOLD + headerSize );
         buffer.put( CHUNKED_GELF_ID );
         buffer.put( messageId );
