@@ -113,7 +113,7 @@ public class GelfConnection
   {
     if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
     {
-      return message.substring( 0, MAX_SHORT_MESSAGE_LENGTH - 1 );
+      return message.substring( 0, MAX_SHORT_MESSAGE_LENGTH );
     }
     else
     {
