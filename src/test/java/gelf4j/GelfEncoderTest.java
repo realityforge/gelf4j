@@ -24,9 +24,15 @@ public class GelfEncoderTest
   public void ensurePayloadOverThresholdCreatesMultipleChunks()
     throws Exception
   {
+    ensurePayloadOverThresholdCreatesMultipleChunks( true );
+    ensurePayloadOverThresholdCreatesMultipleChunks( false );
+  }
+
+  private void ensurePayloadOverThresholdCreatesMultipleChunks( final boolean compressed )
+    throws Exception
+  {
     final int payloadSize = GelfEncoder.MAX_PACKET_SIZE + 1;
     final byte[] payload = createData( payloadSize );
-    final boolean compressed = true;
     final List<byte[]> packets = encoder( compressed ).createPackets( payload );
     assertEquals( 2, packets.size() );
 
@@ -71,7 +77,7 @@ public class GelfEncoderTest
     assertEquals( sequence, packet[ start++ ] );
     if( !compressed )
     {
-      assertEquals( 0, packet[ start ] );
+      assertEquals( 0, packet[ start++ ] );
     }
     assertEquals( chunkCount, packet[ start++ ] );
 
