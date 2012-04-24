@@ -17,7 +17,7 @@ import org.json.simple.JSONValue;
  * Responsible for converting a GelfMessage into packets.
  * The GelfMessage is converted to json, gzipped and then converted into 1 or more packets (a.k.a. chunks).
  */
-public final class GelfEncoder
+final class GelfEncoder
 {
   static final String ID_NAME = "id";
   static final String GELF_VERSION = "1.0";
@@ -44,25 +44,24 @@ public final class GelfEncoder
   private static final BigDecimal TIME_DIVISOR = new BigDecimal( 1000 );
   private static final String DEFAULT_FACILITY = "GELF";
 
-
   private final MessageDigest _messageDigest;
   private final String _hostname;
   private final boolean _compressed;
 
-  public GelfEncoder( final String hostname, final boolean compressed )
+  GelfEncoder( final String hostname, final boolean compressed )
     throws Exception
   {
     this( MessageDigest.getInstance( "MD5" ), hostname, compressed );
   }
 
-  public GelfEncoder( final MessageDigest messageDigest, final String hostname, final boolean compressed )
+  GelfEncoder( final MessageDigest messageDigest, final String hostname, final boolean compressed )
   {
     _messageDigest = messageDigest;
     _hostname = hostname;
     _compressed = compressed;
   }
 
-  public String toJson( final GelfMessage message )
+  String toJson( final GelfMessage message )
   {
     final Map<String, Object> map = new HashMap<String, Object>();
 
