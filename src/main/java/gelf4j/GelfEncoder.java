@@ -137,7 +137,7 @@ public final class GelfEncoder
    *
    * @return unique message ID
    */
-  private byte[] generateMessageID()
+  byte[] generateMessageID()
   {
     // Uniqueness is guaranteed by combining the hostname and the current nanosecond, hashing the result, and
     // selecting the first x bytes of the result
@@ -154,7 +154,7 @@ public final class GelfEncoder
    * @param payload   The full payload
    * @return A list of packets which when added together, make up the full payload
    */
-  private List<byte[]> createPackets( final byte[] payload )
+  List<byte[]> createPackets( final byte[] payload )
   {
     final List<byte[]> packets = new ArrayList<byte[]>();
     if ( payload.length <= MAX_PACKET_SIZE )
