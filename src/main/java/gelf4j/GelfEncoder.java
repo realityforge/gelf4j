@@ -121,7 +121,6 @@ public final class GelfEncoder
   List<byte[]> encode( final GelfMessage message )
   {
     final String json = toJson( message );
-    System.out.println( json );
     final byte[] encodedPayload = gzip( json );
     return null == encodedPayload ? null : createPackets( encodedPayload );
   }
