@@ -2,6 +2,7 @@ package gelf4j;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Random;
@@ -15,6 +16,7 @@ public class GelfConnectionTest
     throws Exception
   {
     final GelfTargetConfig config = new GelfTargetConfig();
+    config.setHost( InetAddress.getLocalHost().getCanonicalHostName() );
     config.setPort( 1977 );
     config.setOriginHost( "Zoon" );
     config.setFacility( "OILZ" );
@@ -24,7 +26,7 @@ public class GelfConnectionTest
     try
     {
 
-      final GelfConnection connection = new GelfConnection( config );
+      final GelfConnection connection = config.createConnection();
 
       //Make sure close can be called before a send
       connection.close();
