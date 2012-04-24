@@ -18,7 +18,7 @@ public class GelfTargetConfig
 
   public static final int DEFAULT_PORT = 12201;
 
-  private String _host = "localhost";
+  private String _host;
   private InetAddress _hostAddress;
   private int _port = DEFAULT_PORT;
   private boolean _compressedChunking = true;
@@ -32,7 +32,7 @@ public class GelfTargetConfig
   {
     try
     {
-      _originHost = InetAddress.getLocalHost().getCanonicalHostName();
+      _host = _originHost = InetAddress.getLocalHost().getCanonicalHostName();
     }
     catch( final UnknownHostException uhe )
     {
