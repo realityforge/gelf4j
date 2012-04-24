@@ -123,8 +123,7 @@ public final class GelfEncoder
     final String json = toJson( message );
     System.out.println( json );
     final byte[] encodedPayload = gzip( json );
-    final byte[] messageId = generateMessageID();
-    return null == encodedPayload ? null : createPackets( messageId, encodedPayload );
+    return null == encodedPayload ? null : createPackets( encodedPayload );
   }
 
   private String encodeTimestamp( final long time )
@@ -151,11 +150,10 @@ public final class GelfEncoder
   /**
    * Splits the payload data into chunks
    *
-   * @param messageId The message ID of the message (remains same for all chunks)
    * @param payload   The full payload
    * @return A list of subPayloads which when added together, make up the full payload
    */
-  private List<byte[]> createPackets( final byte[] messageId, final byte[] payload )
+  private List<byte[]> createPackets( final byte[] payload )
   {
     final List<byte[]> packets = new ArrayList<byte[]>();
     if ( payload.length <= MAX_PACKET_SIZE )
@@ -164,6 +162,8 @@ public final class GelfEncoder
     }
     else
     {
+      final byte[] messageId = generateMessageID();
+
       final int fullChunksCount = payload.length / PAYLOAD_THRESHOLD;
       if ( fullChunksCount > MAX_SEQ_NUMBER )
       {
