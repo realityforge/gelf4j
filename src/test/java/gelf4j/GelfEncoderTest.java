@@ -38,8 +38,8 @@ public class GelfEncoderTest
     message.setShortMessage( myShortMessage );
     final String json = new GelfEncoder( "localhost", true ).toJson( message );
     assertNotNull( json );
-    final Map<String,Object> object = (Map<String,Object>) JSONValue.parse( json );
-    
+    final Map<String, Object> object = parseJsonObject( json );
+
     assertEquals( "1.0", object.get( "version" ) );
     assertEquals( myShortMessage, object.get( "short_message" ) );
     assertEquals( "GELF", object.get( "facility" ) );
@@ -74,7 +74,7 @@ public class GelfEncoderTest
     message.getAdditionalFields().put( "zang", "zing" );
     final String json = new GelfEncoder( "localhost", true ).toJson( message );
     assertNotNull( json );
-    final Map<String,Object> object = (Map<String,Object>) JSONValue.parse( json );
+    final Map<String, Object> object = parseJsonObject( json );
 
     assertEquals( "1.0", object.get( "version" ) );
     assertEquals( myShortMessage, object.get( "short_message" ) );
@@ -87,6 +87,7 @@ public class GelfEncoderTest
     assertEquals( funkyHost, object.get( "host" ) );
     assertEquals( "zing", object.get( "_zang" ) );
     assertEquals( 10, object.size() );
+  }
 /*
 
     if( null != fullMessage )
@@ -130,6 +131,10 @@ public class GelfEncoderTest
     }
 */
 
+  @SuppressWarnings( "unchecked" )
+  private Map<String, Object> parseJsonObject( final String json )
+  {
+    return (Map<String, Object>) JSONValue.parse( json );
   }
 
   @Test
