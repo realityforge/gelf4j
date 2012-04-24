@@ -5,7 +5,6 @@ import gelf4j.GelfMessage;
 import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import org.apache.log4j.AppenderSkeleton;
@@ -24,8 +23,8 @@ public class GelfAppender
 {
   private static final String FIELD_LOGGER_NDC = "loggerNdc";
 
-  private static boolean hasGetTimeStamp = true;
-  private static Method methodGetTimeStamp = null;
+  private static boolean c_searchForMethodOccurred;
+  private static Method c_getTimestampMethod;
 
   private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
@@ -109,7 +108,7 @@ public class GelfAppender
   }
 
   @Override
-  protected void append( LoggingEvent event )
+  protected void append( final LoggingEvent event )
   {
     if( _connection == null || !_connection.send( makeMessage( event ) ) )
     {
@@ -124,10 +123,9 @@ public class GelfAppender
 
   private GelfMessage makeMessage( LoggingEvent event )
   {
-    long timestamp = getTimeStamp( event );
-
-    LocationInfo locationInformation = event.getLocationInformation();
-    String file = locationInformation.getFileName();
+    final long timestamp = getTimestamp( event );
+    final LocationInfo locationInformation = event.getLocationInformation();
+    final String file = locationInformation.getFileName();
     Integer lineNumber = null;
     try
     {
@@ -202,46 +200,33 @@ public class GelfAppender
     return message;
   }
 
-  static long getTimeStamp( LoggingEvent event )
+  static long getTimestamp( final LoggingEvent event )
   {
-
-    long timeStamp = System.currentTimeMillis();
-
-    if( hasGetTimeStamp && methodGetTimeStamp == null )
+    if( !c_searchForMethodOccurred  )
     {
-
-      hasGetTimeStamp = false;
-
-      Method[] declaredMethods = event.getClass().getDeclaredMethods();
-      for( Method m : declaredMethods )
+      for( final Method method : event.getClass().getDeclaredMethods() )
       {
-        if( m.getName().equals( "getTimeStamp" ) )
+        if( method.getName().equals( "getTimeStamp" ) )
         {
-          methodGetTimeStamp = m;
-          hasGetTimeStamp = true;
-
-          break;
+          c_getTimestampMethod = method;
+          c_searchForMethodOccurred = true;
         }
       }
     }
 
-    if( hasGetTimeStamp )
+    if( null != c_getTimestampMethod )
     {
 
       try
       {
-        timeStamp = (Long) methodGetTimeStamp.invoke( event );
+        return (Long) c_getTimestampMethod.invoke( event );
       }
-      catch( IllegalAccessException e )
+      catch( final Throwable t )
       {
-        // Just return the current timestamp
-      }
-      catch( InvocationTargetException e )
-      {
-        // Just return the current timestamp
+        //Ignored
       }
     }
 
-    return timeStamp;
+    return System.currentTimeMillis();
   }
 }
