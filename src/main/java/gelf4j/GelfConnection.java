@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class GelfConnection
 {
-  private static final int MAX_SHORT_MESSAGE_LENGTH = 250;
+  static final int MAX_SHORT_MESSAGE_LENGTH = 250;
 
   private final GelfTargetConfig _config;
   private final GelfEncoder _encoder;
