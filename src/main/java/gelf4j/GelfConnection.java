@@ -111,15 +111,13 @@ public class GelfConnection
 
   private static String truncateShortMessage( final String message )
   {
-    final String shortMessage;
     if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
     {
-      shortMessage = message.substring( 0, MAX_SHORT_MESSAGE_LENGTH - 1 );
+      return message.substring( 0, MAX_SHORT_MESSAGE_LENGTH - 1 );
     }
     else
     {
-      shortMessage = message;
+      return  message;
     }
-    return shortMessage;
   }
 }
