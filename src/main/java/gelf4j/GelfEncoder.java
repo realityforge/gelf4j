@@ -148,10 +148,11 @@ public final class GelfEncoder
   }
 
   /**
-   * Splits the payload data into chunks
+   * Create a list of packets for the specified payload. This may involve splitting the payload into multiple
+   * chunks if it exceeds the max packet size.
    *
    * @param payload   The full payload
-   * @return A list of subPayloads which when added together, make up the full payload
+   * @return A list of packets which when added together, make up the full payload
    */
   private List<byte[]> createPackets( final byte[] payload )
   {
