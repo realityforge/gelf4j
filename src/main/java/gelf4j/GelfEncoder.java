@@ -61,6 +61,13 @@ final class GelfEncoder
     _compressed = compressed;
   }
 
+  List<byte[]> encode( final GelfMessage message )
+  {
+    final String json = toJson( message );
+    final byte[] encodedPayload = gzip( json );
+    return null == encodedPayload ? null : createPackets( encodedPayload );
+  }
+
   String toJson( final GelfMessage message )
   {
     final Map<String, Object> map = new HashMap<String, Object>();
@@ -115,13 +122,6 @@ final class GelfEncoder
     }
 
     return JSONValue.toJSONString( map );
-  }
-
-  List<byte[]> encode( final GelfMessage message )
-  {
-    final String json = toJson( message );
-    final byte[] encodedPayload = gzip( json );
-    return null == encodedPayload ? null : createPackets( encodedPayload );
   }
 
   private String encodeTimestamp( final long time )
