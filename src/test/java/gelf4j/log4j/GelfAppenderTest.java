@@ -1,8 +1,7 @@
 package gelf4j.log4j;
 
-import gelf4j.GelfConnection;
-import gelf4j.GelfMessage;
 import gelf4j.GelfTargetConfig;
+import gelf4j.TestGelfConnection;
 import java.lang.reflect.Field;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -25,12 +24,12 @@ import static org.junit.Assert.*;
 public class GelfAppenderTest {
 
     private static final String CLASS_NAME = GelfAppenderTest.class.getCanonicalName();
-    private TestGelfSender gelfSender;
+    private TestGelfConnection gelfSender;
     private GelfAppender gelfAppender;
 
     @Before
     public void setUp() throws Exception {
-        gelfSender = new TestGelfSender();
+        gelfSender = new TestGelfConnection(new GelfTargetConfig() );
 
       gelfAppender = new GelfAppender();
       final Field field = gelfAppender.getClass().getDeclaredField( "_connection" );
@@ -108,26 +107,4 @@ public class GelfAppenderTest {
 
       assertEquals( gelfSender.getLastMessage().getAdditionalFields().get( "logger" ), CLASS_NAME);
     }
-
-    private class TestGelfSender extends GelfConnection
-    {
-
-        private GelfMessage lastMessage;
-
-        public TestGelfSender() throws Exception {
-            super( new GelfTargetConfig() );
-        }
-
-      @Override
-      public boolean send( final GelfMessage message )
-      {
-        this.lastMessage = message;
-        return super.send( message );
-      }
-
-        public GelfMessage getLastMessage() {
-            return lastMessage;
-        }
-    }
-
 }
