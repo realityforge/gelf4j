@@ -20,19 +20,9 @@ public class GelfAppender<E> extends AppenderBase<E>
   private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
 
-  public boolean isCompressedChunking()
-  {
-    return _config.isCompressedChunking();
-  }
-
   public void setCompressedChunking( final boolean compressedChunking )
   {
     _config.setCompressedChunking( compressedChunking );
-  }
-
-  public String getOriginHost()
-  {
-    return _config.getOriginHost();
   }
 
   public void setOriginHost( final String originHost )
@@ -40,29 +30,14 @@ public class GelfAppender<E> extends AppenderBase<E>
     _config.setOriginHost( originHost );
   }
 
-  public int getPort()
-  {
-    return _config.getPort();
-  }
-
   public void setPort( final int port )
   {
     _config.setPort( port );
   }
 
-  public String getHost()
-  {
-    return _config.getHost();
-  }
-
   public void setHost( final String host )
   {
     _config.setHost( host );
-  }
-
-  public String getFacility()
-  {
-    return _config.getFacility();
   }
 
   public void setFacility( final String facility )
