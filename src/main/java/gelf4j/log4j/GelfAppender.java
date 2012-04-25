@@ -39,19 +39,9 @@ public class GelfAppender
     _config.setCompressedChunking( compressedChunking );
   }
 
-  public String getOriginHost()
-  {
-    return _config.getOriginHost();
-  }
-
   public void setOriginHost( final String originHost )
   {
     _config.setOriginHost( originHost );
-  }
-
-  public int getPort()
-  {
-    return _config.getPort();
   }
 
   public void setPort( final int port )
@@ -59,19 +49,9 @@ public class GelfAppender
     _config.setPort( port );
   }
 
-  public String getHost()
-  {
-    return _config.getHost();
-  }
-
   public void setHost( final String host )
   {
     _config.setHost( host );
-  }
-
-  public String getFacility()
-  {
-    return _config.getFacility();
   }
 
   public void setFacility( final String facility )
