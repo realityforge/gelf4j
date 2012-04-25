@@ -140,7 +140,7 @@ public class GelfAppender
     @SuppressWarnings( "unchecked" ) final Map<String, String> mdc = MDC.getContext();
     for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
     {
-      final String fieldName = entry.getKey();
+      final String fieldName = entry.getValue();
       final String key = entry.getKey();
       if( GelfTargetConfig.FIELD_LOGGER_NAME.equals( fieldName ) )
       {
