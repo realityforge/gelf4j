@@ -184,9 +184,9 @@ public class GelfAppender
     return message;
   }
 
-  static long getTimestamp( final LoggingEvent event )
+  private long getTimestamp( final LoggingEvent event )
   {
-    if( !c_searchForMethodOccurred  )
+    if( !c_searchForMethodOccurred )
     {
       for( final Method method : event.getClass().getDeclaredMethods() )
       {
