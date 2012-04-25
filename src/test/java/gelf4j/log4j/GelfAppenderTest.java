@@ -24,7 +24,6 @@ public class GelfAppenderTest
     final Properties properties = new Properties();
 
     properties.setProperty( "log4j.appender.gelf", GelfAppender.class.getName() );
-    //properties.setProperty( "log4j.appender.gelf.layout", PatternLayout.class.getName() );
     final String hostName = InetAddress.getLocalHost().getCanonicalHostName();
     properties.setProperty( "log4j.appender.gelf.host", hostName );
     properties.setProperty( "log4j.appender.gelf.port", "1971" );
