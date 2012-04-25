@@ -154,6 +154,10 @@ public class GelfHandler
       {
         message.getAdditionalFields().put( key, record.getThreadID() );
       }
+      else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
+      {
+        message.getAdditionalFields().put( key, Thread.currentThread().getName() );
+      }
       else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
       {
         message.getAdditionalFields().put( key, message.getJavaTimestamp() );
