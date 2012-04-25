@@ -1,0 +1,22 @@
+junit: 4.9
+
+gems:
+  #- ci_reporter
+  - buildr >= 1.4.6
+
+repositories:
+  remote:
+   - http://repo.fire.dse.vic.gov.au/content/groups/fisg
+   - http://repo1.maven.org/maven2
+  release_to:
+    url: http://repo.fire.dse.vic.gov.au/content/repositories/releases/
+    username: upload
+    permissions: 0664
+
+artifacts:
+  slf4j_api: org.slf4j:slf4j-api:jar:1.6.1
+  spice_cli: spice:spice-cli:jar:1.0
+  json_simple: com.googlecode.json-simple:json-simple:jar:1.1
+  log4j: log4j:log4j:jar:1.2.8
+  logback_classic: ch.qos.logback:logback-classic:jar:0.9.29
+  logback_core: ch.qos.logback:logback-core:jar:0.9.29
