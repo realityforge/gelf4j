@@ -16,6 +16,7 @@ import java.util.logging.LogRecord;
 public class GelfHandler
   extends Handler
 {
+  public static final String FIELD_THREAD_ID = "threadId";
   public static final String FIELD_SOURCE_CLASS_NAME = "SourceClassName";
   public static final String FIELD_SOURCE_METHOD_NAME = "SourceMethodName";
 
@@ -149,7 +150,7 @@ public class GelfHandler
       {
         message.getAdditionalFields().put( key, record.getLoggerName() );
       }
-      else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
+      else if( FIELD_THREAD_ID.equals( fieldName ) )
       {
         message.getAdditionalFields().put( key, record.getThreadID() );
       }
