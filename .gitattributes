@@ -1,0 +1,7 @@
+* -text
+*.java text -crlf -binary
+*.md text -crlf -binary
+*.rake text -crlf -binary
+buildfile text -crlf -binary
+LICENSE text -crlf -binary
+*.xml text -crlf -binary
