@@ -100,6 +100,11 @@ public class GelfHandler
     }
   }
 
+  GelfTargetConfig getConfig()
+  {
+    return _config;
+  }
+
   @Override
   public synchronized void flush()
   {
