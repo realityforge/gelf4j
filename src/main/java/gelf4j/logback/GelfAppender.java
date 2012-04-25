@@ -20,6 +20,11 @@ public class GelfAppender<E> extends AppenderBase<E>
   private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
 
+  public GelfTargetConfig getConfig()
+  {
+    return _config;
+  }
+
   public void setCompressedChunking( final boolean compressedChunking )
   {
     _config.setCompressedChunking( compressedChunking );
