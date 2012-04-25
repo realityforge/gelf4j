@@ -108,6 +108,9 @@ public class GelfAppenderTest
     assertTrue( ( (Long) message.getAdditionalFields().get( "timestamp_in_millis" ) ) - then < 1000 );
     assertEquals( null, message.getAdditionalFields().get( "ip_address" ) );
 
+    assertEquals( "DEV", message.getAdditionalFields().get( "environment" ) );
+    assertEquals( "MyAPP", message.getAdditionalFields().get( "application" ) );
+
     // now we test the MDC
     MDC.put( "ip_address", "42.42.42.42" );
 
