@@ -15,10 +15,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- * @author Anton Yakimov
- * @author Jochen Schalanda
- */
 public class GelfAppenderTest
 {
   @Test
