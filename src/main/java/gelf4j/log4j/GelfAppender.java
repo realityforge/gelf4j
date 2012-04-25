@@ -84,7 +84,11 @@ public class GelfAppender
 
   public void close()
   {
-    _connection.close();
+    if( null != _connection )
+    {
+      _connection.close();
+      _connection = null;
+    }
   }
 
   @Override
