@@ -29,9 +29,9 @@ public class GelfAppender
   private final GelfTargetConfig _config = new GelfTargetConfig();
   private GelfConnection _connection;
 
-  public boolean isCompressedChunking()
+  public final GelfTargetConfig getConfig()
   {
-    return _config.isCompressedChunking();
+    return _config;
   }
 
   public void setCompressedChunking( final boolean compressedChunking )
