@@ -1,110 +1,119 @@
 package gelf4j.log4j;
 
+import gelf4j.GelfMessage;
 import gelf4j.GelfTargetConfig;
+import gelf4j.SyslogLevel;
 import gelf4j.TestGelfConnection;
 import java.lang.reflect.Field;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import org.apache.log4j.Category;
+import java.net.InetAddress;
+import java.util.Properties;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.NDC;
-import org.apache.log4j.Priority;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Before;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author Anton Yakimov
  * @author Jochen Schalanda
  */
-public class GelfAppenderTest {
+public class GelfAppenderTest
+{
+  @Test
+  public void configureSetsUpLoggerCorrectly()
+    throws Exception
+  {
+    final Properties properties = new Properties();
 
-    private static final String CLASS_NAME = GelfAppenderTest.class.getCanonicalName();
-    private TestGelfConnection gelfSender;
-    private GelfAppender gelfAppender;
+    properties.setProperty( "log4j.appender.gelf", GelfAppender.class.getName() );
+    //properties.setProperty( "log4j.appender.gelf.layout", PatternLayout.class.getName() );
+    final String hostName = InetAddress.getLocalHost().getCanonicalHostName();
+    properties.setProperty( "log4j.appender.gelf.host", hostName );
+    properties.setProperty( "log4j.appender.gelf.port", "1971" );
+    properties.setProperty( "log4j.appender.gelf.originHost", hostName );
+    final String facility = "LOG4J";
+    properties.setProperty( "log4j.appender.gelf.facility", facility );
+    properties.setProperty( "log4j.appender.gelf.compressedChunking", "false" );
+    properties.setProperty( "log4j.appender.gelf.additionalData",
+                            "{\"environment\": \"DEV\", \"application\": \"MyAPP\"}" );
+    properties.setProperty( "log4j.appender.gelf.additionalFields",
+                            "{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\", \"loggerNdc\": \"loggerNdc\"}" );
 
-    @Before
-    public void setUp() throws Exception {
-        gelfSender = new TestGelfConnection(new GelfTargetConfig() );
+    properties.setProperty( "log4j.rootLogger", "DEBUG, gelf" );
 
-      gelfAppender = new GelfAppender();
-      final Field field = gelfAppender.getClass().getDeclaredField( "_connection" );
-      field.setAccessible( true );
-      field.set( gelfAppender, gelfSender );
-    }
+    PropertyConfigurator.configure( properties );
+    final Logger logger = Logger.getLogger( "ZipZipHooray");
+    final Appender appender = Logger.getRootLogger().getAppender( "gelf" );
+    assertTrue( appender instanceof GelfAppender );
+    final GelfTargetConfig config = ( (GelfAppender) appender ).getConfig();
 
-    @Test
-    public void ensureHostnameForMessage() {
+    assertEquals( hostName, config.getOriginHost() );
+    assertEquals( hostName, config.getHost() );
+    assertEquals( facility, config.getFacility() );
+    assertEquals( 1971, config.getPort() );
+    assertEquals( false, config.isCompressedChunking() );
+    assertEquals( 2, config.getAdditionalData().size() );
+    assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
+    assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
 
-        LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(GelfAppenderTest.class), 123L, Priority.INFO, "Das Auto",
-                                              new RuntimeException("LOL"));
-        gelfAppender.append(event);
+    assertEquals( 6, config.getAdditionalFields().size() );
+    assertEquals( "threadName", config.getAdditionalFields().get( "threadName" ) );
+    assertEquals( "timestampMs", config.getAdditionalFields().get( "timestamp_in_millis" ) );
+    assertEquals( "loggerName", config.getAdditionalFields().get( "logger_name" ) );
+    assertEquals( "ipAddress", config.getAdditionalFields().get( "ip_address" ) );
+    assertEquals( "exception", config.getAdditionalFields().get( "exception" ) );
+    assertEquals( "loggerNdc", config.getAdditionalFields().get( "loggerNdc" ) );
 
-        assertThat("Message hostname", gelfSender.getLastMessage().getHostname(), notNullValue());
+    // set up mock connection
+    final TestGelfConnection connection = new TestGelfConnection( config );
+    final Field field = appender.getClass().getDeclaredField( "_connection" );
+    field.setAccessible( true );
+    field.set( appender, connection );
 
-        gelfAppender.setOriginHost("example.com");
-        gelfAppender.append(event);
-        assertThat(gelfSender.getLastMessage().getHostname(), is("example.com"));
-    }
+    final long then = System.currentTimeMillis();
+    final String smallTextMessage = "HELO";
+    logger.debug( smallTextMessage );
 
-    @Test
-    public void handleNullInAppend() {
+    GelfMessage message = connection.getLastMessage();
+    assertEquals( smallTextMessage, message.getShortMessage() );
+    assertEquals( smallTextMessage, message.getFullMessage() );
+    assertEquals( SyslogLevel.DEBUG, message.getLevel() );
+    assertEquals( facility, message.getFacility() );
+    assertEquals( hostName, message.getHostname() );
+    assertEquals( "GelfAppenderTest.java", message.getFile() );
+    assertNotNull( message.getLine() );
+    // The message is in the last second
+    assertTrue( message.getJavaTimestamp() - then < 1000 );
 
-        LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, null, new RuntimeException("LOL"));
-        gelfAppender.append(event);
+    assertEquals( logger.getName(), message.getAdditionalFields().get( "logger_name" ) );
+    assertEquals( null, message.getAdditionalFields().get( "exception" ) );
+    assertEquals( Thread.currentThread().getName(), message.getAdditionalFields().get( "threadName" ) );
+    assertTrue( ( (Long) message.getAdditionalFields().get( "timestamp_in_millis" ) ) - then < 1000 );
+    assertEquals( null, message.getAdditionalFields().get( "ip_address" ) );
 
-        assertThat("Message short message", gelfSender.getLastMessage().getShortMessage(), notNullValue());
-        assertThat("Message full message", gelfSender.getLastMessage().getFullMessage(), notNullValue());
-    }
+    // now we test the MDC
+    MDC.put( "ip_address", "42.42.42.42" );
 
-    @Test
-    public void handleMDC() {
+    logger.info( smallTextMessage );
+    message = connection.getLastMessage();
+    assertEquals( SyslogLevel.INFO, message.getLevel() );
+    assertEquals( "42.42.42.42", message.getAdditionalFields().get( "ip_address" ) );
 
-        LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, "", new RuntimeException("LOL"));
-        MDC.put("foo", "bar");
+    // now test the NDC
+    NDC.push( "ProcessX" );
+    logger.warn( smallTextMessage );
+    message = connection.getLastMessage();
+    assertEquals( SyslogLevel.WARNING, message.getLevel() );
+    assertEquals( "ProcessX", message.getAdditionalFields().get( "loggerNdc" ) );
 
-        gelfAppender.append(event);
+    logger.error( smallTextMessage, new Exception(  ) );
+    message = connection.getLastMessage();
+    assertEquals( SyslogLevel.ERR, message.getLevel() );
+    assertNotNull( message.getAdditionalFields().get( "exception" ) );
 
-      assertEquals("bar", gelfSender.getLastMessage().getAdditionalFields().get( "foo" ));
-      assertNull( gelfSender.getLastMessage().getAdditionalFields().get( "non-existent" ));
-    }
-
-    @Test
-    public void handleNDC() {
-
-        LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, "", new RuntimeException("LOL"));
-        NDC.push("Foobar");
-
-        gelfAppender.append(event);
-
-      assertEquals("Foobar", gelfSender.getLastMessage().getAdditionalFields().get( "loggerNdc" ));
-    }
-
-    @Test
-    public void disableExtendedInformation() {
-
-        LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(this.getClass()), 123L, Priority.INFO, "", new RuntimeException("LOL"));
-
-        MDC.put("foo", "bar");
-        NDC.push("Foobar");
-
-        gelfAppender.append(event);
-
-      assertNull( gelfSender.getLastMessage().getAdditionalFields().get( "loggerNdc" ));
-      assertNull( gelfSender.getLastMessage().getAdditionalFields().get( "foo" ));
-    }
-
-    @Test
-    public void checkExtendedInformation() throws UnknownHostException, SocketException {
-
-        LoggingEvent event = new LoggingEvent(CLASS_NAME, Category.getInstance(GelfAppenderTest.class), 123L, Priority.INFO, "Das Auto", new RuntimeException("LOL"));
-
-        gelfAppender.append(event);
-
-      assertEquals( gelfSender.getLastMessage().getAdditionalFields().get( "logger" ), CLASS_NAME);
-    }
+    // Force a reconfigure that will ensure that the close method is invoked to shutdown appender
+    PropertyConfigurator.configure( properties );
+  }
 }
