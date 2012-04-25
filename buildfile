@@ -8,5 +8,6 @@ define "gelf4j" do
 
   compile.with :slf4j_api, :spice_cli, :json_simple, :log4j, :logback_core, :logback_classic
 
-  package :jar
+  package(:jar)
+  package(:jar, :classifier => 'all').merge(artifacts([:spice_cli,:json_simple]))
 end
