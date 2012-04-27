@@ -96,7 +96,7 @@ public class GelfAppenderTest
     assertEquals( smallTextMessage, message.getFullMessage() );
     assertEquals( SyslogLevel.DEBUG, message.getLevel() );
     assertEquals( facility, message.getFacility() );
-    assertEquals( hostName, message.getHostname() );
+    assertEquals( hostName, message.getHost() );
     assertEquals( null, message.getFile() );
     assertNull( message.getLine() );
     // The message is in the last second

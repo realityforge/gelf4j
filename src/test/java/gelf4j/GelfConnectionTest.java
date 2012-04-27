@@ -35,7 +35,7 @@ public class GelfConnectionTest
       final String textMessage = "Nightmare faces looking at me, and I can see now";
       final long timestamp = System.currentTimeMillis();
       final GelfMessage message1 = connection.newMessage( level, textMessage, timestamp );
-      assertEquals( "Zoon", message1.getHostname() );
+      assertEquals( "Zoon", message1.getHost() );
       assertEquals( "OILZ", message1.getFacility() );
       assertEquals( textMessage, message1.getShortMessage() );
       assertEquals( textMessage, message1.getFullMessage() );

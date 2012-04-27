@@ -108,7 +108,7 @@ final class GelfEncoder
       map.put( "line", line );
     }
 
-    final String hostname = message.getHostname();
+    final String hostname = message.getHost();
     map.put( "host", null == hostname ? _hostname : hostname );
 
     final Map<String, Object> fields = message.getAdditionalFields();

@@ -69,7 +69,7 @@ public final class GelfMessageUtil
     }
     else if( key.equals( GelfTargetConfig.FIELD_HOST ) )
     {
-      message.setHostname( String.valueOf( value ) );
+      message.setHost( String.valueOf( value ) );
     }
     else if( key.equals( GelfTargetConfig.FIELD_MESSAGE ) )
     {

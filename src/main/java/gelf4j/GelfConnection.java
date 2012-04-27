@@ -47,7 +47,7 @@ public class GelfConnection
   public GelfMessage newMessage()
   {
     final GelfMessage gelfMessage = new GelfMessage();
-    gelfMessage.setHostname( _config.getOriginHost() );
+    gelfMessage.setHost( _config.getOriginHost() );
     gelfMessage.setFacility( _config.getFacility() );
     gelfMessage.getAdditionalFields().putAll( _config.getAdditionalData() );
     return gelfMessage;

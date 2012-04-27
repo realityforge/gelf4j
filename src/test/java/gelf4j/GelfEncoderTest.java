@@ -69,7 +69,7 @@ public class GelfEncoderTest
     message.setLevel( SyslogLevel.ERR );
     message.setFile( myFile );
     message.setLine( line );
-    message.setHostname( funkyHost );
+    message.setHost( funkyHost );
     message.setJavaTimestamp( 3000 );
     message.getAdditionalFields().put( "zang", "zing" );
     final String json = new GelfEncoder( "localhost", true ).toJson( message );

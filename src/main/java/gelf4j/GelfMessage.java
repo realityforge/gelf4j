@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class GelfMessage
 {
-  private String _hostname;
+  private String _host;
   private String _shortMessage;
   private String _fullMessage;
   private Long _javaTimestamp;
@@ -15,14 +15,14 @@ public class GelfMessage
   private String _file;
   private final Map<String, Object> _additionalFields = new HashMap<String, Object>(  );
 
-  public String getHostname()
+  public String getHost()
   {
-    return _hostname;
+    return _host;
   }
 
-  public void setHostname( final String hostname )
+  public void setHost( final String host )
   {
-    _hostname = hostname;
+    _host = host;
   }
 
   public String getShortMessage()
