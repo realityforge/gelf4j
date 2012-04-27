@@ -145,22 +145,22 @@ public class GelfAppender
       final String key = entry.getKey();
       if( GelfTargetConfig.FIELD_LOGGER_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, event.getLoggerName() );
+        GelfMessageUtil.setValue( message, key, event.getLoggerName() );
       }
       else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, event.getThreadName() );
+        GelfMessageUtil.setValue( message, key, event.getThreadName() );
       }
       else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, message.getJavaTimestamp() );
+        GelfMessageUtil.setValue( message, key, message.getJavaTimestamp() );
       }
       else if( GelfTargetConfig.FIELD_EXCEPTION.equals( fieldName ) )
       {
         final ThrowableInformation throwable = event.getThrowableInformation();
         if( null != throwable )
         {
-          message.getAdditionalFields().put( key, GelfMessageUtil.extractStacktrace( throwable.getThrowable() ) );
+          GelfMessageUtil.setValue( message, key, GelfMessageUtil.extractStacktrace( throwable.getThrowable() ) );
         }
       }
       else if( FIELD_LOGGER_NDC.equals( fieldName ) )
@@ -168,7 +168,7 @@ public class GelfAppender
         final String ndc = event.getNDC();
         if( null != ndc )
         {
-          message.getAdditionalFields().put( key, ndc );
+          GelfMessageUtil.setValue( message, key, ndc );
         }
       }
       else if( null != mdc )
@@ -176,7 +176,7 @@ public class GelfAppender
         final String value = mdc.get( key );
         if( null != value )
         {
-          message.getAdditionalFields().put( key, value );
+          GelfMessageUtil.setValue( message, key, value );
         }
       }
     }

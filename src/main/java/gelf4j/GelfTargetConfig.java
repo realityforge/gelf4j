@@ -15,6 +15,12 @@ public class GelfTargetConfig
   public static final String FIELD_TIMESTAMP_MS = "timestampMs";
   public static final String FIELD_LOGGER_NAME = "loggerName";
   public static final String FIELD_EXCEPTION = "exception";
+  public static final String FIELD_LEVEL = "level";
+  public static final String FIELD_FACILITY = "facility";
+  public static final String FIELD_LINE = "line";
+  public static final String FIELD_FILE = "file";
+  public static final String FIELD_HOST = "host";
+  public static final String FIELD_MESSAGE = "message";
 
   public static final int DEFAULT_PORT = 12201;
 

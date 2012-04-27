@@ -41,6 +41,48 @@ public final class GelfMessageUtil
     }
   }
 
+  public static void setValue( final GelfMessage message, final String key, final Object value )
+  {
+    if( key.equals( GelfTargetConfig.FIELD_LEVEL ) )
+    {
+      final SyslogLevel level = parseLevel( String.valueOf( value ) );
+      message.setLevel( null != level ? level : SyslogLevel.INFO );
+    }
+    else if( key.equals( GelfTargetConfig.FIELD_FACILITY ) )
+    {
+      message.setFacility( String.valueOf( value ) );
+    }
+    else if( key.equals( GelfTargetConfig.FIELD_LINE ) )
+    {
+      try
+      {
+        message.setLine( Integer.parseInt( String.valueOf( value ) ) );
+      }
+      catch( final NumberFormatException nfe )
+      {
+        //Ignore
+      }
+    }
+    else if( key.equals( GelfTargetConfig.FIELD_FILE ) )
+    {
+      message.setFile( String.valueOf( value ) );
+    }
+    else if( key.equals( GelfTargetConfig.FIELD_HOST ) )
+    {
+      message.setHostname( String.valueOf( value ) );
+    }
+    else if( key.equals( GelfTargetConfig.FIELD_MESSAGE ) )
+    {
+      final String textMessage = String.valueOf( message );
+      message.setShortMessage( truncateShortMessage( textMessage ) );
+      message.setFullMessage( textMessage );
+    }
+    else
+    {
+      message.getAdditionalFields().put( key, value );
+    }
+  }
+
   public static String truncateShortMessage( final String message )
   {
     if( message.length() > MAX_SHORT_MESSAGE_LENGTH )

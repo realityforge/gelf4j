@@ -148,35 +148,35 @@ public class GelfHandler
       final String key = entry.getKey();
       if( GelfTargetConfig.FIELD_LOGGER_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, record.getLoggerName() );
+        GelfMessageUtil.setValue( message, key, record.getLoggerName() );
       }
       else if( FIELD_THREAD_ID.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, record.getThreadID() );
+        GelfMessageUtil.setValue( message, key, record.getThreadID() );
       }
       else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, Thread.currentThread().getName() );
+        GelfMessageUtil.setValue( message, key, Thread.currentThread().getName() );
       }
       else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, message.getJavaTimestamp() );
+        GelfMessageUtil.setValue( message, key, message.getJavaTimestamp() );
       }
       else if( GelfTargetConfig.FIELD_EXCEPTION.equals( fieldName ) )
       {
         final Throwable throwable = record.getThrown();
         if( null != throwable )
         {
-          message.getAdditionalFields().put( key, GelfMessageUtil.extractStacktrace( throwable ) );
+          GelfMessageUtil.setValue( message, key, GelfMessageUtil.extractStacktrace( throwable ) );
         }
       }
       else if( FIELD_SOURCE_CLASS_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, record.getSourceClassName() );
+        GelfMessageUtil.setValue( message, key, record.getSourceClassName() );
       }
       else if( FIELD_SOURCE_METHOD_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, record.getSourceMethodName() );
+        GelfMessageUtil.setValue( message, key, record.getSourceMethodName() );
       }
     }
 

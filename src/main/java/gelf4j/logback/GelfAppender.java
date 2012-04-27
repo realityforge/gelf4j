@@ -7,6 +7,7 @@ import ch.qos.logback.classic.util.LevelToSyslogSeverity;
 import ch.qos.logback.core.AppenderBase;
 import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
+import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
 import java.util.Map;
@@ -127,22 +128,22 @@ public class GelfAppender<E> extends AppenderBase<E>
       final String key = entry.getKey();
       if( GelfTargetConfig.FIELD_LOGGER_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, event.getLoggerName() );
+        GelfMessageUtil.setValue( message, key, event.getLoggerName() );
       }
       else if( GelfTargetConfig.FIELD_THREAD_NAME.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, event.getThreadName() );
+        GelfMessageUtil.setValue( message, key, event.getThreadName() );
       }
       else if( GelfTargetConfig.FIELD_TIMESTAMP_MS.equals( fieldName ) )
       {
-        message.getAdditionalFields().put( key, message.getJavaTimestamp() );
+        GelfMessageUtil.setValue( message, key, message.getJavaTimestamp() );
       }
       else if( GelfTargetConfig.FIELD_EXCEPTION.equals( fieldName ) )
       {
         final IThrowableProxy proxy = event.getThrowableProxy();
         if( null != proxy )
         {
-          message.getAdditionalFields().put( key, toStackTraceString( proxy.getStackTraceElementProxyArray() ) );
+          GelfMessageUtil.setValue( message, key, toStackTraceString( proxy.getStackTraceElementProxyArray() ) );
         }
       }
       else if( null != mdc )
@@ -150,7 +151,7 @@ public class GelfAppender<E> extends AppenderBase<E>
         final String value = mdc.get( key );
         if( null != value )
         {
-          message.getAdditionalFields().put( key, value );
+          GelfMessageUtil.setValue( message, key, value );
         }
       }
     }
