@@ -179,7 +179,6 @@ public class GelfHandler
         message.getAdditionalFields().put( key, record.getSourceMethodName() );
       }
     }
-    message.getAdditionalFields().putAll( _config.getAdditionalData() );
 
     return message;
   }
