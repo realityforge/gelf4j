@@ -2,6 +2,7 @@ package gelf4j.sender;
 
 import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
+import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
 import java.util.List;
@@ -195,21 +196,11 @@ public class Main
         case LEVEL_OPT:
         {
           final String level = option.getArgument();
-          try
+          c_level = GelfMessageUtil.parseLevel( level );
+          if( null == c_level )
           {
-            c_level = SyslogLevel.values()[ Integer.parseInt( level ) ];
-          }
-          catch( final Exception e )
-          {
-            try
-            {
-              c_level = SyslogLevel.valueOf( level );
-            }
-            catch( final Exception e2 )
-            {
-              error( "parsing level: " + level );
-              return false;
-            }
+            error( "parsing level: " + level );
+            return false;
           }
           break;
         }

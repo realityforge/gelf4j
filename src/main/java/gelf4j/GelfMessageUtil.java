@@ -19,4 +19,23 @@ public final class GelfMessageUtil
     throwable.printStackTrace( pw );
     return sw.toString();
   }
+
+  public static SyslogLevel parseLevel( final String level )
+  {
+    try
+    {
+      return SyslogLevel.values()[ Integer.parseInt( level ) ];
+    }
+    catch( final Exception e )
+    {
+      try
+      {
+        return SyslogLevel.valueOf( level );
+      }
+      catch( final Exception e2 )
+      {
+        return null;
+      }
+    }
+  }
 }
