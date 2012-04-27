@@ -12,8 +12,6 @@ import java.util.List;
  */
 public class GelfConnection
 {
-  static final int MAX_SHORT_MESSAGE_LENGTH = 250;
-
   private final GelfTargetConfig _config;
   private final GelfEncoder _encoder;
   private DatagramSocket _socket;
@@ -42,7 +40,7 @@ public class GelfConnection
     gelfMessage.setJavaTimestamp( timestamp );
     gelfMessage.setLevel( level );
     gelfMessage.setFullMessage( message );
-    gelfMessage.setShortMessage( truncateShortMessage( message ) );
+    gelfMessage.setShortMessage( GelfMessageUtil.truncateShortMessage( message ) );
     return gelfMessage;
   }
 
@@ -112,18 +110,6 @@ public class GelfConnection
     catch( final SocketException se )
     {
       throw new RuntimeException( se );
-    }
-  }
-
-  private static String truncateShortMessage( final String message )
-  {
-    if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
-    {
-      return message.substring( 0, MAX_SHORT_MESSAGE_LENGTH );
-    }
-    else
-    {
-      return  message;
     }
   }
 }

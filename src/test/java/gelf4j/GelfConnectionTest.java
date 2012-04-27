@@ -57,7 +57,7 @@ public class GelfConnectionTest
       final GelfMessage message2 = connection.newMessage( level, textMessage2, timestamp );
 
       //The really large message should have been truncated for the short_message field
-      assertEquals( textMessage2.substring( 0, GelfConnection.MAX_SHORT_MESSAGE_LENGTH ), message2.getShortMessage() );
+      assertEquals( textMessage2.substring( 0, GelfMessageUtil.MAX_SHORT_MESSAGE_LENGTH ), message2.getShortMessage() );
       assertEquals( textMessage2, message2.getFullMessage() );
 
       final boolean sent2 = connection.send( message2 );

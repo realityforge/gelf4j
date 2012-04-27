@@ -8,6 +8,8 @@ import java.io.StringWriter;
  */
 public final class GelfMessageUtil
 {
+  static final int MAX_SHORT_MESSAGE_LENGTH = 250;
+
   private GelfMessageUtil()
   {
   }
@@ -36,6 +38,18 @@ public final class GelfMessageUtil
       {
         return null;
       }
+    }
+  }
+
+  public static String truncateShortMessage( final String message )
+  {
+    if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
+    {
+      return message.substring( 0, MAX_SHORT_MESSAGE_LENGTH );
+    }
+    else
+    {
+      return  message;
     }
   }
 }
