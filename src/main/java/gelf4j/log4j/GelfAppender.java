@@ -18,6 +18,7 @@ import org.apache.log4j.spi.ThrowableInformation;
  * @author Anton Yakimov
  * @author Jochen Schalanda
  */
+@SuppressWarnings( "UnusedDeclaration" )
 public class GelfAppender
   extends AppenderSkeleton
 {

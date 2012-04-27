@@ -15,6 +15,7 @@ import java.util.Map;
  * Responsible for Formatting a log event and sending it to the Server. Note that you can't swap in a different
  * Layout since the GELF format is static.
  */
+@SuppressWarnings( "UnusedDeclaration" )
 public class GelfAppender<E> extends AppenderBase<E>
 {
   private final GelfTargetConfig _config = new GelfTargetConfig();
