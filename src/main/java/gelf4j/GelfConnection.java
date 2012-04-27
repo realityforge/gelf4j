@@ -45,6 +45,7 @@ public class GelfConnection
     gelfMessage.setLevel( level );
     gelfMessage.setFullMessage( message );
     gelfMessage.setShortMessage( truncateShortMessage( message ) );
+    gelfMessage.getAdditionalFields().putAll( _config.getAdditionalData() );
     return gelfMessage;
   }
 
@@ -56,7 +57,6 @@ public class GelfConnection
    */
   public final boolean send( final GelfMessage message )
   {
-    message.getAdditionalFields().putAll( _config.getAdditionalData() );
     return performSend( message );
   }
 
