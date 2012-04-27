@@ -38,13 +38,19 @@ public class GelfConnection
                                  final String message,
                                  final long timestamp )
   {
-    final GelfMessage gelfMessage = new GelfMessage();
-    gelfMessage.setHostname( _config.getOriginHost() );
-    gelfMessage.setFacility( _config.getFacility() );
+    final GelfMessage gelfMessage = newMessage();
     gelfMessage.setJavaTimestamp( timestamp );
     gelfMessage.setLevel( level );
     gelfMessage.setFullMessage( message );
     gelfMessage.setShortMessage( truncateShortMessage( message ) );
+    return gelfMessage;
+  }
+
+  public GelfMessage newMessage()
+  {
+    final GelfMessage gelfMessage = new GelfMessage();
+    gelfMessage.setHostname( _config.getOriginHost() );
+    gelfMessage.setFacility( _config.getFacility() );
     gelfMessage.getAdditionalFields().putAll( _config.getAdditionalData() );
     return gelfMessage;
   }
