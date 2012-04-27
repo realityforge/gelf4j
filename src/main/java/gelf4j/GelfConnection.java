@@ -55,12 +55,7 @@ public class GelfConnection
    * @param message the GELF Message
    * @return false if sending failed
    */
-  public final boolean send( final GelfMessage message )
-  {
-    return performSend( message );
-  }
-
-  protected boolean performSend( final GelfMessage message )
+  public boolean send( final GelfMessage message )
   {
     final List<byte[]> packets = _encoder.encode( message );
     // Note: Returning false when encoding fails for whatever reason

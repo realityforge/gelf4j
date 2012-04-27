@@ -12,10 +12,10 @@ public class TestGelfConnection
   }
 
   @Override
-  protected boolean performSend( final GelfMessage message )
+  public boolean send( final GelfMessage message )
   {
     this._lastMessage = message;
-    return super.performSend( message );
+    return super.send( message );
   }
 
   public GelfMessage getLastMessage()
