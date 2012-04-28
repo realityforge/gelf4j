@@ -75,7 +75,15 @@ public class Main
       }
       connection = config.createConnection();
       final GelfMessage message = connection.newMessage();
-      GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_MESSAGE, c_message );
+      if( null != c_message )
+      {
+        GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_MESSAGE, c_message );
+      }
+      if( null == message.getShortMessage() )
+      {
+        error( "No message specified" );
+        System.exit( ERROR_PARSING_ARGS_EXIT_CODE );
+      }
       if( !connection.send( message ) )
       {
         error( "Failed to send message: " + message );
@@ -188,20 +196,12 @@ public class Main
 
       }
     }
-    // Check the message
-    if( null == c_message )
-    {
-      error( "Must specify log message" );
-      return false;
-    }
-
     if( c_verbose )
     {
       info( "Server Host: " + config.getHost() );
       info( "Server Port: " + config.getPort() );
       info( "Compressed Chunking Format?: " + config.isCompressedChunking() );
       info( "Additional Data: " + config.getAdditionalData() );
-      info( "Message: " + c_message );
     }
 
     return true;
