@@ -47,6 +47,7 @@ public class Main
   private static final int ERROR_PARSING_ARGS_EXIT_CODE = 1;
 
   private static boolean c_verbose;
+  private static final GelfTargetConfig c_config = new GelfTargetConfig();
 
   public static void main( final String[] args )
   {
