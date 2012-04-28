@@ -1,5 +1,6 @@
 package gelf4j.forwarder;
 
+import gelf4j.GelfConnection;
 import gelf4j.GelfTargetConfig;
 import java.util.List;
 import org.realityforge.cli.CLArgsParser;
@@ -45,6 +46,7 @@ public class Main
 
   private static final int SUCCESS_EXIT_CODE = 0;
   private static final int ERROR_PARSING_ARGS_EXIT_CODE = 1;
+  private static final int ERROR_PARSING_FILE_EXIT_CODE = 2;
 
   private static boolean c_verbose;
   private static final GelfTargetConfig c_config = new GelfTargetConfig();
@@ -57,6 +59,16 @@ public class Main
       return;
     }
 
+    try
+    {
+      final GelfConnection connection = c_config.createConnection();
+    }
+    catch( final Exception e )
+    {
+      e.printStackTrace();
+      System.exit( ERROR_PARSING_FILE_EXIT_CODE );
+      return;
+    }
     System.exit( SUCCESS_EXIT_CODE );
   }
 
