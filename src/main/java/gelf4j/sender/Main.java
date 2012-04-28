@@ -114,16 +114,6 @@ public class Main
     }
   }
 
-  private static void info( final String message )
-  {
-    System.out.println( message );
-  }
-
-  private static void error( final String message )
-  {
-    System.out.println( "Error: " + message );
-  }
-
   public static boolean processOptions( final GelfTargetConfig config, final String[] args )
   {
     // Parse the arguments
@@ -226,5 +216,15 @@ public class Main
     msg.append( CLUtil.describeOptions( OPTIONS ).toString() );
 
     info( msg.toString() );
+  }
+
+  private static void info( final String message )
+  {
+    System.out.println( message );
+  }
+
+  private static void error( final String message )
+  {
+    System.out.println( "Error: " + message );
   }
 }
