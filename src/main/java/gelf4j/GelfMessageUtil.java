@@ -22,7 +22,7 @@ public final class GelfMessageUtil
     return sw.toString();
   }
 
-  public static SyslogLevel parseLevel( final String level )
+  static SyslogLevel parseLevel( final String level )
   {
     try
     {
