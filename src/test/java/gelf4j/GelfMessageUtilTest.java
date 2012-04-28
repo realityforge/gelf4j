@@ -29,6 +29,10 @@ public class GelfMessageUtilTest
 
     GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_HOST, "foo.com" );
     assertEquals( "foo.com", message.getHost() );
+
+    assertNull( message.getJavaTimestamp() );
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_TIMESTAMP_PREFIX + "dd/MM/yy", "20/10/1977" );
+    assertNotNull( message.getJavaTimestamp() );
   }
 
   @Test

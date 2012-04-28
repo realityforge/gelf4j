@@ -12,6 +12,7 @@ import org.json.simple.JSONValue;
 public class GelfTargetConfig
 {
   public static final String FIELD_THREAD_NAME = "threadName";
+  public static final String FIELD_TIMESTAMP_PREFIX = "timestamp:";
   public static final String FIELD_TIMESTAMP_MS = "timestampMs";
   public static final String FIELD_LOGGER_NAME = "loggerName";
   public static final String FIELD_EXCEPTION = "exception";
