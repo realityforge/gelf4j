@@ -11,7 +11,7 @@ import org.realityforge.cli.CLOptionDescriptor;
 import org.realityforge.cli.CLUtil;
 
 /**
- * A simple commandline application for sending a log to a logger.
+ * A simple commandline application for sending a log to a gelf server.
  */
 public class Main
 {
@@ -216,8 +216,11 @@ public class Main
 
     final StringBuilder msg = new StringBuilder();
 
+    msg.append( "java " );
     msg.append( Main.class.getName() );
-    msg.append( " Options: " );
+    msg.append( " [options] message" );
+    msg.append( lineSeparator );
+    msg.append( "Options: " );
     msg.append( lineSeparator );
 
     msg.append( CLUtil.describeOptions( OPTIONS ).toString() );
