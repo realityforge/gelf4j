@@ -4,7 +4,6 @@ import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
 import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
-import gelf4j.SyslogLevel;
 import java.util.List;
 import org.realityforge.cli.CLArgsParser;
 import org.realityforge.cli.CLOption;
@@ -70,8 +69,6 @@ public class Main
   private static final int ERROR_SENDING_EXIT_CODE = 2;
 
   private static boolean c_verbose;
-  private static SyslogLevel c_level = SyslogLevel.ALERT;
-  private static Long c_timestamp = System.currentTimeMillis();
   private static String c_message;
 
   public static void main( final String[] args )
@@ -92,8 +89,13 @@ public class Main
         info( "Attempting to transmit message" );
       }
       connection = config.createConnection();
-      final GelfMessage gelfMessage = connection.newMessage( c_level, "", c_timestamp );
-      connection.send( gelfMessage );
+      final GelfMessage message = connection.newMessage();
+      GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_MESSAGE, c_message );
+      if( !connection.send( message ) )
+      {
+        error( "Failed to send message: " + message );
+        System.exit( ERROR_SENDING_EXIT_CODE );
+      }
       connection.close();
       if( c_verbose )
       {
@@ -193,17 +195,6 @@ public class Main
           }
           break;
         }
-        case LEVEL_OPT:
-        {
-          final String level = option.getArgument();
-          c_level = GelfMessageUtil.parseLevel( level );
-          if( null == c_level )
-          {
-            error( "parsing level: " + level );
-            return false;
-          }
-          break;
-        }
         case UNCOMPRESSED_CHUNKING_OPT:
         {
           config.setCompressedChunking( false );
@@ -236,7 +227,6 @@ public class Main
       info( "Origin Host: " + config.getOriginHost() );
       info( "Compressed Chunking Format?: " + config.isCompressedChunking() );
       info( "Facility: " + config.getFacility() );
-      info( "Level: " + c_level );
       info( "Additional Data: " + config.getAdditionalData() );
       info( "Message: " + c_message );
     }
