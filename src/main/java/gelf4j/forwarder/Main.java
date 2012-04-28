@@ -71,12 +71,41 @@ public class Main
       return false;
     }
 
+    c_config.getDefaultFields().clear();
+
     // Get a list of parsed options
     @SuppressWarnings( "unchecked" ) final List<CLOption> options = parser.getArguments();
     for( final CLOption option : options )
     {
       switch( option.getId() )
       {
+        case HOST_CONFIG_OPT:
+          c_config.setHost( option.getArgument() );
+          break;
+        case FIELD_OPT:
+        {
+          c_config.getDefaultFields().put( option.getArgument(), option.getArgument( 1 ) );
+          break;
+        }
+        case PORT_CONFIG_OPT:
+        {
+          final String port = option.getArgument();
+          try
+          {
+            c_config.setPort( Integer.parseInt( port ) );
+          }
+          catch( final NumberFormatException nfe )
+          {
+            error( "parsing port: " + port );
+            return false;
+          }
+          break;
+        }
+        case UNCOMPRESSED_CHUNKING_OPT:
+        {
+          c_config.setCompressedChunking( false );
+          break;
+        }
         case VERBOSE_OPT:
         {
           c_verbose = true;
@@ -92,7 +121,10 @@ public class Main
     }
     if( c_verbose )
     {
-      //info( "Server Host: " + config.getHost() );
+      info( "Server Host: " + c_config.getHost() );
+      info( "Server Port: " + c_config.getPort() );
+      info( "Compressed Chunking Format?: " + c_config.isCompressedChunking() );
+      info( "Default Fields: " + c_config.getDefaultFields() );
     }
 
     return true;
