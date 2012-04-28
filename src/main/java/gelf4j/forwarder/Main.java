@@ -14,6 +14,7 @@ public class Main
   private static final int PORT_CONFIG_OPT = 'p';
   private static final int VERBOSE_OPT = 'v';
   private static final int UNCOMPRESSED_CHUNKING_OPT = 'u';
+  private static final int FIELD_OPT = 'D';
 
   private static final CLOptionDescriptor[] OPTIONS = new CLOptionDescriptor[]{
     new CLOptionDescriptor( "help",
@@ -28,6 +29,10 @@ public class Main
                             CLOptionDescriptor.ARGUMENT_REQUIRED,
                             PORT_CONFIG_OPT,
                             "the port on the server. Defaults to " + GelfTargetConfig.DEFAULT_PORT ),
+    new CLOptionDescriptor( "field",
+                            CLOptionDescriptor.ARGUMENTS_REQUIRED_2 | CLOptionDescriptor.DUPLICATES_ALLOWED,
+                            FIELD_OPT,
+                            "fields added to the message." ),
     new CLOptionDescriptor( "verbose",
                             CLOptionDescriptor.ARGUMENT_DISALLOWED,
                             VERBOSE_OPT,
