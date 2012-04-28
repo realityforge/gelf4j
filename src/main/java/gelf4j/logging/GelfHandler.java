@@ -38,11 +38,6 @@ public class GelfHandler
     {
       _config.setPort( Integer.parseInt( port ) );
     }
-    final String originHost = manager.getProperty( prefix + ".originHost" );
-    if( null != originHost )
-    {
-      _config.setOriginHost( originHost );
-    }
     final String additionalFields = manager.getProperty( prefix + ".additionalFields" );
     if( null != additionalFields )
     {
@@ -53,13 +48,6 @@ public class GelfHandler
     {
       _config.setAdditionalData( additionalData );
     }
-
-    final String facility = manager.getProperty( prefix + ".facility" );
-    if( null != facility )
-    {
-      _config.setFacility( facility );
-    }
-
     final String compressedChunking = manager.getProperty( prefix + ".compressedChunking" );
     if( null != compressedChunking )
     {

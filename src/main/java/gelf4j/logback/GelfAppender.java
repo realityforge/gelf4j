@@ -32,11 +32,6 @@ public class GelfAppender<E> extends AppenderBase<E>
     _config.setCompressedChunking( compressedChunking );
   }
 
-  public void setOriginHost( final String originHost )
-  {
-    _config.setOriginHost( originHost );
-  }
-
   public void setPort( final int port )
   {
     _config.setPort( port );
@@ -45,11 +40,6 @@ public class GelfAppender<E> extends AppenderBase<E>
   public void setHost( final String host )
   {
     _config.setHost( host );
-  }
-
-  public void setFacility( final String facility )
-  {
-    _config.setFacility( facility );
   }
 
   public void setAdditionalFields( final String additionalFields )

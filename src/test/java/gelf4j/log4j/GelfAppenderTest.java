@@ -27,12 +27,13 @@ public class GelfAppenderTest
     final String hostName = InetAddress.getLocalHost().getCanonicalHostName();
     properties.setProperty( "log4j.appender.gelf.host", hostName );
     properties.setProperty( "log4j.appender.gelf.port", "1971" );
-    properties.setProperty( "log4j.appender.gelf.originHost", hostName );
     final String facility = "LOG4J";
-    properties.setProperty( "log4j.appender.gelf.facility", facility );
     properties.setProperty( "log4j.appender.gelf.compressedChunking", "false" );
     properties.setProperty( "log4j.appender.gelf.additionalData",
-                            "{\"environment\": \"DEV\", \"application\": \"MyAPP\"}" );
+                            "{\"environment\": \"DEV\", " +
+                            "\"application\": \"MyAPP\", " +
+                            "\"host\": \"" + hostName + "\", " +
+                            "\"facility\": \"" + facility + "\"}" );
     properties.setProperty( "log4j.appender.gelf.additionalFields",
                             "{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\", \"loggerNdc\": \"loggerNdc\"}" );
 
@@ -44,12 +45,12 @@ public class GelfAppenderTest
     assertTrue( appender instanceof GelfAppender );
     final GelfTargetConfig config = ( (GelfAppender) appender ).getConfig();
 
-    assertEquals( hostName, config.getOriginHost() );
     assertEquals( hostName, config.getHost() );
-    assertEquals( facility, config.getFacility() );
     assertEquals( 1971, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
-    assertEquals( 2, config.getAdditionalData().size() );
+    assertEquals( 4, config.getAdditionalData().size() );
+    assertEquals( facility, config.getAdditionalData().get( "facility" ) );
+    assertEquals( hostName, config.getAdditionalData().get( "host" ) );
     assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
     assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
 

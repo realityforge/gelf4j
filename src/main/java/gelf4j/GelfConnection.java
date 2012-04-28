@@ -3,6 +3,7 @@ package gelf4j;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class GelfConnection
     throws Exception
   {
     _config = config;
-    _encoder = new GelfEncoder( _config.getOriginHost(), _config.isCompressedChunking() );
+    _encoder = new GelfEncoder( InetAddress.getLocalHost().getCanonicalHostName(), _config.isCompressedChunking() );
   }
 
   public void close()
@@ -47,8 +48,6 @@ public class GelfConnection
   public GelfMessage newMessage()
   {
     final GelfMessage gelfMessage = new GelfMessage();
-    gelfMessage.setHost( _config.getOriginHost() );
-    gelfMessage.setFacility( _config.getFacility() );
     for( final Map.Entry<String, Object> entry : _config.getAdditionalData().entrySet() )
     {
       GelfMessageUtil.setValue( gelfMessage, entry.getKey(), entry.getValue() );

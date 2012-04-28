@@ -29,16 +29,14 @@ public class GelfTargetConfig
   private int _port = DEFAULT_PORT;
   private boolean _compressedChunking = true;
 
-  private String _originHost;
-  private String _facility;
-  private final Map<String, Object> _additionalData = new HashMap<String, Object>();
+  private final Map<String, Object> _additionalData;
   private final Map<String, String> _additionalFields;
 
   public GelfTargetConfig()
   {
     try
     {
-      _host = _originHost = InetAddress.getLocalHost().getCanonicalHostName();
+      _host = InetAddress.getLocalHost().getCanonicalHostName();
     }
     catch( final UnknownHostException uhe )
     {
@@ -49,6 +47,9 @@ public class GelfTargetConfig
     _additionalFields.put( FIELD_THREAD_NAME, FIELD_THREAD_NAME );
     _additionalFields.put( FIELD_LOGGER_NAME, FIELD_LOGGER_NAME );
     _additionalFields.put( FIELD_TIMESTAMP_MS, FIELD_TIMESTAMP_MS );
+
+    _additionalData = new HashMap<String, Object>();
+    _additionalData.put( FIELD_HOST, _host );
   }
 
   public boolean isCompressedChunking()
@@ -59,26 +60,6 @@ public class GelfTargetConfig
   public void setCompressedChunking( final boolean compressedChunking )
   {
     _compressedChunking = compressedChunking;
-  }
-
-  public String getOriginHost()
-  {
-    return _originHost;
-  }
-
-  public void setOriginHost( final String originHost )
-  {
-    _originHost = originHost;
-  }
-
-  public String getFacility()
-  {
-    return _facility;
-  }
-
-  public void setFacility( final String facility )
-  {
-    _facility = facility;
   }
 
   public String getHost()

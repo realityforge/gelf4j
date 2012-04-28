@@ -30,12 +30,11 @@ public class GelfHandlerTest
       "\n" +
       prefix + ".host=" + hostName + "\n" +
       prefix + ".port=1998\n" +
-      prefix + ".originHost=" + hostName + "\n" +
-      prefix + ".facility=" + facility + "\n" +
       prefix + ".compressedChunking=false\n" +
       prefix + ".level=FINE\n" +
       prefix + ".additionalFields={\"thread_id\": \"threadId\", \"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"SourceClassName\": \"SourceClassName\", \"SourceMethodName\": \"SourceMethodName\", \"exception\": \"exception\"}\n" +
-      prefix + ".additionalData={\"environment\": \"DEV\", \"application\": \"MyAPP\"}\n" +
+      prefix + ".additionalData={\"environment\": \"DEV\", \"application\": \"MyAPP\", \"host\":\"" + hostName +
+      "\", \"facility\":\"" + facility + "\"}\n" +
       "\n";
 
     LogManager.getLogManager().reset();
@@ -50,12 +49,12 @@ public class GelfHandlerTest
     final GelfHandler gelfHandler = (GelfHandler) handler;
     final GelfTargetConfig config = gelfHandler.getConfig();
 
-    assertEquals( hostName, config.getOriginHost() );
     assertEquals( hostName, config.getHost() );
-    assertEquals( facility, config.getFacility() );
     assertEquals( 1998, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
-    assertEquals( 2, config.getAdditionalData().size() );
+    assertEquals( 4, config.getAdditionalData().size() );
+    assertEquals( hostName, config.getAdditionalData().get( "host" ) );
+    assertEquals( facility, config.getAdditionalData().get( "facility" ) );
     assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
     assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
 

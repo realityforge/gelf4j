@@ -11,13 +11,12 @@ public class GelfTargetConfigTest
     throws Exception
   {
     final GelfTargetConfig config = new GelfTargetConfig();
-    assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getOriginHost() );
     assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getHost() );
     assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getHostAddress().getCanonicalHostName() );
-    assertEquals( null, config.getFacility() );
     assertEquals( 12201, config.getPort() );
     assertEquals( true, config.isCompressedChunking() );
-    assertEquals( 0, config.getAdditionalData().size() );
+    assertEquals( 1, config.getAdditionalData().size() );
+    assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getAdditionalData().get( "host" ) );
 
     assertEquals( 4, config.getAdditionalFields().size() );
     assertEquals( "exception", config.getAdditionalFields().get( "exception" ) );
@@ -44,7 +43,7 @@ public class GelfTargetConfigTest
   {
     final GelfTargetConfig config = new GelfTargetConfig();
 
-    assertEquals( 0, config.getAdditionalData().size() );
+    assertEquals( 1, config.getAdditionalData().size() );
     config.setAdditionalData("{\"foo\":1}");
     assertEquals( 1, config.getAdditionalData().size() );
     config.setAdditionalData("{\"foo2\":\"x\",\"baz\":7}");

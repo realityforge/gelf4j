@@ -17,12 +17,9 @@ public class Main
 {
   private static final int HELP_OPT = 1;
   private static final int HOST_CONFIG_OPT = 'h';
-  private static final int ORIGIN_HOST_CONFIG_OPT = 'o';
   private static final int PORT_CONFIG_OPT = 'p';
   private static final int VERBOSE_OPT = 'v';
   private static final int UNCOMPRESSED_CHUNKING_OPT = 'u';
-  private static final int FACILITY_OPT = 'f';
-  private static final int LEVEL_OPT = 'l';
   private static final int ADDITIONAL_FIELD_OPT = 'D';
 
   private static final CLOptionDescriptor[] OPTIONS = new CLOptionDescriptor[]{
@@ -38,18 +35,6 @@ public class Main
                             CLOptionDescriptor.ARGUMENT_REQUIRED,
                             PORT_CONFIG_OPT,
                             "the port on the server. Defaults to " + GelfTargetConfig.DEFAULT_PORT ),
-    new CLOptionDescriptor( "origin-host",
-                            CLOptionDescriptor.ARGUMENT_REQUIRED,
-                            ORIGIN_HOST_CONFIG_OPT,
-                            "the name of host that generated the message. Defaults to the local host." ),
-    new CLOptionDescriptor( "facility",
-                            CLOptionDescriptor.ARGUMENT_REQUIRED,
-                            FACILITY_OPT,
-                            "the facility against which the message is logged. Defaults to GELF." ),
-    new CLOptionDescriptor( "level",
-                            CLOptionDescriptor.ARGUMENT_REQUIRED,
-                            LEVEL_OPT,
-                            "the syslog level either as a numeric (0-7) or the textual value (EMERG,ALERT,CRIT,ERR,WARNING,NOTICE,INFO,DEBUG). Defaults to ALERT." ),
     new CLOptionDescriptor( "additional-field",
                             CLOptionDescriptor.ARGUMENTS_REQUIRED_2 | CLOptionDescriptor.DUPLICATES_ALLOWED,
                             ADDITIONAL_FIELD_OPT,
@@ -166,19 +151,9 @@ public class Main
         case HOST_CONFIG_OPT:
           config.setHost( option.getArgument() );
           break;
-        case ORIGIN_HOST_CONFIG_OPT:
-          config.setOriginHost( option.getArgument() );
-          break;
-        case FACILITY_OPT:
-        {
-          config.setFacility( option.getArgument() );
-          break;
-        }
         case ADDITIONAL_FIELD_OPT:
         {
-          final String key = option.getArgument();
-          final String value = option.getArgument( 1 );
-          config.getAdditionalData().put( key, value );
+          config.getAdditionalData().put( option.getArgument(), option.getArgument( 1 ) );
           break;
         }
         case PORT_CONFIG_OPT:
@@ -224,9 +199,7 @@ public class Main
     {
       info( "Server Host: " + config.getHost() );
       info( "Server Port: " + config.getPort() );
-      info( "Origin Host: " + config.getOriginHost() );
       info( "Compressed Chunking Format?: " + config.isCompressedChunking() );
-      info( "Facility: " + config.getFacility() );
       info( "Additional Data: " + config.getAdditionalData() );
       info( "Message: " + c_message );
     }

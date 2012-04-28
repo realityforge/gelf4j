@@ -45,13 +45,11 @@ public class GelfAppenderTest
     final String configXml =
       "<configuration>\n" +
       "  <appender name=\"GELF\" class=\"" + TestGelfAppender.class.getName() + "\">\n" +
-      "    <facility>" + facility + "</facility>\n" +
       "    <host>" + hostName + "</host>\n" +
-      "    <originHost>" + hostName + "</originHost>\n" +
       "    <port>1971</port>\n" +
       "    <compressedChunking>false</compressedChunking>\n" +
       "    <additionalFields>{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\"}</additionalFields>\n" +
-      "    <additionalData>{\"environment\": \"DEV\", \"application\": \"MyAPP\"}</additionalData>\n" +
+      "    <additionalData>{\"environment\": \"DEV\", \"application\": \"MyAPP\", \"facility\": \"" + facility + "\", \"host\":\"" + hostName + "\"}</additionalData>\n" +
       "  </appender>\n" +
       "\n" +
       "  <root level=\"debug\">\n" +
@@ -65,12 +63,12 @@ public class GelfAppenderTest
     final Logger logger = LoggerFactory.getLogger( "ZipZipHooray");
     final GelfTargetConfig config = TestGelfAppender.c_appender.getConfig();
 
-    assertEquals( hostName, config.getOriginHost() );
     assertEquals( hostName, config.getHost() );
-    assertEquals( facility, config.getFacility() );
     assertEquals( 1971, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
-    assertEquals( 2, config.getAdditionalData().size() );
+    assertEquals( 4, config.getAdditionalData().size() );
+    assertEquals( hostName, config.getAdditionalData().get( "host" ) );
+    assertEquals( facility, config.getAdditionalData().get( "facility" ) );
     assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
     assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
 
