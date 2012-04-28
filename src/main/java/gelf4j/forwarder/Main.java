@@ -59,7 +59,7 @@ public class Main
     System.exit( SUCCESS_EXIT_CODE );
   }
 
-  public static boolean processOptions( final String[] args )
+  private static boolean processOptions( final String[] args )
   {
     // Parse the arguments
     final CLArgsParser parser = new CLArgsParser( args, OPTIONS );
