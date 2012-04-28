@@ -107,8 +107,11 @@ public class Main
 
     final StringBuilder msg = new StringBuilder();
 
+    msg.append( "java " );
     msg.append( Main.class.getName() );
-    msg.append( " Options: " );
+    msg.append( " [options]" );
+    msg.append( lineSeparator );
+    msg.append( "Options: " );
     msg.append( lineSeparator );
 
     msg.append( CLUtil.describeOptions( OPTIONS ).toString() );
