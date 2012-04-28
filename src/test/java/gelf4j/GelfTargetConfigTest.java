@@ -15,8 +15,8 @@ public class GelfTargetConfigTest
     assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getHostAddress().getCanonicalHostName() );
     assertEquals( 12201, config.getPort() );
     assertEquals( true, config.isCompressedChunking() );
-    assertEquals( 1, config.getAdditionalData().size() );
-    assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getAdditionalData().get( "host" ) );
+    assertEquals( 1, config.getDefaultFields().size() );
+    assertEquals( InetAddress.getLocalHost().getCanonicalHostName(), config.getDefaultFields().get( "host" ) );
 
     assertEquals( 4, config.getAdditionalFields().size() );
     assertEquals( "exception", config.getAdditionalFields().get( "exception" ) );
@@ -38,17 +38,17 @@ public class GelfTargetConfigTest
   }
 
   @Test
-  public void setAdditionalData()
+  public void setDefaultFields()
     throws Exception
   {
     final GelfTargetConfig config = new GelfTargetConfig();
 
-    assertEquals( 1, config.getAdditionalData().size() );
-    config.setAdditionalData("{\"foo\":1}");
-    assertEquals( 1, config.getAdditionalData().size() );
-    config.setAdditionalData("{\"foo2\":\"x\",\"baz\":7}");
-    assertEquals( 2, config.getAdditionalData().size() );
-    assertEquals( 7L, config.getAdditionalData().get( "baz" ) );
-    assertEquals( "x", config.getAdditionalData().get( "foo2" ) );
+    assertEquals( 1, config.getDefaultFields().size() );
+    config.setDefaultFields( "{\"foo\":1}" );
+    assertEquals( 1, config.getDefaultFields().size() );
+    config.setDefaultFields( "{\"foo2\":\"x\",\"baz\":7}" );
+    assertEquals( 2, config.getDefaultFields().size() );
+    assertEquals( 7L, config.getDefaultFields().get( "baz" ) );
+    assertEquals( "x", config.getDefaultFields().get( "foo2" ) );
   }
 }

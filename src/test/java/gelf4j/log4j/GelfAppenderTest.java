@@ -29,7 +29,7 @@ public class GelfAppenderTest
     properties.setProperty( "log4j.appender.gelf.port", "1971" );
     final String facility = "LOG4J";
     properties.setProperty( "log4j.appender.gelf.compressedChunking", "false" );
-    properties.setProperty( "log4j.appender.gelf.additionalData",
+    properties.setProperty( "log4j.appender.gelf.defaultFields",
                             "{\"environment\": \"DEV\", " +
                             "\"application\": \"MyAPP\", " +
                             "\"host\": \"" + hostName + "\", " +
@@ -48,11 +48,11 @@ public class GelfAppenderTest
     assertEquals( hostName, config.getHost() );
     assertEquals( 1971, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
-    assertEquals( 4, config.getAdditionalData().size() );
-    assertEquals( facility, config.getAdditionalData().get( "facility" ) );
-    assertEquals( hostName, config.getAdditionalData().get( "host" ) );
-    assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
-    assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
+    assertEquals( 4, config.getDefaultFields().size() );
+    assertEquals( facility, config.getDefaultFields().get( "facility" ) );
+    assertEquals( hostName, config.getDefaultFields().get( "host" ) );
+    assertEquals( "DEV", config.getDefaultFields().get( "environment" ) );
+    assertEquals( "MyAPP", config.getDefaultFields().get( "application" ) );
 
     assertEquals( 6, config.getAdditionalFields().size() );
     assertEquals( "threadName", config.getAdditionalFields().get( "threadName" ) );

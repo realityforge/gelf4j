@@ -18,8 +18,8 @@ public class GelfConnectionTest
     final GelfTargetConfig config = new GelfTargetConfig();
     config.setHost( InetAddress.getLocalHost().getCanonicalHostName() );
     config.setPort( 1977 );
-    config.getAdditionalData().put( GelfTargetConfig.FIELD_HOST, "Zoon" );
-    config.getAdditionalData().put( GelfTargetConfig.FIELD_FACILITY, "OILZ" );
+    config.getDefaultFields().put( GelfTargetConfig.FIELD_HOST, "Zoon" );
+    config.getDefaultFields().put( GelfTargetConfig.FIELD_FACILITY, "OILZ" );
 
     final InetSocketAddress address = new InetSocketAddress( config.getHostAddress(), config.getPort() );
     final DatagramSocket socket = new DatagramSocket( address );

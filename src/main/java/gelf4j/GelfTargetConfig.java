@@ -29,7 +29,7 @@ public class GelfTargetConfig
   private int _port = DEFAULT_PORT;
   private boolean _compressedChunking = true;
 
-  private final Map<String, Object> _additionalData;
+  private final Map<String, Object> _defaultFields;
   private final Map<String, String> _additionalFields;
 
   public GelfTargetConfig()
@@ -48,8 +48,8 @@ public class GelfTargetConfig
     _additionalFields.put( FIELD_LOGGER_NAME, FIELD_LOGGER_NAME );
     _additionalFields.put( FIELD_TIMESTAMP_MS, FIELD_TIMESTAMP_MS );
 
-    _additionalData = new HashMap<String, Object>();
-    _additionalData.put( FIELD_HOST, _host );
+    _defaultFields = new HashMap<String, Object>();
+    _defaultFields.put( FIELD_HOST, _host );
   }
 
   public boolean isCompressedChunking()
@@ -135,17 +135,17 @@ public class GelfTargetConfig
   }
 
   /**
-   * @return the set of data fields that will be added to the GELF message.
+   * @return the default set of fields that will be added to the GELF message.
    */
-  public Map<String, Object> getAdditionalData()
+  public Map<String, Object> getDefaultFields()
   {
-    return _additionalData;
+    return _defaultFields;
   }
 
-  public void setAdditionalData( final String additionalData )
+  public void setDefaultFields( final String additionalData )
   {
-    _additionalData.clear();
-    _additionalData.putAll( parseJsonObject( additionalData ) );
+    _defaultFields.clear();
+    _defaultFields.putAll( parseJsonObject( additionalData ) );
   }
 
   @SuppressWarnings( "unchecked" )

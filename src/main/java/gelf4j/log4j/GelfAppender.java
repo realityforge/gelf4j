@@ -55,9 +55,9 @@ public class GelfAppender
     _config.setAdditionalFields( additionalFields );
   }
 
-  public void setAdditionalData( final String additionalData )
+  public void setDefaultFields( final String data )
   {
-    _config.setAdditionalData( additionalData );
+    _config.setDefaultFields( data );
   }
 
   @Override
@@ -170,7 +170,7 @@ public class GelfAppender
         }
       }
     }
-    message.getAdditionalFields().putAll( _config.getAdditionalData() );
+    message.getAdditionalFields().putAll( _config.getDefaultFields() );
 
     return message;
   }

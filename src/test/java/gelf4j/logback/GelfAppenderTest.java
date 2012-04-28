@@ -49,7 +49,7 @@ public class GelfAppenderTest
       "    <port>1971</port>\n" +
       "    <compressedChunking>false</compressedChunking>\n" +
       "    <additionalFields>{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\"}</additionalFields>\n" +
-      "    <additionalData>{\"environment\": \"DEV\", \"application\": \"MyAPP\", \"facility\": \"" + facility + "\", \"host\":\"" + hostName + "\"}</additionalData>\n" +
+      "    <defaultFields>{\"environment\": \"DEV\", \"application\": \"MyAPP\", \"facility\": \"" + facility + "\", \"host\":\"" + hostName + "\"}</defaultFields>\n" +
       "  </appender>\n" +
       "\n" +
       "  <root level=\"debug\">\n" +
@@ -66,11 +66,11 @@ public class GelfAppenderTest
     assertEquals( hostName, config.getHost() );
     assertEquals( 1971, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
-    assertEquals( 4, config.getAdditionalData().size() );
-    assertEquals( hostName, config.getAdditionalData().get( "host" ) );
-    assertEquals( facility, config.getAdditionalData().get( "facility" ) );
-    assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
-    assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
+    assertEquals( 4, config.getDefaultFields().size() );
+    assertEquals( hostName, config.getDefaultFields().get( "host" ) );
+    assertEquals( facility, config.getDefaultFields().get( "facility" ) );
+    assertEquals( "DEV", config.getDefaultFields().get( "environment" ) );
+    assertEquals( "MyAPP", config.getDefaultFields().get( "application" ) );
 
     assertEquals( 5, config.getAdditionalFields().size() );
     assertEquals( "threadName", config.getAdditionalFields().get( "threadName" ) );

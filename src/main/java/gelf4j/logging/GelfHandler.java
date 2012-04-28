@@ -43,10 +43,10 @@ public class GelfHandler
     {
       _config.setAdditionalFields( additionalFields );
     }
-    final String additionalData = manager.getProperty( prefix + ".additionalData" );
+    final String additionalData = manager.getProperty( prefix + ".defaultFields" );
     if( null != additionalData )
     {
-      _config.setAdditionalData( additionalData );
+      _config.setDefaultFields( additionalData );
     }
     final String compressedChunking = manager.getProperty( prefix + ".compressedChunking" );
     if( null != compressedChunking )

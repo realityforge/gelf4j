@@ -48,7 +48,7 @@ public class GelfConnection
   public GelfMessage newMessage()
   {
     final GelfMessage gelfMessage = new GelfMessage();
-    for( final Map.Entry<String, Object> entry : _config.getAdditionalData().entrySet() )
+    for( final Map.Entry<String, Object> entry : _config.getDefaultFields().entrySet() )
     {
       GelfMessageUtil.setValue( gelfMessage, entry.getKey(), entry.getValue() );
     }

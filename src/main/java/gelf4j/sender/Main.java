@@ -20,7 +20,7 @@ public class Main
   private static final int PORT_CONFIG_OPT = 'p';
   private static final int VERBOSE_OPT = 'v';
   private static final int UNCOMPRESSED_CHUNKING_OPT = 'u';
-  private static final int DATA_FIELD_OPT = 'D';
+  private static final int FIELD_OPT = 'D';
 
   private static final CLOptionDescriptor[] OPTIONS = new CLOptionDescriptor[]{
     new CLOptionDescriptor( "help",
@@ -35,9 +35,9 @@ public class Main
                             CLOptionDescriptor.ARGUMENT_REQUIRED,
                             PORT_CONFIG_OPT,
                             "the port on the server. Defaults to " + GelfTargetConfig.DEFAULT_PORT ),
-    new CLOptionDescriptor( "data-field",
+    new CLOptionDescriptor( "field",
                             CLOptionDescriptor.ARGUMENTS_REQUIRED_2 | CLOptionDescriptor.DUPLICATES_ALLOWED,
-                            DATA_FIELD_OPT,
+                            FIELD_OPT,
                             "fields added to the message." ),
     new CLOptionDescriptor( "verbose",
                             CLOptionDescriptor.ARGUMENT_DISALLOWED,
@@ -136,7 +136,7 @@ public class Main
       return false;
     }
 
-    config.getAdditionalData().clear();
+    config.getDefaultFields().clear();
     config.getAdditionalFields().clear();
 
     // Get a list of parsed options
@@ -159,9 +159,9 @@ public class Main
         case HOST_CONFIG_OPT:
           config.setHost( option.getArgument() );
           break;
-        case DATA_FIELD_OPT:
+        case FIELD_OPT:
         {
-          config.getAdditionalData().put( option.getArgument(), option.getArgument( 1 ) );
+          config.getDefaultFields().put( option.getArgument(), option.getArgument( 1 ) );
           break;
         }
         case PORT_CONFIG_OPT:
@@ -201,7 +201,7 @@ public class Main
       info( "Server Host: " + config.getHost() );
       info( "Server Port: " + config.getPort() );
       info( "Compressed Chunking Format?: " + config.isCompressedChunking() );
-      info( "Additional Data: " + config.getAdditionalData() );
+      info( "Additional Data: " + config.getDefaultFields() );
     }
 
     return true;

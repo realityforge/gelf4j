@@ -33,7 +33,7 @@ public class GelfHandlerTest
       prefix + ".compressedChunking=false\n" +
       prefix + ".level=FINE\n" +
       prefix + ".additionalFields={\"thread_id\": \"threadId\", \"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"SourceClassName\": \"SourceClassName\", \"SourceMethodName\": \"SourceMethodName\", \"exception\": \"exception\"}\n" +
-      prefix + ".additionalData={\"environment\": \"DEV\", \"application\": \"MyAPP\", \"host\":\"" + hostName +
+      prefix + ".defaultFields={\"environment\": \"DEV\", \"application\": \"MyAPP\", \"host\":\"" + hostName +
       "\", \"facility\":\"" + facility + "\"}\n" +
       "\n";
 
@@ -52,11 +52,11 @@ public class GelfHandlerTest
     assertEquals( hostName, config.getHost() );
     assertEquals( 1998, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
-    assertEquals( 4, config.getAdditionalData().size() );
-    assertEquals( hostName, config.getAdditionalData().get( "host" ) );
-    assertEquals( facility, config.getAdditionalData().get( "facility" ) );
-    assertEquals( "DEV", config.getAdditionalData().get( "environment" ) );
-    assertEquals( "MyAPP", config.getAdditionalData().get( "application" ) );
+    assertEquals( 4, config.getDefaultFields().size() );
+    assertEquals( hostName, config.getDefaultFields().get( "host" ) );
+    assertEquals( facility, config.getDefaultFields().get( "facility" ) );
+    assertEquals( "DEV", config.getDefaultFields().get( "environment" ) );
+    assertEquals( "MyAPP", config.getDefaultFields().get( "application" ) );
 
     assertEquals( 7, config.getAdditionalFields().size() );
     assertEquals( "threadId", config.getAdditionalFields().get( "thread_id" ) );
