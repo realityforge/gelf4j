@@ -91,7 +91,7 @@ public final class GelfMessageUtil
     }
     else
     {
-      return  message;
+      return message;
     }
   }
 }
