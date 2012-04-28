@@ -20,7 +20,7 @@ public class Main
   private static final int PORT_CONFIG_OPT = 'p';
   private static final int VERBOSE_OPT = 'v';
   private static final int UNCOMPRESSED_CHUNKING_OPT = 'u';
-  private static final int ADDITIONAL_FIELD_OPT = 'D';
+  private static final int DATA_FIELD_OPT = 'D';
 
   private static final CLOptionDescriptor[] OPTIONS = new CLOptionDescriptor[]{
     new CLOptionDescriptor( "help",
@@ -35,10 +35,10 @@ public class Main
                             CLOptionDescriptor.ARGUMENT_REQUIRED,
                             PORT_CONFIG_OPT,
                             "the port on the server. Defaults to " + GelfTargetConfig.DEFAULT_PORT ),
-    new CLOptionDescriptor( "additional-field",
+    new CLOptionDescriptor( "data-field",
                             CLOptionDescriptor.ARGUMENTS_REQUIRED_2 | CLOptionDescriptor.DUPLICATES_ALLOWED,
-                            ADDITIONAL_FIELD_OPT,
-                            "additional fields added to the message." ),
+                            DATA_FIELD_OPT,
+                            "fields added to the message." ),
     new CLOptionDescriptor( "verbose",
                             CLOptionDescriptor.ARGUMENT_DISALLOWED,
                             VERBOSE_OPT,
@@ -151,7 +151,7 @@ public class Main
         case HOST_CONFIG_OPT:
           config.setHost( option.getArgument() );
           break;
-        case ADDITIONAL_FIELD_OPT:
+        case DATA_FIELD_OPT:
         {
           config.getAdditionalData().put( option.getArgument(), option.getArgument( 1 ) );
           break;
