@@ -191,7 +191,7 @@ public class Main
       info( "Server Host: " + c_config.getHost() );
       info( "Server Port: " + c_config.getPort() );
       info( "Compressed Chunking Format?: " + c_config.isCompressedChunking() );
-      info( "Additional Data: " + c_config.getDefaultFields() );
+      info( "Default Fields: " + c_config.getDefaultFields() );
     }
 
     return true;
