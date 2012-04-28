@@ -73,7 +73,7 @@ public final class GelfMessageUtil
     }
     else if( key.equals( GelfTargetConfig.FIELD_MESSAGE ) )
     {
-      final String textMessage = String.valueOf( message );
+      final String textMessage = String.valueOf( value );
       message.setShortMessage( truncateShortMessage( textMessage ) );
       message.setFullMessage( textMessage );
     }
