@@ -53,13 +53,13 @@ public class Main
   private static final int ERROR_PARSING_ARGS_EXIT_CODE = 1;
   private static final int ERROR_SENDING_EXIT_CODE = 2;
 
+  private static final GelfTargetConfig c_config = new GelfTargetConfig();
   private static boolean c_verbose;
   private static String c_message;
 
   public static void main( final String[] args )
   {
-    final GelfTargetConfig config = new GelfTargetConfig();
-    if( !processOptions( config, args ) )
+    if( !processOptions( args ) )
     {
       System.exit( ERROR_PARSING_ARGS_EXIT_CODE );
       return;
@@ -73,7 +73,7 @@ public class Main
       {
         info( "Attempting to transmit message" );
       }
-      connection = config.createConnection();
+      connection = c_config.createConnection();
       final GelfMessage message = connection.newMessage();
       if( null != c_message )
       {
@@ -114,7 +114,7 @@ public class Main
     }
   }
 
-  public static boolean processOptions( final GelfTargetConfig config, final String[] args )
+  public static boolean processOptions( final String[] args )
   {
     // Parse the arguments
     final CLArgsParser parser = new CLArgsParser( args, OPTIONS );
@@ -126,8 +126,8 @@ public class Main
       return false;
     }
 
-    config.getDefaultFields().clear();
-    config.getAdditionalFields().clear();
+    c_config.getDefaultFields().clear();
+    c_config.getAdditionalFields().clear();
 
     // Get a list of parsed options
     @SuppressWarnings( "unchecked" ) final List<CLOption> options = parser.getArguments();
@@ -147,11 +147,11 @@ public class Main
           }
           break;
         case HOST_CONFIG_OPT:
-          config.setHost( option.getArgument() );
+          c_config.setHost( option.getArgument() );
           break;
         case FIELD_OPT:
         {
-          config.getDefaultFields().put( option.getArgument(), option.getArgument( 1 ) );
+          c_config.getDefaultFields().put( option.getArgument(), option.getArgument( 1 ) );
           break;
         }
         case PORT_CONFIG_OPT:
@@ -159,7 +159,7 @@ public class Main
           final String port = option.getArgument();
           try
           {
-            config.setPort( Integer.parseInt( port ) );
+            c_config.setPort( Integer.parseInt( port ) );
           }
           catch( final NumberFormatException nfe )
           {
@@ -170,7 +170,7 @@ public class Main
         }
         case UNCOMPRESSED_CHUNKING_OPT:
         {
-          config.setCompressedChunking( false );
+          c_config.setCompressedChunking( false );
           break;
         }
         case VERBOSE_OPT:
@@ -188,10 +188,10 @@ public class Main
     }
     if( c_verbose )
     {
-      info( "Server Host: " + config.getHost() );
-      info( "Server Port: " + config.getPort() );
-      info( "Compressed Chunking Format?: " + config.isCompressedChunking() );
-      info( "Additional Data: " + config.getDefaultFields() );
+      info( "Server Host: " + c_config.getHost() );
+      info( "Server Port: " + c_config.getPort() );
+      info( "Compressed Chunking Format?: " + c_config.isCompressedChunking() );
+      info( "Additional Data: " + c_config.getDefaultFields() );
     }
 
     return true;
