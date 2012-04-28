@@ -20,7 +20,7 @@ public class GelfConnection
     throws Exception
   {
     _config = config;
-    _encoder = new GelfEncoder( MessageDigest.getInstance( "MD5" ), _config.getOriginHost(), _config.isCompressedChunking() );
+    _encoder = new GelfEncoder( _config.getOriginHost(), _config.isCompressedChunking() );
   }
 
   public void close()
