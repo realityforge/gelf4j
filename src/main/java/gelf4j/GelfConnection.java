@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Responsible for communicating with a GELF compliant server.
@@ -49,7 +50,10 @@ public class GelfConnection
     final GelfMessage gelfMessage = new GelfMessage();
     gelfMessage.setHost( _config.getOriginHost() );
     gelfMessage.setFacility( _config.getFacility() );
-    gelfMessage.getAdditionalFields().putAll( _config.getAdditionalData() );
+    for( final Map.Entry<String, Object> entry : _config.getAdditionalData().entrySet() )
+    {
+      GelfMessageUtil.setValue( gelfMessage, entry.getKey(), entry.getValue() );
+    }
     return gelfMessage;
   }
 
