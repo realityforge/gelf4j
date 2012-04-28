@@ -64,7 +64,7 @@ final class GelfEncoder
   List<byte[]> encode( final GelfMessage message )
   {
     final String json = toJson( message );
-    final byte[] encodedPayload = gzip( json );
+    final byte[] encodedPayload = null != json ? gzip( json ) : null;
     return null == encodedPayload ? null : createPackets( encodedPayload );
   }
 
