@@ -7,6 +7,31 @@ import static org.junit.Assert.*;
 public class GelfMessageUtilTest
 {
   @Test
+  public void setValue()
+    throws Exception
+  {
+    final GelfMessage message = new GelfMessage();
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_LEVEL, "WARNING" );
+    assertEquals( SyslogLevel.WARNING, message.getLevel() );
+
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_FACILITY, "BINK" );
+    assertEquals( "BINK", message.getFacility() );
+
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_LINE, "222" );
+    assertEquals( (Long)222L, message.getLine() );
+
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_FILE, "BINKBINK" );
+    assertEquals( "BINKBINK", message.getFile() );
+
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_MESSAGE, "ZANGZANGZANGZANGZANG" );
+    assertEquals( "ZANGZANGZANGZANGZANG", message.getShortMessage() );
+    assertEquals( "ZANGZANGZANGZANGZANG", message.getFullMessage() );
+
+    GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_HOST, "foo.com" );
+    assertEquals( "foo.com", message.getHost() );
+  }
+
+  @Test
   public void parseLevel()
     throws Exception
   {
