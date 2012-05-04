@@ -1,8 +1,5 @@
-.idea
 target
 reports
 *.iml
 *.ipr
 *.iws
-.idea/
-*~
