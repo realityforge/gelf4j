@@ -6,8 +6,8 @@ define "gelf4j" do
   compile.options.target = '1.6'
   compile.options.lint = 'all'
 
-  compile.with :slf4j_api, :spice_cli, :json_simple, :log4j, :logback_core, :logback_classic
+  compile.with :getopt4j, :json_simple, :slf4j_api, :log4j, :logback_core, :logback_classic
 
   package(:jar)
-  package(:jar, :classifier => 'all').merge(artifacts([:spice_cli,:json_simple]))
+  package(:jar, :classifier => 'all').merge(artifacts([:getopt4j,:json_simple]))
 end
