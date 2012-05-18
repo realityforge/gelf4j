@@ -2,7 +2,10 @@ package gelf4j.forwarder;
 
 import gelf4j.GelfConnection;
 import gelf4j.GelfTargetConfig;
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.realityforge.cli.CLArgsParser;
 import org.realityforge.cli.CLOption;
 import org.realityforge.cli.CLOptionDescriptor;
@@ -58,10 +61,25 @@ public class Main
       System.exit( ERROR_PARSING_ARGS_EXIT_CODE );
       return;
     }
+    final File file = new File( "/var/log/kernel.log" );
+    final Pattern pattern = Pattern.compile( "^([A-Za-z]+ +\\d+ \\d\\d:\\d\\d:\\d\\d) ([^ ]+) ([^ ]+)\\[(\\d+)\\]: (.+)$" );
+    final HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
+    fieldMap.put( "timestamp:MMM dd HH:mm:ss", 1 );
+    fieldMap.put( "host", 2 );
+    fieldMap.put( "facility", 3 );
+    fieldMap.put( "process_id", 4 );
+    fieldMap.put( "message", 5 );
+    final HashMap<String, Object> defaultFields = new HashMap<String, Object>();
+    final LogSourceConfig config = new LogSourceConfig( file, pattern, fieldMap, defaultFields );
+    final LogSourceEntry entry = new LogSourceEntry( config );
 
     try
     {
       final GelfConnection connection = c_config.createConnection();
+      while( ParseStatus.DATA_REMAINING == Forwarder.processFile( entry, connection, 50 ) )
+      {
+        //Ignored
+      }
     }
     catch( final Exception e )
     {
