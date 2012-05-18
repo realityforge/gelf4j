@@ -14,7 +14,7 @@ How to use GELF4j
 To integrate into a logging framework simply drop the jar into your classpath and configure the logging framework to use it. The following examples demonstrate it's use in various frameworks.
 
 JDK Logging
-+++++++++++
+-----------
 
     ...
     handlers = gelf4j.logging.GelfHandler
@@ -28,7 +28,7 @@ JDK Logging
     ...
 
 Logback XML Example
-+++++++++++++++++++
+-------------------
 
     ...
     <appender name="gelf" class="gelf4j.logback.GelfAppender">
@@ -45,7 +45,7 @@ Logback XML Example
     ...
 
 Log4j XML Example
-+++++++++++++++++
+-----------------
 
     ...
     <!-- define the appender -->
@@ -67,7 +67,7 @@ Log4j XML Example
 
 
 Log4j Properties Example
-++++++++++++++++++++++++
+------------------------
 
     ...
     log4j.appender.gelf.host=graylog.example.com
@@ -90,14 +90,14 @@ Each of the different log systems can be configured with similar parameters;
 - **additionalFields**: A JSON object that describes dynamic fields that should be merged into the message. The key indicates the name of the field in message while the value is a symbolic key that indicates the source or type information that should be merged into the message. The supported symbolic keys vary between the different supported logging frameworks. Default: {"threadName": "threadName", "exception": "exception", "loggerName": "loggerName", "timestampMs": "timestampMs"} (*optional*)
 
 The set of symbolic keys supported by different logging frameworks is listed below. In addition both Log4j and Logback support the notion of "Mapped Diagnostic Contexts" or MDCs. The integration with these frameworks is such that if a symbolic key is not one of the several listed below, the integration will use the value in the MDC under the specified key.
-- threadName: The thread name in which the log message was generated.
-- timestampMs: The time at which the log message was generated in milliseconds.
-- loggerName: The name of the logger that generated the message.
-- exception: The exception message if any that was logged with the message.
-- loggerNdc: The nested diagnostic context of the message. (Log4j only).
-- threadId: The unique id of the thread in the system. (JDK Logging only).
-- SourceClassName: The name of the class in which the log message was generated. (JDK Logging only).
-- SourceMethodName: The name of the method in which the log message was generated. (JDK Logging only).
+- **threadName**: The thread name in which the log message was generated.
+- **timestampMs**: The time at which the log message was generated in milliseconds.
+- **loggerName**: The name of the logger that generated the message.
+- **exception**: The exception message if any that was logged with the message.
+- **loggerNdc**: The nested diagnostic context of the message. (Log4j only).
+- **threadId**: The unique id of the thread in the system. (JDK Logging only).
+- **SourceClassName**: The name of the class in which the log message was generated. (JDK Logging only).
+- **SourceMethodName**: The name of the method in which the log message was generated. (JDK Logging only).
 
 Credits
 -------
