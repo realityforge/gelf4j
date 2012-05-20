@@ -11,7 +11,9 @@ GELF4j is a client-side integration library to send GELF messages. GELF4j has in
 How to use GELF4j
 -----------------
 
-To integrate into a logging framework simply drop the jar into your classpath and configure the logging framework to use it. The following examples demonstrate it's use in various frameworks.
+To integrate into a logging framework simply drop the jar into your classpath and configure the logging framework to use it. The jars are available form the github projects downloads. The "-all" artifact includes all the required dependencies. At some point i the future the libraries mayt attempt to be placed in maven central.
+
+The following examples demonstrate it's use in various frameworks.
 
 JDK Logging
 -----------
@@ -98,6 +100,11 @@ The set of symbolic keys supported by different logging frameworks is listed bel
 - **threadId**: The unique id of the thread in the system. (JDK Logging only).
 - **SourceClassName**: The name of the class in which the log message was generated. (JDK Logging only).
 - **SourceMethodName**: The name of the method in which the log message was generated. (JDK Logging only).
+
+How-to Build
+------------
+
+Gelf4j uses [Apache Buildr](http://buildr.apache.org) and requires you to have already built and installed the [getopt4j](https://github.com/realityforge/getopt4j) library.
 
 Credits
 -------
