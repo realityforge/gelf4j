@@ -1,3 +1,7 @@
+## 0.9:
+
+* Enhance  : Package the artifacts as OSGi bundles.
+
 ## 0.8:
 
 * Enhance  : Improve the documentation.
