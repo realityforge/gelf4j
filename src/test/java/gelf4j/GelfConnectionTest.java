@@ -3,7 +3,6 @@ package gelf4j;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Random;
 import org.junit.Test;
@@ -21,11 +20,10 @@ public class GelfConnectionTest
     config.getDefaultFields().put( GelfTargetConfig.FIELD_HOST, "Zoon" );
     config.getDefaultFields().put( GelfTargetConfig.FIELD_FACILITY, "OILZ" );
 
-    final InetSocketAddress address = new InetSocketAddress( config.getHostAddress(), config.getPort() );
-    final DatagramSocket socket = new DatagramSocket( address );
+    final DatagramSocket socket =
+      ConnectionUtil.createServer( config.getHostAddress().getHostName(), config.getPort() );
     try
     {
-
       final GelfConnection connection = config.createConnection();
 
       //Make sure close can be called before a send
@@ -45,11 +43,12 @@ public class GelfConnectionTest
       final boolean sent1 = connection.send( message1 );
       assertTrue( sent1 );
 
-      final DatagramPacket packet = newPacket();
+      final DatagramPacket packet = ConnectionUtil.receivePacket( socket );
 
-      socket.receive( packet );
       //Get the first two bytes of received message and compare it to magic numbers of gzip
-      assertArrayEquals( new byte[]{ 0x1F, (byte) 0x8B }, Arrays.copyOfRange( packet.getData(), packet.getOffset(), packet.getOffset() + 2 ) );
+      assertArrayEquals( new byte[]{ 0x1F, (byte) 0x8B }, Arrays.copyOfRange( packet.getData(),
+                                                                              packet.getOffset(),
+                                                                              packet.getOffset() + 2 ) );
 
       // Create a big enough message that it will require chunking
       final String textMessage2 = createString( 18823 );
@@ -63,9 +62,11 @@ public class GelfConnectionTest
       final boolean sent2 = connection.send( message2 );
       assertTrue( sent2 );
 
-      socket.receive( packet );
+      final DatagramPacket packet2 = ConnectionUtil.receivePacket( socket );
       //Get the first two bytes of received message and compare it to magic numbers of gzip
-      assertArrayEquals( new byte[]{ 0x1e, 0x0f }, Arrays.copyOfRange( packet.getData(), packet.getOffset(), packet.getOffset() + 2 ) );
+      assertArrayEquals( new byte[]{ 0x1e, 0x0f }, Arrays.copyOfRange( packet2.getData(),
+                                                                       packet2.getOffset(),
+                                                                       packet2.getOffset() + 2 ) );
 
       connection.close();
 
