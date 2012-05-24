@@ -1,11 +1,13 @@
 package gelf4j.logging;
 
+import gelf4j.ConnectionUtil;
 import gelf4j.GelfMessage;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
 import gelf4j.TestGelfConnection;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -24,12 +26,14 @@ public class GelfHandlerTest
     final String facility = "LOG4J";
 
     final String prefix = GelfHandler.class.getName();
+    final int port = 1998;
     final String configData =
       "handlers = " + prefix + "\n" +
       ".level = FINE\n" +
       "\n" +
       prefix + ".host=" + hostName + "\n" +
-      prefix + ".port=1998\n" +
+      prefix + ".port=" + port +
+      "\n" +
       prefix + ".compressedChunking=false\n" +
       prefix + ".level=FINE\n" +
       prefix + ".additionalFields={\"thread_id\": \"threadId\", \"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"SourceClassName\": \"SourceClassName\", \"SourceMethodName\": \"SourceMethodName\", \"exception\": \"exception\"}\n" +
@@ -40,7 +44,9 @@ public class GelfHandlerTest
     LogManager.getLogManager().reset();
     LogManager.getLogManager().readConfiguration( new ByteArrayInputStream( configData.getBytes() ) );
 
-    //PropertyConfigurator.configure( properties );
+    //Setup fake server
+    final DatagramSocket socket = ConnectionUtil.createServer( hostName, port );
+
     final Logger logger = Logger.getLogger( "ZipZipHooray" );
     final Handler[] handlers = logger.getParent().getHandlers();
     assertEquals( 1, handlers.length );
@@ -50,7 +56,7 @@ public class GelfHandlerTest
     final GelfTargetConfig config = gelfHandler.getConfig();
 
     assertEquals( hostName, config.getHost() );
-    assertEquals( 1998, config.getPort() );
+    assertEquals( port, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
     assertEquals( 4, config.getDefaultFields().size() );
     assertEquals( hostName, config.getDefaultFields().get( "host" ) );
@@ -76,6 +82,7 @@ public class GelfHandlerTest
     final long then = System.currentTimeMillis();
     final String smallTextMessage = "HELO";
     logger.fine( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
 
     GelfMessage message = connection.getLastMessage();
     assertEquals( smallTextMessage, message.getShortMessage() );
@@ -101,11 +108,14 @@ public class GelfHandlerTest
     assertEquals( "MyAPP", message.getAdditionalFields().get( "application" ) );
 
     logger.log( Level.SEVERE, smallTextMessage, new Exception() );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
     message = connection.getLastMessage();
     assertEquals( SyslogLevel.ERR, message.getLevel() );
     assertNotNull( message.getAdditionalFields().get( "exception" ) );
 
     // Force the closing of the appender
     LogManager.getLogManager().reset();
+
+    socket.close();
   }
 }

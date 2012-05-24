@@ -1,10 +1,12 @@
 package gelf4j;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.zip.GZIPInputStream;
 
 public class ConnectionUtil
 {
@@ -16,6 +18,21 @@ public class ConnectionUtil
     throws SocketException
   {
     return new DatagramSocket( new InetSocketAddress( host, port ) );
+  }
+
+  public static String receivePacketAsString( final DatagramSocket socket )
+    throws IOException
+  {
+    final DatagramPacket packet = receivePacket( socket );
+    final GZIPInputStream inputStream =
+      new GZIPInputStream( new ByteArrayInputStream( packet.getData(), packet.getOffset(), packet.getLength() ) );
+    final StringBuilder sb = new StringBuilder();
+    int ch;
+    while ( ( ch = inputStream.read() ) >= 0 )
+    {
+      sb.append( (char) ch );
+    }
+    return sb.toString();
   }
 
   public static DatagramPacket receivePacket( final DatagramSocket socket )

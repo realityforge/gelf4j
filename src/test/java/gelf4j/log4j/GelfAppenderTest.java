@@ -1,12 +1,19 @@
 package gelf4j.log4j;
 
+import gelf4j.ConnectionUtil;
 import gelf4j.GelfMessage;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
 import gelf4j.TestGelfConnection;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.lang.reflect.Field;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Properties;
+import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -46,7 +53,8 @@ public class GelfAppenderTest
     final GelfTargetConfig config = ( (GelfAppender) appender ).getConfig();
 
     assertEquals( hostName, config.getHost() );
-    assertEquals( 1971, config.getPort() );
+    final int port = 1971;
+    assertEquals( port, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
     assertEquals( 4, config.getDefaultFields().size() );
     assertEquals( facility, config.getDefaultFields().get( "facility" ) );
@@ -62,6 +70,9 @@ public class GelfAppenderTest
     assertEquals( "exception", config.getAdditionalFields().get( "exception" ) );
     assertEquals( "loggerNdc", config.getAdditionalFields().get( "loggerNdc" ) );
 
+    //Setup fake server
+    final DatagramSocket socket = ConnectionUtil.createServer( hostName, port );
+
     // set up mock connection
     final TestGelfConnection connection = new TestGelfConnection( config );
     final Field field = appender.getClass().getDeclaredField( "_connection" );
@@ -71,6 +82,7 @@ public class GelfAppenderTest
     final long then = System.currentTimeMillis();
     final String smallTextMessage = "HELO";
     logger.debug( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
 
     GelfMessage message = connection.getLastMessage();
     assertEquals( smallTextMessage, message.getShortMessage() );
@@ -96,6 +108,8 @@ public class GelfAppenderTest
     MDC.put( "ip_address", "42.42.42.42" );
 
     logger.info( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
+
     message = connection.getLastMessage();
     assertEquals( SyslogLevel.INFO, message.getLevel() );
     assertEquals( "42.42.42.42", message.getAdditionalFields().get( "ip_address" ) );
@@ -114,5 +128,7 @@ public class GelfAppenderTest
 
     // Force a reconfigure that will ensure that the close method is invoked to shutdown appender
     PropertyConfigurator.configure( properties );
+
+    socket.close();
   }
 }

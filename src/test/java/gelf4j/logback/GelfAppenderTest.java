@@ -2,12 +2,14 @@ package gelf4j.logback;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import gelf4j.ConnectionUtil;
 import gelf4j.GelfMessage;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
 import gelf4j.TestGelfConnection;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,11 +44,12 @@ public class GelfAppenderTest
     final String hostName = InetAddress.getLocalHost().getCanonicalHostName();
     final String facility = "LOG4J";
 
+    final int port = 1971;
     final String configXml =
       "<configuration>\n" +
       "  <appender name=\"GELF\" class=\"" + TestGelfAppender.class.getName() + "\">\n" +
       "    <host>" + hostName + "</host>\n" +
-      "    <port>1971</port>\n" +
+      "    <port>" + port + "</port>\n" +
       "    <compressedChunking>false</compressedChunking>\n" +
       "    <additionalFields>{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\"}</additionalFields>\n" +
       "    <defaultFields>{\"environment\": \"DEV\", \"application\": \"MyAPP\", \"facility\": \"" + facility + "\", \"host\":\"" + hostName + "\"}</defaultFields>\n" +
@@ -59,12 +62,14 @@ public class GelfAppenderTest
       "";
     configurator.doConfigure( new ByteArrayInputStream( configXml.getBytes() ) );
 
-    //PropertyConfigurator.configure( properties );
+    //Setup fake server
+    final DatagramSocket socket = ConnectionUtil.createServer( hostName, port );
+
     final Logger logger = LoggerFactory.getLogger( "ZipZipHooray");
     final GelfTargetConfig config = TestGelfAppender.c_appender.getConfig();
 
     assertEquals( hostName, config.getHost() );
-    assertEquals( 1971, config.getPort() );
+    assertEquals( port, config.getPort() );
     assertEquals( false, config.isCompressedChunking() );
     assertEquals( 4, config.getDefaultFields().size() );
     assertEquals( hostName, config.getDefaultFields().get( "host" ) );
@@ -88,6 +93,7 @@ public class GelfAppenderTest
     final long then = System.currentTimeMillis();
     final String smallTextMessage = "HELO";
     logger.debug( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
 
     GelfMessage message = connection.getLastMessage();
     assertEquals( smallTextMessage, message.getShortMessage() );
@@ -113,11 +119,13 @@ public class GelfAppenderTest
     MDC.put( "ip_address", "42.42.42.42" );
 
     logger.info( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
     message = connection.getLastMessage();
     assertEquals( SyslogLevel.INFO, message.getLevel() );
     assertEquals( "42.42.42.42", message.getAdditionalFields().get( "ip_address" ) );
 
-    logger.error( smallTextMessage, new Exception(  ) );
+    logger.error( smallTextMessage, new Exception() );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
     message = connection.getLastMessage();
     assertEquals( SyslogLevel.ERR, message.getLevel() );
     assertNotNull( message.getAdditionalFields().get( "exception" ) );
