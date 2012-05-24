@@ -5,6 +5,7 @@ import gelf4j.GelfMessage;
 import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
 import gelf4j.SyslogLevel;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import org.apache.log4j.AppenderSkeleton;
@@ -77,7 +78,14 @@ public class GelfAppender
   {
     if( null != _connection )
     {
-      _connection.close();
+      try
+      {
+        _connection.close();
+      }
+      catch ( final IOException ioe )
+      {
+        //Ignored.
+      }
       _connection = null;
     }
   }

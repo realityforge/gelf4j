@@ -1,10 +1,10 @@
 package gelf4j;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +15,7 @@ public class GelfConnection
 {
   private final GelfTargetConfig _config;
   private final GelfEncoder _encoder;
-  private DatagramSocket _socket;
+  private DatagramChannel _channel;
 
   protected GelfConnection( final GelfTargetConfig config )
     throws Exception
@@ -25,11 +25,18 @@ public class GelfConnection
   }
 
   public void close()
+    throws IOException
   {
-    if( null != _socket )
+    if ( null != _channel )
     {
-      _socket.close();
-      _socket = null;
+      try
+      {
+        _channel.close();
+      }
+      finally
+      {
+        _channel = null;
+      }
     }
   }
 
@@ -48,7 +55,7 @@ public class GelfConnection
   public GelfMessage newMessage()
   {
     final GelfMessage gelfMessage = new GelfMessage();
-    for( final Map.Entry<String, Object> entry : _config.getDefaultFields().entrySet() )
+    for ( final Map.Entry<String, Object> entry : _config.getDefaultFields().entrySet() )
     {
       GelfMessageUtil.setValue( gelfMessage, entry.getKey(), entry.getValue() );
     }
@@ -76,9 +83,9 @@ public class GelfConnection
    */
   private boolean send( final List<byte[]> packets )
   {
-    for( final byte[] packet : packets )
+    for ( final byte[] packet : packets )
     {
-      if( !sendPacket( new DatagramPacket( packet, packet.length, _config.getHostAddress(), _config.getPort() ) ) )
+      if ( !sendPacket( packet ) )
       {
         return false;
       }
@@ -86,32 +93,32 @@ public class GelfConnection
     return true;
   }
 
-  private boolean sendPacket( final DatagramPacket datagramPacket )
+  private boolean sendPacket( final byte[] packet )
   {
     try
     {
-      getSocket().send( datagramPacket );
+      final ByteBuffer buffer = ByteBuffer.allocate( packet.length );
+      buffer.put( packet );
+      buffer.flip();
+      getChannel().write( buffer );
       return true;
     }
-    catch( final IOException ioe )
+    catch ( final IOException ioe )
     {
       return false;
     }
   }
 
-  private DatagramSocket getSocket()
+  private DatagramChannel getChannel()
+    throws IOException
   {
-    try
+    if ( null == _channel )
     {
-      if( null == _socket )
-      {
-        _socket = new DatagramSocket();
-      }
-      return _socket;
+      _channel = DatagramChannel.open();
+      _channel.socket().bind( new InetSocketAddress( 0 ) );
+      _channel.connect( new InetSocketAddress( _config.getHostAddress(), _config.getPort() ) );
+      _channel.configureBlocking( false );
     }
-    catch( final SocketException se )
-    {
-      throw new RuntimeException( se );
-    }
+    return _channel;
   }
 }

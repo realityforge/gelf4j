@@ -4,6 +4,7 @@ import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
 import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
+import java.io.IOException;
 import java.util.List;
 import org.realityforge.getopt4j.CLArgsParser;
 import org.realityforge.getopt4j.CLOption;
@@ -109,7 +110,14 @@ public class Main
     {
       if( null != connection )
       {
-        connection.close();
+        try
+        {
+          connection.close();
+        }
+        catch ( final IOException ioe )
+        {
+          //Ignored
+        }
       }
     }
   }

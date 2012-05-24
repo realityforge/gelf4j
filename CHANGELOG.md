@@ -1,5 +1,6 @@
 ## 0.9:
 
+* Enhance  : Use Java NIO when sending the packets.
 * Enhance  : Package the artifacts as OSGi bundles.
 
 ## 0.8:
