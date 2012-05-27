@@ -79,17 +79,17 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>0.9.29</version>
+            <version>1.0.3</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>0.9.29</version>
+            <version>1.0.3</version>
         </dependency>
         <dependency>
-            <groupId>org.realityforge</groupId>
-            <artifactId>getopt4j</artifactId>
-            <version>1.0</version>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.25</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
