@@ -51,7 +51,7 @@ public class GelfConnectionTest
                                                                               packet.getOffset() + 2 ) );
 
       // Create a big enough message that it will require chunking
-      final String textMessage2 = createString( 18823 );
+      final String textMessage2 = createString( 188323 );
 
       final GelfMessage message2 = connection.newMessage( level, textMessage2, timestamp );
 
