@@ -6,10 +6,10 @@ import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
 import java.io.IOException;
 import java.util.List;
-import org.realityforge.getopt4j.CLArgsParser;
-import org.realityforge.getopt4j.CLOption;
-import org.realityforge.getopt4j.CLOptionDescriptor;
-import org.realityforge.getopt4j.CLUtil;
+import org.realityforge.cli.CLArgsParser;
+import org.realityforge.cli.CLOption;
+import org.realityforge.cli.CLOptionDescriptor;
+import org.realityforge.cli.CLUtil;
 
 /**
  * A simple commandline application for sending a log to a gelf server.

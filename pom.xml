@@ -87,8 +87,8 @@
             <version>0.9.29</version>
         </dependency>
         <dependency>
-            <groupId>org.realityforge</groupId>
-            <artifactId>getopt4j</artifactId>
+            <groupId>spice</groupId>
+            <artifactId>spice-cli</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
