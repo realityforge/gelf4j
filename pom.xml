@@ -6,7 +6,7 @@
     <groupId>gelf4j</groupId>
     <artifactId>gelf4j</artifactId>
     <version>0.10-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <name>GELF4j</name>
     <description>GELF4j: Library for sending log messages using the GELF protocol</description>
@@ -210,6 +210,22 @@
                         </plugin>
                     </reportPlugins>
                 </configuration>
+            </plugin>
+
+            <plugin>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>maven-bundle-plugin</artifactId>
+              <version>2.3.5</version>
+              <extensions>true</extensions>
+              <configuration>
+                <instructions>
+                  <Bundle-Name>${project.groupId}.${project.artifactId}</Bundle-Name>
+                  <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                  <Import-Package>*;resolution:=optional</Import-Package>
+                  <Embed-Dependency>spice-cli;scope=compile|runtime;inline=true</Embed-Dependency>
+                  <Implementation-Version>${project.version}</Implementation-Version>
+                </instructions>
+              </configuration>
             </plugin>
         </plugins>
     </build>
