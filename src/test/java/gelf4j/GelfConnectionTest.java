@@ -89,10 +89,4 @@ public class GelfConnectionTest
     }
     return sb.toString();
   }
-
-  private DatagramPacket newPacket()
-  {
-    final byte[] data = new byte[ 1024 * 8 ];
-    return new DatagramPacket( data, data.length );
-  }
 }
