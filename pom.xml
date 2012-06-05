@@ -47,6 +47,22 @@
       </roles>
     </developer>
     <developer>
+      <id>Moocar</id>
+      <email>Anthony.Marcar@gmail.com</email>
+      <name>Anthony Marcar</name>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>t0xa</id>
+      <email>anton.jakimov@gmail.com</email>
+      <name>Anton Yakimov</name>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
       <id>joschi</id>
       <email>jochen@schalanda.name</email>
       <name>Jochen Schalanda</name>
