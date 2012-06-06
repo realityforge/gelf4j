@@ -39,7 +39,7 @@ final class GelfEncoder
 
   // Payload threshold (Maximum packet size minus the size of uncompressed header)
   static final int PAYLOAD_THRESHOLD = MAX_PACKET_SIZE - 38;
-  static final int MAX_SEQ_NUMBER = Byte.MAX_VALUE;
+  static final int MAX_SEQ_NUMBER = 255;
 
   private static final BigDecimal TIME_DIVISOR = new BigDecimal( 1000 );
   private static final String DEFAULT_FACILITY = "GELF";
