@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.MDC;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
