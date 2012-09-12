@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.MDC;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
@@ -136,7 +135,6 @@ public class GelfAppender
       message.setFile( file );
     }
 
-    @SuppressWarnings( "unchecked" ) final Map<String, String> mdc = MDC.getContext();
     for( final Map.Entry<String, String> entry : _config.getAdditionalFields().entrySet() )
     {
       final String fieldName = entry.getValue();
@@ -169,9 +167,9 @@ public class GelfAppender
           GelfMessageUtil.setValue( message, key, ndc );
         }
       }
-      else if( null != mdc )
+      else
       {
-        final String value = mdc.get( key );
+        final Object value = event.getMDC( key );
         if( null != value )
         {
           GelfMessageUtil.setValue( message, key, value );
