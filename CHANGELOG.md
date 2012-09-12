@@ -1,3 +1,8 @@
+## 1.0:
+
+* Fix      : Ensure that the MDC data in the log4j appender works with 
+             the AsyncAppender. Thanks to Christoph Neuroth.
+
 ## 0.9:
 
 * Enhance  : Use Java NIO when sending the packets.
