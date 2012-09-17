@@ -130,7 +130,11 @@ public final class GelfMessageUtil
 
   public static String truncateShortMessage( final String message )
   {
-    if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
+    if ( null == message )
+    {
+      return "";
+    }
+    else if( message.length() > MAX_SHORT_MESSAGE_LENGTH )
     {
       return message.substring( 0, MAX_SHORT_MESSAGE_LENGTH );
     }
