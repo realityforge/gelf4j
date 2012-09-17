@@ -1,3 +1,7 @@
+## 1.1:
+
+* Fix      : Handle the scenario where the logging frameworks supply a null message.
+
 ## 1.0:
 
 * Fix      : Ensure that the MDC data in the log4j appender works with 
