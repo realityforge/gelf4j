@@ -1,3 +1,7 @@
+## 1.2:
+
+* Fix      : Fix data encoding for non-latin symbols.
+
 ## 1.1:
 
 * Fix      : Handle the scenario where the logging frameworks supply a null message.

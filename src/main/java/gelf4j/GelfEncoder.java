@@ -226,7 +226,7 @@ final class GelfEncoder
     {
       final ByteArrayOutputStream targetStream = new ByteArrayOutputStream();
       zipStream = new GZIPOutputStream( targetStream );
-      zipStream.write( message.getBytes() );
+      zipStream.write( message.getBytes("UTF-8") );
       zipStream.close();
       final byte[] zipped = targetStream.toByteArray();
       targetStream.close();
