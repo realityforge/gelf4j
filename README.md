@@ -27,7 +27,7 @@ JDK Logging
     gelf4j.logging.GelfHandler.host=graylog.example.com
     gelf4j.logging.GelfHandler.port=1942
     gelf4j.logging.GelfHandler.compressedChunking=false
-    gelf4j.logging.GelfHandler.defaultFields={"environment": "DEV", "application": "MyAPP"}
+    gelf4j.logging.GelfHandler.defaultFields={"host": "OverridenOriginHost", "environment": "DEV", "application": "MyAPP"}
     gelf4j.logging.GelfHandler.additionalFields={"thread_name": "threadName", "exception": "exception"}
     ...
 
@@ -39,7 +39,7 @@ Logback XML Example
         <host>graylog.example.com</host>
         <port>1942</port>
         <compressedChunking>false</compressedChunking>
-        <defaultFields>{"environment": "DEV", "application": "MyAPP"}</defaultFields>
+        <defaultFields>{"host": "OverridenOriginHost", "environment": "DEV", "application": "MyAPP"}</defaultFields>
         <additionalFields>{"thread_name": "threadName", "exception": "exception"}</additionalFields>
     </appender>
 
@@ -58,7 +58,7 @@ Log4j XML Example
         <param name="host" value="graylog.example.com"/>
         <param name="port" value="1942"/>
         <param name="compressedChunking" value="false"/>
-        <param name="defaultFields" value='{"environment": "DEV", "application": "MyAPP"}'/>
+        <param name="defaultFields" value='{"host": "OverridenOriginHost", "environment": "DEV", "application": "MyAPP"}'/>
         <param name="additionalFields" value='{"thread_name": "threadName", "exception": "exception"}'/>
     </appender>
 
@@ -77,7 +77,7 @@ Log4j Properties Example
     log4j.appender.gelf.host=graylog.example.com
     log4j.appender.gelf.port=1942
     log4j.appender.gelf.compressedChunking=false
-    log4j.appender.gelf.defaultFields={"environment": "DEV", "application": "MyAPP"}
+    log4j.appender.gelf.defaultFields={"host": "OverridenOriginHost", "environment": "DEV", "application": "MyAPP"}
     log4j.appender.gelf.additionalFields={"thread_name": "threadName", "exception": "exception"}
     log4j.rootLogger=INFO, gelf
     ...
