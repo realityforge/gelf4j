@@ -55,6 +55,7 @@ public class GelfMessageUtilTest
     final String truncatedLongMessage = GelfMessageUtil.truncateShortMessage( longMessage );
     assertEquals( 250, truncatedLongMessage.length() );
     assertEquals( true, longMessage.startsWith( truncatedLongMessage ) );
+    assertEquals( "", GelfMessageUtil.truncateShortMessage( null ) );
   }
 
   private String createString( final int byteCount )

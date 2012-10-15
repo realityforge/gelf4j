@@ -1,7 +1,19 @@
-## 1.0:
+## 1.3:
 
 * Enhance  : If looking up the canonical hostname results in an exception attempt to guess the host name by iterating
              over the network interfaces.
+## 1.2:
+
+* Fix      : Fix data encoding for non-latin symbols.
+
+## 1.1:
+
+* Fix      : Handle the scenario where the logging frameworks supply a null message.
+
+## 1.0:
+
+* Fix      : Ensure that the MDC data in the log4j appender works with 
+             the AsyncAppender. Thanks to Christoph Neuroth.
 
 ## 0.9:
 
