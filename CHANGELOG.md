@@ -1,3 +1,8 @@
+## 1.0:
+
+* Enhance  : If looking up the canonical hostname results in an exception attempt to guess the host name by iterating
+             over the network interfaces.
+
 ## 0.9:
 
 * Enhance  : Use Java NIO when sending the packets.

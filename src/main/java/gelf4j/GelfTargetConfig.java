@@ -1,5 +1,6 @@
 package gelf4j;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -37,9 +38,9 @@ public class GelfTargetConfig
   {
     try
     {
-      _host = InetAddress.getLocalHost().getCanonicalHostName();
+      _host = GelfMessageUtil.getLocalHost();
     }
-    catch( final UnknownHostException uhe )
+    catch( final IOException ioe )
     {
       //ignore
     }

@@ -1,9 +1,14 @@
 package gelf4j;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -137,6 +142,32 @@ public final class GelfMessageUtil
     else
     {
       return message;
+    }
+  }
+
+  static String getLocalHost()
+    throws IOException
+  {
+    try
+    {
+      return InetAddress.getLocalHost().getCanonicalHostName();
+    }
+    catch( final UnknownHostException uhe )
+    {
+      final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+      while( interfaces.hasMoreElements() )
+      {
+        final NetworkInterface networkInterface = interfaces.nextElement();
+        if( null != networkInterface )
+        {
+          final Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+          if( addresses.hasMoreElements() )
+          {
+            return addresses.nextElement().getHostAddress();
+          }
+        }
+      }
+      throw uhe;
     }
   }
 }

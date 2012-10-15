@@ -1,7 +1,6 @@
 package gelf4j;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -21,7 +20,7 @@ public class GelfConnection
     throws Exception
   {
     _config = config;
-    _encoder = new GelfEncoder( InetAddress.getLocalHost().getCanonicalHostName(), _config.isCompressedChunking() );
+    _encoder = new GelfEncoder( GelfMessageUtil.getLocalHost(), _config.isCompressedChunking() );
   }
 
   public void close()
