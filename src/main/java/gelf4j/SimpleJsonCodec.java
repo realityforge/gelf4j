@@ -2,14 +2,22 @@ package gelf4j;
 
 import org.json.simple.JSONValue;
 
-public class SimpleJsonCodec implements JsonCodec {
+/**
+ * An implementation of JsonCodec that uses google-json's
+ * simple json library
+ */
+public class SimpleJsonCodec implements JsonCodec
+{
 
-  public String toJson(Object object) {
-    return JSONValue.toJSONString(object);
+  public String toJson( final Object object )
+  {
+    return JSONValue.toJSONString( object );
   }
 
-  public <T> T fromJson(String json, Class<T> type) {
-    return (T) JSONValue.parse(json);
+  @SuppressWarnings( "unchecked" )
+  public <T> T fromJson( final String json, final Class<T> type )
+  {
+    return ( T ) JSONValue.parse( json );
   }
 
 }

@@ -11,8 +11,8 @@ package gelf4j;
  */
 public interface JsonCodec {
 
-  public String toJson(Object object);
+  public String toJson( Object object );
 
-  public <T> T fromJson(String json, Class<T> type);
+  public <T> T fromJson( String json, Class<T> type );
 
 }
