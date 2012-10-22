@@ -86,6 +86,7 @@
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <version>1.1</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
@@ -175,7 +176,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>

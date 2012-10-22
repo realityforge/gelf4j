@@ -54,6 +54,11 @@ public class GelfHandler
     {
       _config.setCompressedChunking( "true".equals( compressedChunking ) );
     }
+    final String codecClass = manager.getProperty( prefix + ".codecClass" );
+    if( null != codecClass )
+    {
+      _config.setCodecClass( codecClass );
+    }
 
     final String level = manager.getProperty( prefix + ".level" );
     if( null != level )
