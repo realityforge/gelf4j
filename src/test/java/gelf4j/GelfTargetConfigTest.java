@@ -1,11 +1,17 @@
 package gelf4j;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class GelfTargetConfigTest
 {
+
   @Test
   public void validateDefaults()
     throws Exception
@@ -50,5 +56,33 @@ public class GelfTargetConfigTest
     assertEquals( 2, config.getDefaultFields().size() );
     assertEquals( 7L, config.getDefaultFields().get( "baz" ) );
     assertEquals( "x", config.getDefaultFields().get( "foo2" ) );
+  }
+
+  @Test
+  public void setJsonCodec()
+    throws Exception
+  {
+    final GelfTargetConfig config = new GelfTargetConfig();
+    config.setCodecClass( "gelf4j.MockJsonCodec" );
+    config.setDefaultFields( "{ \"foo\":10, \"bar\": { \"baz\": \"bingo\", \"otherBaz\": 10 } }" );
+
+    assertEquals( MockJsonCodec.class, config.getCodec().getClass() );
+    assertEquals( 1, config.getDefaultFields().size() );
+    assertEquals( 10, config.getDefaultFields().get( "foo" ) );
+  }
+}
+
+class MockJsonCodec implements JsonCodec
+{
+  public String toJson(Object object) {
+    // always return mock data
+    return "{ \"foo\":10, \"bar\": { \"baz\": \"bingo\", \"otherBaz\": 10 } }";
+  }
+
+  @SuppressWarnings( "unchecked" )
+  public <T> T fromJson(String json, Class<T> type) {
+    final Map<String, Object> mockResult = new HashMap<String, Object>();
+    mockResult.put( "foo", 10 );
+    return (T) mockResult;
   }
 }

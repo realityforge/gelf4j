@@ -43,6 +43,11 @@ public class GelfAppender<E> extends AppenderBase<E>
     _config.setHost( host );
   }
 
+  public void setCodecClass( final String codecClass )
+  {
+    _config.setCodecClass( codecClass );
+  }
+
   public void setAdditionalFields( final String additionalFields )
   {
     _config.setAdditionalFields( additionalFields );
