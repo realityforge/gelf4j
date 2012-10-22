@@ -59,7 +59,7 @@ public class GelfTargetConfigTest
   }
 
   @Test
-  public void setJsonCodec()
+  public void setJsonCodecClass()
     throws Exception
   {
     final GelfTargetConfig config = new GelfTargetConfig();
@@ -70,6 +70,17 @@ public class GelfTargetConfigTest
     assertEquals( 1, config.getDefaultFields().size() );
     assertEquals( 10, config.getDefaultFields().get( "foo" ) );
   }
+
+  @Test
+  public void setUnknownJsonCodecClass()
+      throws Exception
+  {
+    final GelfTargetConfig config = new GelfTargetConfig();
+    config.setCodecClass( "blah.blah.UnknownJsonCodec" );
+
+    assertEquals( SimpleJsonCodec.class, config.getCodec().getClass() );
+  }
+
 }
 
 class MockJsonCodec implements JsonCodec
