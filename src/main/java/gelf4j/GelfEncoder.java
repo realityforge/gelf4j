@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
-import org.json.simple.JSONValue;
 
 /**
  * Responsible for converting a GelfMessage into packets.
@@ -47,18 +46,20 @@ final class GelfEncoder
   private final MessageDigest _messageDigest;
   private final String _hostname;
   private final boolean _compressed;
+  private final JsonCodec _codec;
 
-  GelfEncoder( final String hostname, final boolean compressed )
+  GelfEncoder( final String hostname, final boolean compressed, final JsonCodec codec )
     throws Exception
   {
-    this( MessageDigest.getInstance( "MD5" ), hostname, compressed );
+    this( MessageDigest.getInstance( "MD5" ), hostname, compressed, codec );
   }
 
-  GelfEncoder( final MessageDigest messageDigest, final String hostname, final boolean compressed )
+  GelfEncoder( final MessageDigest messageDigest, final String hostname, final boolean compressed, final JsonCodec codec )
   {
     _messageDigest = messageDigest;
     _hostname = hostname;
     _compressed = compressed;
+    _codec = codec;
   }
 
   List<byte[]> encode( final GelfMessage message )
@@ -121,7 +122,7 @@ final class GelfEncoder
       }
     }
 
-    return JSONValue.toJSONString( map );
+    return _codec.toJson( map );
   }
 
   private String encodeTimestamp( final long time )

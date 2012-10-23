@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.json.simple.JSONValue;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -17,7 +16,7 @@ public class GelfEncoderTest
   {
     final GelfMessage message = new GelfMessage();
     message.setShortMessage( "MyShortMessage" );
-    final List<byte[]> packets = new GelfEncoder( "localhost", true ).encode( message );
+    final List<byte[]> packets = new GelfEncoder( "localhost", true, new SimpleJsonCodec() ).encode( message );
     assertEquals( 1, packets.size() );
   }
 
@@ -26,7 +25,7 @@ public class GelfEncoderTest
     throws Exception
   {
     final GelfMessage message = new GelfMessage();
-    assertNull( new GelfEncoder( "localhost", true ).toJson( message ) );
+    assertNull( new GelfEncoder( "localhost", true, new SimpleJsonCodec() ).toJson( message ) );
   }
 
   @Test
@@ -36,7 +35,7 @@ public class GelfEncoderTest
     final GelfMessage message = new GelfMessage();
     final String myShortMessage = "MyShortMessage";
     message.setShortMessage( myShortMessage );
-    final String json = new GelfEncoder( "localhost", true ).toJson( message );
+    final String json = new GelfEncoder( "localhost", true, new SimpleJsonCodec() ).toJson( message );
     assertNotNull( json );
     final Map<String, Object> object = parseJsonObject( json );
 
@@ -72,7 +71,7 @@ public class GelfEncoderTest
     message.setHost( funkyHost );
     message.setJavaTimestamp( 3000 );
     message.getAdditionalFields().put( "zang", "zing" );
-    final String json = new GelfEncoder( "localhost", true ).toJson( message );
+    final String json = new GelfEncoder( "localhost", true, new SimpleJsonCodec() ).toJson( message );
     assertNotNull( json );
     final Map<String, Object> object = parseJsonObject( json );
 
@@ -92,7 +91,7 @@ public class GelfEncoderTest
   @SuppressWarnings( "unchecked" )
   private Map<String, Object> parseJsonObject( final String json )
   {
-    return (Map<String, Object>) JSONValue.parse( json );
+    return (Map<String, Object>) new SimpleJsonCodec().fromJson( json, Map.class );
   }
 
   @Test
@@ -206,6 +205,6 @@ public class GelfEncoderTest
   private GelfEncoder encoder( final boolean compressed )
     throws Exception
   {
-    return new GelfEncoder( "localhost", compressed );
+    return new GelfEncoder( "localhost", compressed, new SimpleJsonCodec() );
   }
 }
