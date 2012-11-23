@@ -20,7 +20,7 @@ public class GelfConnection
     throws Exception
   {
     _config = config;
-    _encoder = new GelfEncoder( GelfMessageUtil.getLocalHost(), _config.isCompressedChunking() );
+    _encoder = new GelfEncoder( GelfMessageUtil.getLocalHost(), _config.isCompressedChunking(), _config.getCodec() );
   }
 
   public void close()

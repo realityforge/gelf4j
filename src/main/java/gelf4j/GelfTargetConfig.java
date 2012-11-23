@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-import org.json.simple.JSONValue;
 
 /**
  * Configuration about how to create GELF messages in a particular logging framework.
@@ -23,6 +22,7 @@ public class GelfTargetConfig
   public static final String FIELD_FILE = "file";
   public static final String FIELD_HOST = "host";
   public static final String FIELD_MESSAGE = "message";
+  public static final String DEFAULT_JSON_CODEC = "gelf4j.SimpleJsonCodec";
 
   public static final int DEFAULT_PORT = 12201;
 
@@ -30,8 +30,12 @@ public class GelfTargetConfig
   private InetAddress _hostAddress;
   private int _port = DEFAULT_PORT;
   private boolean _compressedChunking = true;
+  private String _codecClass = DEFAULT_JSON_CODEC;
+  private JsonCodec _codec;
 
+  private String _defaultFieldsJson;
   private final Map<String, Object> _defaultFields;
+  private String _additionalFieldsJson;
   private final Map<String, String> _additionalFields;
 
   public GelfTargetConfig()
@@ -114,6 +118,16 @@ public class GelfTargetConfig
     }
   }
 
+  public String getCodecClass()
+  {
+    return _codecClass;
+  }
+
+  public void setCodecClass( final String codecClass )
+  {
+    _codecClass = codecClass;
+  }
+
   /**
    * Additional fields to add to the gelf message. The keys are the key in the GELF message and the value corresponds
    * to a symbol recognized by the underlying log system.
@@ -124,16 +138,20 @@ public class GelfTargetConfig
    */
   public Map<String, String> getAdditionalFields()
   {
+    if ( null != _additionalFieldsJson )
+    {
+      _additionalFields.clear();
+      for ( final Map.Entry<String, Object> entry : parseJsonObject( _additionalFieldsJson ).entrySet() )
+      {
+        _additionalFields.put( entry.getKey(), String.valueOf( entry.getValue() ) );
+      }
+    }
     return _additionalFields;
   }
 
   public void setAdditionalFields( final String additionalFields )
   {
-    _additionalFields.clear();
-    for( Map.Entry<String, Object> entry : parseJsonObject( additionalFields ).entrySet() )
-    {
-      _additionalFields.put( entry.getKey(), String.valueOf( entry.getValue() ) );
-    }
+    _additionalFieldsJson = additionalFields;
   }
 
   /**
@@ -141,18 +159,38 @@ public class GelfTargetConfig
    */
   public Map<String, Object> getDefaultFields()
   {
+    if ( null != _defaultFieldsJson )
+    {
+      _defaultFields.clear();
+      _defaultFields.putAll( parseJsonObject( _defaultFieldsJson ) );
+    }
     return _defaultFields;
   }
 
   public void setDefaultFields( final String additionalData )
   {
-    _defaultFields.clear();
-    _defaultFields.putAll( parseJsonObject( additionalData ) );
+    _defaultFieldsJson = additionalData;
   }
 
   @SuppressWarnings( "unchecked" )
   private Map<String, Object> parseJsonObject( final String additionalFields )
   {
-    return (Map<String, Object>) JSONValue.parse( additionalFields );
+    return (Map<String, Object>) getCodec().fromJson( additionalFields, Map.class );
+  }
+
+  protected final JsonCodec getCodec()
+  {
+    if ( null == _codec )
+    {
+      try
+      {
+        _codec = (JsonCodec) Class.forName( _codecClass ).newInstance();
+      }
+      catch ( final Exception e )
+      {
+        _codec = new SimpleJsonCodec();
+      }
+    }
+    return _codec;
   }
 }
