@@ -5,13 +5,15 @@ cat <<EOF
 *****************************************************
 EOF
 
-if [ -f .ruby_version ]; then
-  ruby_string=${RVM_RUBY_NAME-`cat .ruby_version 2>/dev/null`}
+DIR=`pwd`
+
+if [ -f "${DIR}/.ruby_version" ]; then
+  ruby_string=${RVM_RUBY_NAME-`cat "${DIR}/.ruby_version" 2>/dev/null`}
   ruby_string="${ruby_string//[[:space:]]/}"
 else
   ruby_string=${RVM_RUBY_NAME-"1.9.3"}
 fi
-export project_name=${RVM_GEMSET_NAME-`basename \`pwd\``}
+export project_name=${RVM_GEMSET_NAME-`basename $DIR`}
 
 detected_version=`rvm list strings | grep ${ruby_string}`
 if [ "X" == "X${detected_version}" ] ; then
@@ -21,7 +23,7 @@ fi
 
 rvm use --create "${ruby_string}@${project_name}"
 
-if [ -f Gemfile ]; then
+if [ -f "${DIR}/Gemfile" ]; then
   gem list | grep 'bundler' &> /dev/null
   if [ $? -gt 0 ]; then
     gem install bundler
