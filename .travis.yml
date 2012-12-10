@@ -4,4 +4,4 @@ jdk:
   - openjdk6
   - openjdk7
   - oraclejdk7
-script: buildr clean package
+script: "buildr clean package"
