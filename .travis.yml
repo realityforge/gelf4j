@@ -4,5 +4,5 @@ jdk:
   - openjdk6
   - openjdk7
   - oraclejdk7
-install:
+install: "/bin/true"
 script: "buildr clean package"
