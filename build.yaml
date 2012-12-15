@@ -1,9 +1,5 @@
 junit: 4.9
 
-gems:
-  #- ci_reporter
-  - buildr >= 1.4.6
-
 repositories:
   remote:
    - http://repo.fire.dse.vic.gov.au/content/groups/fisg
