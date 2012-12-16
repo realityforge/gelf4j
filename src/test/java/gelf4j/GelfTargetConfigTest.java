@@ -1,17 +1,13 @@
 package gelf4j;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class GelfTargetConfigTest
 {
-
   @Test
   public void validateDefaults()
     throws Exception
@@ -38,7 +34,7 @@ public class GelfTargetConfigTest
     final GelfTargetConfig config = new GelfTargetConfig();
 
     assertEquals( 4, config.getAdditionalFields().size() );
-    config.setAdditionalFields("{\"foo\":\"bar\"}");
+    config.setAdditionalFields( "{\"foo\":\"bar\"}" );
     assertEquals( 1, config.getAdditionalFields().size() );
     assertEquals( "bar", config.getAdditionalFields().get( "foo" ) );
   }
@@ -73,7 +69,7 @@ public class GelfTargetConfigTest
 
   @Test
   public void setUnknownJsonCodecClass()
-      throws Exception
+    throws Exception
   {
     final GelfTargetConfig config = new GelfTargetConfig();
     config.setCodecClass( "blah.blah.UnknownJsonCodec" );
@@ -81,19 +77,21 @@ public class GelfTargetConfigTest
     assertEquals( SimpleJsonCodec.class, config.getCodec().getClass() );
   }
 
-}
+  static final class MockJsonCodec
+    implements JsonCodec
+  {
+    public String toJson( Object object )
+    {
+      // always return mock data
+      return "{ \"foo\":10, \"bar\": { \"baz\": \"bingo\", \"otherBaz\": 10 } }";
+    }
 
-class MockJsonCodec implements JsonCodec
-{
-  public String toJson(Object object) {
-    // always return mock data
-    return "{ \"foo\":10, \"bar\": { \"baz\": \"bingo\", \"otherBaz\": 10 } }";
-  }
-
-  @SuppressWarnings( "unchecked" )
-  public <T> T fromJson(String json, Class<T> type) {
-    final Map<String, Object> mockResult = new HashMap<String, Object>();
-    mockResult.put( "foo", 10 );
-    return (T) mockResult;
+    @SuppressWarnings( "unchecked" )
+    public <T> T fromJson( String json, Class<T> type )
+    {
+      final Map<String, Object> mockResult = new HashMap<String, Object>();
+      mockResult.put( "foo", 10 );
+      return (T) mockResult;
+    }
   }
 }
