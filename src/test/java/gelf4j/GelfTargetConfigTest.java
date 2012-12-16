@@ -59,7 +59,7 @@ public class GelfTargetConfigTest
     throws Exception
   {
     final GelfTargetConfig config = new GelfTargetConfig();
-    config.setCodecClass( "gelf4j.MockJsonCodec" );
+    config.setCodecClass( MockJsonCodec.class.getName() );
     config.setDefaultFields( "{ \"foo\":10, \"bar\": { \"baz\": \"bingo\", \"otherBaz\": 10 } }" );
 
     assertEquals( MockJsonCodec.class, config.getCodec().getClass() );
