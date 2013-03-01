@@ -40,7 +40,6 @@ module Buildr
 
       tmp = nil
       begin
-        puts cmd_args.join("\n")
         tmp = Tempfile.open("testNG")
         tmp.write cmd_args.join("\n")
         tmp.close
