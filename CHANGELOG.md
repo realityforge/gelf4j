@@ -1,5 +1,10 @@
 ## 1.3:
 
+* Enhance  : Specify the Main-Class attribute in the manifest for the all jar so it can be
+             directly executed from the command line.
+
+## 1.3:
+
 * Enhance  : If looking up the canonical hostname results in an exception attempt to guess the host name by iterating
              over the network interfaces.
 ## 1.2:
