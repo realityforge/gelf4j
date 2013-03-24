@@ -1,3 +1,8 @@
+## 1.5:
+
+* Enhance  : Improve the mechanism for deriving the message id so that even when a message
+             is sent in the same nano-second, the message will have a unique identifier.
+
 ## 1.4:
 
 * Enhance  : Specify the Main-Class attribute in the manifest for the all jar so it can be

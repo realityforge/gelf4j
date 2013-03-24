@@ -2,6 +2,7 @@ package gelf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -42,6 +44,9 @@ final class GelfEncoder
 
   private static final BigDecimal TIME_DIVISOR = new BigDecimal( 1000 );
   private static final String DEFAULT_FACILITY = "GELF";
+  private static final String RUNTIME_ID = ManagementFactory.getRuntimeMXBean().getName();
+
+  private static final AtomicLong c_sequence = new AtomicLong( System.nanoTime() );
 
   private final MessageDigest _messageDigest;
   private final String _hostname;
@@ -138,10 +143,7 @@ final class GelfEncoder
    */
   byte[] generateMessageID()
   {
-    // Uniqueness is guaranteed by combining the hostname and the current nanosecond, hashing the result, and
-    // selecting the first x bytes of the result
-    final String timestamp = String.valueOf( System.nanoTime() );
-    final byte[] digestString = ( _hostname + timestamp ).getBytes();
+    final byte[] digestString = ( _hostname + c_sequence.incrementAndGet() + RUNTIME_ID ).getBytes();
     final int messageIdLength = _compressed ? COMPRESSED_MESSAGE_ID_LENGTH : MESSAGE_ID_LENGTH;
     return Arrays.copyOf( _messageDigest.digest( digestString ), messageIdLength );
   }
