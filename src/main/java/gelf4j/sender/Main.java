@@ -4,6 +4,9 @@ import gelf4j.GelfConnection;
 import gelf4j.GelfMessage;
 import gelf4j.GelfMessageUtil;
 import gelf4j.GelfTargetConfig;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import org.realityforge.cli.CLArgsParser;
@@ -22,6 +25,7 @@ public class Main
   private static final int VERBOSE_OPT = 'v';
   private static final int UNCOMPRESSED_CHUNKING_OPT = 'u';
   private static final int FIELD_OPT = 'D';
+  private static final int FILE_OPT = 'f';
 
   private static final CLOptionDescriptor[] OPTIONS = new CLOptionDescriptor[]{
     new CLOptionDescriptor( "help",
@@ -36,6 +40,10 @@ public class Main
                             CLOptionDescriptor.ARGUMENT_REQUIRED,
                             PORT_CONFIG_OPT,
                             "the port on the server. Defaults to " + GelfTargetConfig.DEFAULT_PORT ),
+    new CLOptionDescriptor( "file",
+                            CLOptionDescriptor.ARGUMENT_REQUIRED,
+                            FILE_OPT,
+                            "file to read message from." ),
     new CLOptionDescriptor( "field",
                             CLOptionDescriptor.ARGUMENTS_REQUIRED_2 | CLOptionDescriptor.DUPLICATES_ALLOWED,
                             FIELD_OPT,
@@ -57,6 +65,7 @@ public class Main
   private static final GelfTargetConfig c_config = new GelfTargetConfig();
   private static boolean c_verbose;
   private static String c_message;
+  private static File c_messageFromFile;
 
   public static void main( final String[] args )
   {
@@ -79,6 +88,18 @@ public class Main
       if( null != c_message )
       {
         GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_MESSAGE, c_message );
+      }
+      if( null != c_messageFromFile )
+      {
+        final BufferedReader reader = new BufferedReader(  new FileReader( c_messageFromFile ) );
+        final StringBuilder sb = new StringBuilder(  );
+        String line;
+        while ( null != ( line = reader.readLine() ) )
+        {
+          sb.append( line );
+          sb.append( "\n" );
+        }
+        GelfMessageUtil.setValue( message, GelfTargetConfig.FIELD_MESSAGE, sb.toString() );
       }
       if( null == message.getShortMessage() )
       {
@@ -162,6 +183,11 @@ public class Main
           c_config.getDefaultFields().put( option.getArgument(), option.getArgument( 1 ) );
           break;
         }
+        case FILE_OPT:
+        {
+          c_messageFromFile = new File( option.getArgument() );
+          break;
+        }
         case PORT_CONFIG_OPT:
         {
           final String port = option.getArgument();
@@ -193,6 +219,11 @@ public class Main
         }
 
       }
+    }
+    if ( null != c_messageFromFile && null != c_message )
+    {
+      error( "Message file specified as well as message on the command line" );
+      return false;
     }
     if( c_verbose )
     {

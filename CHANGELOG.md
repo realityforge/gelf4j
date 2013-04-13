@@ -1,3 +1,7 @@
+## 1.6:
+
+* Enhance  : Add support for a -f option that will take the message from a file.
+
 ## 1.5:
 
 * Enhance  : Improve the mechanism for deriving the message id so that even when a message
