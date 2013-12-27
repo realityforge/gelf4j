@@ -74,6 +74,7 @@ Log4j Properties Example
 ------------------------
 
     ...
+    log4j.appender.gelf=gelf4j.log4j.GelfAppender
     log4j.appender.gelf.host=graylog.example.com
     log4j.appender.gelf.port=1942
     log4j.appender.gelf.compressedChunking=false
