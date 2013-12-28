@@ -1,3 +1,8 @@
+## 1.7:
+
+* Change   : Move from the Spice CLI library to the Getopt4j library as that library
+             is a direct descendant and is still maintained.
+
 ## 1.6:
 
 * Enhance  : Add support for a -f option that will take the message from a file.
