@@ -31,4 +31,6 @@ define 'gelf4j' do
     bnd['Private-Package'] = 'org.realityforge.getopt4j.*,org.json.simple.*'
     bnd['Export-Package'] = "gelf4j.*;version=#{version}"
   end
+  package(:sources)
+  package(:javadoc)
 end
