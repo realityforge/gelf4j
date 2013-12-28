@@ -18,7 +18,7 @@ define 'gelf4j' do
   end
   package(:bundle, :classifier => 'all').tap do |bnd|
     bnd['Main-Class'] = 'gelf4j.sender.Main'
-    bnd['Bundle-SymbolicName'] = 'gelf4j.gelf4j-all'
+    bnd['Bundle-SymbolicName'] = 'org.realityforge.gelf4j-all'
     bnd['Private-Package'] = 'org.realityforge.getopt4j.*,org.json.simple.*'
     bnd['Export-Package'] = "gelf4j.*;version=#{version}"
   end
