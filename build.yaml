@@ -2,12 +2,7 @@ junit: 4.9
 
 repositories:
   remote:
-   - http://repo.fire.dse.vic.gov.au/content/groups/fisg
    - http://repo1.maven.org/maven2
-  release_to:
-    url: http://repo.fire.dse.vic.gov.au/content/repositories/releases/
-    username: upload
-    permissions: 0664
 
 artifacts:
   slf4j_api: org.slf4j:slf4j-api:jar:1.6.1
