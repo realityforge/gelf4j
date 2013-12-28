@@ -46,7 +46,7 @@ module RealityForge
       @developers ||= []
     end
 
-    def add_developer(id, name = nil, email = nil, roles = [])
+    def add_developer(id, name = nil, email = nil, roles = nil)
       self.developers << Developer.new(id, name, email, roles)
     end
 
@@ -206,4 +206,3 @@ module Buildr
     end
   end
 end
-
