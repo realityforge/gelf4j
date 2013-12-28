@@ -107,7 +107,7 @@ The set of symbolic keys supported by different logging frameworks is listed bel
 How-to Build
 ------------
 
-Gelf4j uses [Apache Buildr](http://buildr.apache.org) and requires you to have already built and installed the [getopt4j](https://github.com/realityforge/getopt4j) library.
+Gelf4j uses [Apache Buildr](http://buildr.apache.org) to build the library.
 
 Credits
 -------
