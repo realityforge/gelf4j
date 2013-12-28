@@ -9,7 +9,16 @@ define 'gelf4j' do
   compile.options.target = '1.6'
   compile.options.lint = 'all'
 
+  pom.add_apache2_license
+  pom.add_github_project('realityforge/gelf4j')
+  pom.add_developer('realityforge', 'Peter Donald', 'peter@realityforge.org', ['Developer'])
+  pom.add_developer('Moocar', 'Anthony Marcar', 'Anthony.Marcar@gmail.com', ['Developer'])
+  pom.add_developer('t0xa', 'Anton Yakimov', 'anton.jakimov@gmail.com', ['Developer'])
+  pom.add_developer('joschi', 'Jochen Schalanda', 'jochen@schalanda.name', ['Developer'])
+  pom.optional_dependencies.concat [:getopt4j, :slf4j_api, :log4j, :logback_core, :logback_classic]
+
   compile.with :getopt4j, :json_simple, :slf4j_api, :log4j, :logback_core, :logback_classic
+  test.using :junit
 
   package(:bundle).tap do |bnd|
     bnd['Private-Package'] = 'gelf4j.sender.*'

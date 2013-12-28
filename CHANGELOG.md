@@ -1,5 +1,6 @@
 ## 1.7:
 
+* Enhance  : Generate the Maven POM from buildr.
 * Change   : Move to group "org.realityforge.gelf4j" rather than "gelf4j" to meet Maven
              Central requirements.
 * Change   : Move from the Spice CLI library to the Getopt4j library as that library
