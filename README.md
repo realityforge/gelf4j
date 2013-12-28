@@ -13,7 +13,28 @@ GELF4j is a client-side integration library to send GELF messages. GELF4j has in
 How to use GELF4j
 -----------------
 
-To integrate into a logging framework simply drop the jar into your classpath and configure the logging framework to use it. The jars are available form the github projects downloads. The "-all" artifact includes all the required dependencies. At some point i the future the libraries mayt attempt to be placed in maven central.
+To integrate into a logging framework simply drop the jar into your classpath and configure the logging framework to use it.
+
+The GELF4j jars are available from Maven Central. The "-all" artifact includes all the required dependencies. The
+easiest way to get the library is to add it as a maven dependency;
+
+```xml
+<dependency>
+   <groupId>org.realityforge.gelf4j</groupId>
+   <artifactId>gelf4j</artifactId>
+   <version>1.7</version>
+</dependency>
+```
+
+or
+
+```xml
+<dependency>
+   <groupId>org.realityforge.gelf4j</groupId>
+   <artifactId>gelf4j-all</artifactId>
+   <version>1.7</version>
+</dependency>
+```
 
 The following examples demonstrate it's use in various frameworks.
 
