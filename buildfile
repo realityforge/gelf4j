@@ -4,7 +4,7 @@ require 'buildr/gpg'
 
 desc 'GELF4j: Library for sending log messages using the GELF protocol'
 define 'gelf4j' do
-  project.group = 'gelf4j'
+  project.group = 'org.realityforge.gelf4j'
   compile.options.source = '1.6'
   compile.options.target = '1.6'
   compile.options.lint = 'all'
