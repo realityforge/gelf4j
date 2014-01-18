@@ -131,7 +131,7 @@ public class GelfTargetConfig
   /**
    * Additional fields to add to the gelf message. The keys are the key in the GELF message and the value corresponds
    * to a symbol recognized by the underlying log system.
-   * 
+   *
    * <p>There are some common fields recognized by multiple frameworks (See FIELD_* constants) but in most cases
    * this will result in access to application specific data such as Mapped Diagnostic Contexts (MDC) in Log4j and
    * Logback.</p>
@@ -194,3 +194,4 @@ public class GelfTargetConfig
     return _codec;
   }
 }
+

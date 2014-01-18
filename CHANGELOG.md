@@ -34,7 +34,7 @@
 
 ## 1.0:
 
-* Fix      : Ensure that the MDC data in the log4j appender works with 
+* Fix      : Ensure that the MDC data in the log4j appender works with
              the AsyncAppender. Thanks to Christoph Neuroth.
 
 ## 0.9:
@@ -52,3 +52,4 @@
 ## 0.7:
 
 * Initial release
+

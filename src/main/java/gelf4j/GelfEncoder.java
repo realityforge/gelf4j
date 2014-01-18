@@ -174,7 +174,7 @@ final class GelfEncoder
       final int remainingBytes = payload.length % PAYLOAD_THRESHOLD;
       final int chunkCount = fullChunksCount + ( remainingBytes != 0 ? 1 : 0 );
       final int headerSize = _compressed ? COMPRESSED_HEADER_SIZE : HEADER_SIZE;
-      
+
       for ( int chunk = 0; chunk < fullChunksCount; chunk++ )
       {
         final ByteBuffer buffer = ByteBuffer.allocate( PAYLOAD_THRESHOLD + headerSize );
@@ -255,3 +255,4 @@ final class GelfEncoder
     }
   }
 }
+
