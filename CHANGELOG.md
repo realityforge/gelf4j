@@ -1,7 +1,7 @@
 ## 1.8:
 
 * Fix      : Make sure the logback appender sends the entire exception message to the
-             gelf server.
+             gelf server. Reported by https://github.com/rsff.
 
 ## 1.7:
 
