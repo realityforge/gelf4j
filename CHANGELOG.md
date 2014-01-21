@@ -1,3 +1,8 @@
+## 1.8:
+
+* Fix      : Make sure the logback appender sends the entire exception message to the
+             gelf server.
+
 ## 1.7:
 
 * Enhance  : Generate the Maven POM from buildr.

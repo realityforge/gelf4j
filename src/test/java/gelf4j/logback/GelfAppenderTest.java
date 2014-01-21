@@ -127,8 +127,24 @@ public class GelfAppenderTest
     logger.error( smallTextMessage, new Exception() );
     assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
     message = connection.getLastMessage();
-    assertEquals( SyslogLevel.ERR, message.getLevel() );
-    assertNotNull( message.getAdditionalFields().get( "exception" ) );
+    {
+      assertEquals( SyslogLevel.ERR, message.getLevel() );
+      final String exception = (String) message.getAdditionalFields().get( "exception" );
+      assertNotNull( exception );
+      assertTrue( exception.contains( "java.lang.Exception\n" ) );
+      assertTrue( exception.contains( "\tat gelf4j.logback.GelfAppenderTest.configureSetsUpLoggerCorrectly(" ) );
+    }
+
+    logger.error( smallTextMessage, new Exception( "MyError", new IllegalStateException() ) );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
+    message = connection.getLastMessage();
+    {
+      assertEquals( SyslogLevel.ERR, message.getLevel() );
+      final String exception = (String) message.getAdditionalFields().get( "exception" );
+      assertNotNull( exception );
+      assertTrue( exception.contains( "java.lang.Exception: MyError\n" ) );
+      assertTrue( exception.contains( "Caused by: java.lang.IllegalStateException\n" ) );
+    }
 
     // Force the closing of the appender
     context.reset();

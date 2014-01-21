@@ -146,7 +146,9 @@ public class GelfAppender<E> extends AppenderBase<E>
         final IThrowableProxy proxy = event.getThrowableProxy();
         if( null != proxy )
         {
-          GelfMessageUtil.setValue( message, key, toStackTraceString( proxy.getStackTraceElementProxyArray() ) );
+          final StringBuilder sb = new StringBuilder();
+          collectExceptionMessage( proxy, sb );
+          GelfMessageUtil.setValue( message, key, sb.toString() );
         }
       }
       else if( null != mdc )
@@ -161,6 +163,30 @@ public class GelfAppender<E> extends AppenderBase<E>
     message.getAdditionalFields().putAll( _config.getDefaultFields() );
 
     return message;
+  }
+
+  private void collectExceptionMessage( final IThrowableProxy proxy, final StringBuilder sb )
+  {
+    sb.append( proxy.getClassName() );
+    final String m = proxy.getMessage();
+    if( null != m )
+    {
+      sb.append( ": " );
+      sb.append( m );
+    }
+    sb.append( "\n" );
+    for ( final StackTraceElementProxy element : proxy.getStackTraceElementProxyArray() )
+    {
+      sb.append( "\t" );
+      sb.append( element.getSTEAsString() );
+      sb.append( "\n" );
+    }
+    final IThrowableProxy cause = proxy.getCause();
+    if( null != cause )
+    {
+      sb.append( "Caused by: " );
+      collectExceptionMessage( cause, sb );
+    }
   }
 
   private String toStackTraceString( final StackTraceElementProxy[] elements )
