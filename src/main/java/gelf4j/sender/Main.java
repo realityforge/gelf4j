@@ -217,7 +217,6 @@ public class Main
           printUsage();
           return false;
         }
-
       }
     }
     if ( null != c_messageFromFile && null != c_message )
