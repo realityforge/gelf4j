@@ -194,4 +194,3 @@ public class GelfTargetConfig
     return _codec;
   }
 }
-

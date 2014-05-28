@@ -255,4 +255,3 @@ final class GelfEncoder
     }
   }
 }
-
