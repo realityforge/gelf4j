@@ -10,6 +10,8 @@ define 'gelf4j' do
   compile.options.target = '1.6'
   compile.options.lint = 'all'
 
+  project.version = ENV['PRODUCT_VERSION'] if ENV['PRODUCT_VERSION']
+
   pom.add_apache_v2_license
   pom.add_github_project('realityforge/gelf4j')
   pom.add_developer('realityforge', 'Peter Donald', 'peter@realityforge.org', ['Developer'])
