@@ -5,6 +5,4 @@
 /*.iws
 /.idea
 /_buildr.rb
-/bin
-/.bundle
 /Gemfile.lock
