@@ -37,7 +37,7 @@ public class GelfAppenderTest
                             "\"host\": \"" + hostName + "\", " +
                             "\"facility\": \"" + facility + "\"}" );
     properties.setProperty( "log4j.appender.gelf.additionalFields",
-                            "{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\", \"loggerNdc\": \"loggerNdc\"}" );
+                            "{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\", \"loggerNdc\": \"loggerNdc\", \"coolUserName\": \"userName\"}" );
 
     properties.setProperty( "log4j.rootLogger", "DEBUG, gelf" );
 
@@ -57,13 +57,14 @@ public class GelfAppenderTest
     assertEquals( "DEV", config.getDefaultFields().get( "environment" ) );
     assertEquals( "MyAPP", config.getDefaultFields().get( "application" ) );
 
-    assertEquals( 6, config.getAdditionalFields().size() );
+    assertEquals( 7, config.getAdditionalFields().size() );
     assertEquals( "threadName", config.getAdditionalFields().get( "threadName" ) );
     assertEquals( "timestampMs", config.getAdditionalFields().get( "timestamp_in_millis" ) );
     assertEquals( "loggerName", config.getAdditionalFields().get( "logger_name" ) );
     assertEquals( "ipAddress", config.getAdditionalFields().get( "ip_address" ) );
     assertEquals( "exception", config.getAdditionalFields().get( "exception" ) );
     assertEquals( "loggerNdc", config.getAdditionalFields().get( "loggerNdc" ) );
+    assertEquals( "userName", config.getAdditionalFields().get( "coolUserName" ) );
 
     //Setup fake server
     final DatagramSocket socket = ConnectionUtil.createServer( hostName, port );
@@ -108,6 +109,16 @@ public class GelfAppenderTest
     message = connection.getLastMessage();
     assertEquals( SyslogLevel.INFO, message.getLevel() );
     assertEquals( "42.42.42.42", message.getAdditionalFields().get( "ip_address" ) );
+
+    //now we test the MDC with custom message key
+    MDC.put( "userName", "johnsmith" );
+
+    logger.info( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
+
+    message = connection.getLastMessage();
+    assertEquals( SyslogLevel.INFO, message.getLevel() );
+    assertEquals( "johnsmith", message.getAdditionalFields().get( "coolUserName" ) );
 
     // now test the NDC
     NDC.push( "ProcessX" );

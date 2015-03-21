@@ -51,7 +51,7 @@ public class GelfAppenderTest
       "    <host>" + hostName + "</host>\n" +
       "    <port>" + port + "</port>\n" +
       "    <compressedChunking>false</compressedChunking>\n" +
-      "    <additionalFields>{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\"}</additionalFields>\n" +
+      "    <additionalFields>{\"threadName\": \"threadName\", \"timestamp_in_millis\": \"timestampMs\", \"logger_name\": \"loggerName\", \"ip_address\": \"ipAddress\", \"exception\": \"exception\", \"coolUserName\": \"userName\"}</additionalFields>\n" +
       "    <defaultFields>{\"environment\": \"DEV\", \"application\": \"MyAPP\", \"facility\": \"" + facility + "\", \"host\":\"" + hostName + "\"}</defaultFields>\n" +
       "  </appender>\n" +
       "\n" +
@@ -77,12 +77,13 @@ public class GelfAppenderTest
     assertEquals( "DEV", config.getDefaultFields().get( "environment" ) );
     assertEquals( "MyAPP", config.getDefaultFields().get( "application" ) );
 
-    assertEquals( 5, config.getAdditionalFields().size() );
+    assertEquals( 6, config.getAdditionalFields().size() );
     assertEquals( "threadName", config.getAdditionalFields().get( "threadName" ) );
     assertEquals( "timestampMs", config.getAdditionalFields().get( "timestamp_in_millis" ) );
     assertEquals( "loggerName", config.getAdditionalFields().get( "logger_name" ) );
     assertEquals( "ipAddress", config.getAdditionalFields().get( "ip_address" ) );
     assertEquals( "exception", config.getAdditionalFields().get( "exception" ) );
+    assertEquals( "userName", config.getAdditionalFields().get( "coolUserName" ) );
 
     // set up mock connection
     final TestGelfConnection connection = new TestGelfConnection( config );
@@ -123,6 +124,15 @@ public class GelfAppenderTest
     message = connection.getLastMessage();
     assertEquals( SyslogLevel.INFO, message.getLevel() );
     assertEquals( "42.42.42.42", message.getAdditionalFields().get( "ip_address" ) );
+
+    //now we test the MDC with custom message key
+    MDC.put( "userName", "johnsmith" );
+
+    logger.info( smallTextMessage );
+    assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );
+    message = connection.getLastMessage();
+    assertEquals( SyslogLevel.INFO, message.getLevel() );
+    assertEquals( "johnsmith", message.getAdditionalFields().get( "coolUserName" ) );
 
     logger.error( smallTextMessage, new Exception() );
     assertTrue( ConnectionUtil.receivePacketAsString( socket ).contains( smallTextMessage ) );

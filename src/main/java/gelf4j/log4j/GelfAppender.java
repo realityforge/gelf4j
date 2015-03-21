@@ -179,6 +179,14 @@ public class GelfAppender
         {
           GelfMessageUtil.setValue( message, key, value );
         }
+        else
+        {
+          final Object valueByFieldName = event.getMDC( fieldName );
+          if ( null != valueByFieldName )
+          {
+            GelfMessageUtil.setValue( message, key, valueByFieldName );
+          }
+        }
       }
     }
     message.getAdditionalFields().putAll( _config.getDefaultFields() );
