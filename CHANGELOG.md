@@ -1,3 +1,9 @@
+## 1.9:
+
+* Fix      : Update handling of MDC for logback and log4j to be more consistent with
+             handling of other fields. See  https://github.com/realityforge/gelf4j/issues/9
+             for a full description. Submitted by Akrem Saed.
+
 ## 1.8:
 
 * Fix      : Make sure the logback appender sends the entire exception message to the
