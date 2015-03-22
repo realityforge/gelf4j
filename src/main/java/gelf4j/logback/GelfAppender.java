@@ -158,6 +158,14 @@ public class GelfAppender<E> extends AppenderBase<E>
         {
           GelfMessageUtil.setValue( message, key, value );
         }
+        else
+        {
+          final String valueByFieldName = mdc.get( fieldName );
+          if( null != valueByFieldName )
+          {
+            GelfMessageUtil.setValue(message, key, valueByFieldName);
+          }
+        }
       }
     }
     message.getAdditionalFields().putAll( _config.getDefaultFields() );
