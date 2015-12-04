@@ -22,7 +22,7 @@ easiest way to get the library is to add it as a maven dependency;
 <dependency>
    <groupId>org.realityforge.gelf4j</groupId>
    <artifactId>gelf4j</artifactId>
-   <version>1.8</version>
+   <version>1.9</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ or
 <dependency>
    <groupId>org.realityforge.gelf4j</groupId>
    <artifactId>gelf4j-all</artifactId>
-   <version>1.8</version>
+   <version>1.9</version>
 </dependency>
 ```
 
