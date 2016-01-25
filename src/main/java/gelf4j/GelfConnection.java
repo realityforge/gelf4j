@@ -23,7 +23,7 @@ public class GelfConnection
     _encoder = new GelfEncoder( GelfMessageUtil.getLocalHost(), _config.isCompressedChunking(), _config.getCodec() );
   }
 
-  public void close()
+  public synchronized void close()
     throws IOException
   {
     if ( null != _channel )
@@ -94,21 +94,33 @@ public class GelfConnection
 
   private boolean sendPacket( final byte[] packet )
   {
+    final ByteBuffer buffer = ByteBuffer.allocate( packet.length );
+    buffer.put( packet );
+    buffer.flip();
+    return doSend( buffer );
+  }
+
+  private synchronized boolean doSend( final ByteBuffer buffer )
+  {
     try
     {
-      final ByteBuffer buffer = ByteBuffer.allocate( packet.length );
-      buffer.put( packet );
-      buffer.flip();
       getChannel().write( buffer );
       return true;
     }
     catch ( final IOException ioe )
     {
+      try
+      {
+        close();
+      }
+      catch ( final IOException ignored )
+      {
+      }
       return false;
     }
   }
 
-  private DatagramChannel getChannel()
+  private synchronized DatagramChannel getChannel()
     throws IOException
   {
     if ( null == _channel )

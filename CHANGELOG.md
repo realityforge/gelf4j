@@ -1,5 +1,8 @@
 ## 1.10 (Pending):
 
+* Fix      : Synchronize access to the DatagramChannel in GelfConnection. Close the DatagramChannel
+             on errors. Both changes aimed at eliminating race conditions when sending datagrams.
+
 ## 1.9:
 
 * Fix      : Update handling of MDC for logback and log4j to be more consistent with
