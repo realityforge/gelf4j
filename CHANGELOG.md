@@ -1,4 +1,4 @@
-## 1.10 (Pending):
+## 1.10:
 
 * Fix      : Synchronize access to the DatagramChannel in GelfConnection. Close the DatagramChannel
              on errors. Both changes aimed at eliminating race conditions when sending datagrams.
