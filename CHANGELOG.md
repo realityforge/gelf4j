@@ -1,3 +1,5 @@
+## 1.11 (Pending):
+
 ## 1.10:
 
 * Fix      : Synchronize access to the DatagramChannel in GelfConnection. Close the DatagramChannel
