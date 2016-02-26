@@ -90,7 +90,6 @@ Log4j XML Example
     </root>
     ...
 
-
 Log4j Properties Example
 ------------------------
 
