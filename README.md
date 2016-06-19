@@ -2,6 +2,7 @@ GELF4j - GELF client-side integration library
 =============================================
 
 [![Build Status](https://secure.travis-ci.org/realityforge/gelf4j.png?branch=master)](http://travis-ci.org/realityforge/gelf4j)
+[<img src="https://img.shields.io/maven-central/v/org.realityforge.gelf4j/gelf4j.svg?label=latest%20release"/>](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.realityforge.gelf4j%22%20a%3A%22gelf4j%22)
 
 What is GELF4j
 --------------
