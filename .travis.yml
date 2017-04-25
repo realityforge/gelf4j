@@ -1,7 +1,10 @@
-language: java
+language: ruby
 jdk:
   - oraclejdk7
+rvm:
+  - 2.3.1
 install:
+  - rvm use 2.3.1
   - gem install bundler
   - bundle install
 script: buildr clean package PRODUCT_VERSION=1.0.0
