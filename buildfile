@@ -1,7 +1,6 @@
 require 'buildr/git_auto_version'
 require 'buildr/bnd'
 require 'buildr/gpg'
-require 'buildr/custom_pom'
 
 desc 'GELF4j: Library for sending log messages using the GELF protocol'
 define 'gelf4j' do
