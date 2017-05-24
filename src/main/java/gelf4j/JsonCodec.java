@@ -5,7 +5,7 @@ package gelf4j;
  * parsing capabilities.  Abstracting here allows clients to provide their
  * own implementations and not have to pull in unwanted dependencies,
  * ultimately making GELF4J more palatable to a wider audience.
- * <p/>
+ *
  * This class may be deemed to simple as a general JSON class, but is
  * sufficient for what we use it for.
  */
