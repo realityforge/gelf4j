@@ -5,8 +5,8 @@ require 'buildr/gpg'
 desc 'GELF4j: Library for sending log messages using the GELF protocol'
 define 'gelf4j' do
   project.group = 'org.realityforge.gelf4j'
-  compile.options.source = '1.6'
-  compile.options.target = '1.6'
+  compile.options.source = '1.8'
+  compile.options.target = '1.8'
   compile.options.lint = 'all'
 
   project.version = ENV['PRODUCT_VERSION'] if ENV['PRODUCT_VERSION']
