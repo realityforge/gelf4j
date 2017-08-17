@@ -1,7 +1,12 @@
+# DO NOT EDIT: File is auto-generated
 * -text
-*.java text -crlf -binary
-*.md text -crlf -binary
-*.rake text -crlf -binary
-buildfile text -crlf -binary
-LICENSE text -crlf -binary
-*.xml text -crlf -binary
+*.java text
+*.md text
+*.yaml text
+*.yml text
+.gitattributes text
+.gitignore text
+.ruby-version text
+Gemfile text
+LICENSE text
+buildfile text
